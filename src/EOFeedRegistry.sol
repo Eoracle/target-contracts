@@ -3,14 +3,14 @@ pragma solidity 0.8.20;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import { ITargetExitHelper } from "./interfaces/ITargetExitHelper.sol";
-import { IEoracle } from "./interfaces/IEoracle.sol";
+import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
+import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
 
-contract Eoracle is Initializable, OwnableUpgradeable, IEoracle {
+contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     mapping(string => PriceFeed) public priceFeeds;
     mapping(address => bool) public whitelistedPublishers;
     mapping(string => bool) public supportedSymbols;
-    ITargetExitHelper public targetExitHelper;
+    IEOFeedVerifier public feedVerifier;
 
     // This is for debugging
     // event DebugLatency(
@@ -24,9 +24,9 @@ contract Eoracle is Initializable, OwnableUpgradeable, IEoracle {
         _;
     }
 
-    function initialize(ITargetExitHelper _targetExitHelper) external initializer {
+    function initialize(IEOFeedVerifier _feedVerifier) external initializer {
         __Ownable_init(msg.sender);
-        targetExitHelper = ITargetExitHelper(_targetExitHelper);
+        feedVerifier = IEOFeedVerifier(_feedVerifier);
     }
 
     function setSupportedSymbols(string[] calldata symbols, bool[] calldata isSupported) external onlyOwner {
@@ -57,7 +57,7 @@ contract Eoracle is Initializable, OwnableUpgradeable, IEoracle {
         onlyWhitelisted
     {
         require(supportedSymbols[symbol], "Symbol is not supported");
-        targetExitHelper.submitAndExit(proofData);
+        feedVerifier.submitAndExit(proofData);
 
         priceFeeds[symbol] = PriceFeed(value, timestamp);
     }

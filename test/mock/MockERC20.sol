@@ -211,6 +211,7 @@ contract MockERC20 {
     // Checker changed `chainid` from pure to view in 0.8.0.
     function _viewChainId() private view returns (uint256 chainId) {
         // Assembly required since `block.chainid` was introduced in 0.8.0.
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             chainId := chainid()
         }
@@ -221,6 +222,7 @@ contract MockERC20 {
     function _pureChainId() private pure returns (uint256 chainId) {
         function() internal view returns (uint256) fnIn = _viewChainId;
         function() internal pure returns (uint256) pureChainId;
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             pureChainId := fnIn
         }

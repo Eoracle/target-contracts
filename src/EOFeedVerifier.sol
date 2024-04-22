@@ -3,16 +3,16 @@ pragma solidity 0.8.20;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
-import { ITargetExitHelper } from "./interfaces/ITargetExitHelper.sol";
+import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 
 import { Merkle } from "./common/Merkle.sol";
 
 using Merkle for bytes32;
 
-contract TargetExitHelper is ITargetExitHelper, OwnableUpgradeable {
+contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     mapping(uint256 => bool) public processedExits;
     ICheckpointManager public checkpointManager;
-    address public eoracle;
+    address public feedRegistry;
 
     event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
 
@@ -37,7 +37,7 @@ contract TargetExitHelper is ITargetExitHelper, OwnableUpgradeable {
     }
 
     /**
-     * @inheritdoc ITargetExitHelper
+     * @inheritdoc IEOFeedVerifier
      */
     function exit(
         uint256 blockNumber,
@@ -51,8 +51,8 @@ contract TargetExitHelper is ITargetExitHelper, OwnableUpgradeable {
         _exit(blockNumber, leafIndex, unhashedLeaf, proof, false);
     }
 
-    function setEoracle(address _eoracle) external onlyOwner {
-        eoracle = _eoracle;
+    function setFeedRegistry(address _feedRegistry) external onlyOwner {
+        feedRegistry = _feedRegistry;
     }
 
     function submitAndExit(bytes calldata proofData) external onlyInitialized {
@@ -96,7 +96,7 @@ contract TargetExitHelper is ITargetExitHelper, OwnableUpgradeable {
     }
 
     /**
-     * @inheritdoc ITargetExitHelper
+     * @inheritdoc IEOFeedVerifier
      */
     function batchExit(BatchExitInput[] calldata inputs) external onlyInitialized {
         uint256 length = inputs.length;

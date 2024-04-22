@@ -260,6 +260,7 @@ contract BN256G2 is IBN256G2 {
         bool success;
         // prettier-ignore
         // slither-disable-next-line assembly
+        // solhint-disable-next-line no-inline-assembly
         assembly {
             // solhint-disable-line no-inline-assembly
             let freemem := mload(0x40)

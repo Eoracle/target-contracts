@@ -6,7 +6,7 @@ pragma solidity 0.8.20;
  * @author @QEDK (Polygon Technology)
  * @notice Helper contract to process exits from stored event roots in CheckpointManager
  */
-interface ITargetExitHelper {
+interface IEOFeedVerifier {
     struct BatchExitInput {
         uint256 blockNumber;
         uint256 leafIndex;
