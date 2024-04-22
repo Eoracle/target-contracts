@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {ITargetExitHelper} from "./interfaces/ITargetExitHelper.sol";
-import {IEoracle} from "./interfaces/IEoracle.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { ITargetExitHelper } from "./interfaces/ITargetExitHelper.sol";
+import { IEoracle } from "./interfaces/IEoracle.sol";
 
 contract Eoracle is Initializable, OwnableUpgradeable, IEoracle {
     mapping(string => PriceFeed) public priceFeeds;
@@ -25,7 +25,7 @@ contract Eoracle is Initializable, OwnableUpgradeable, IEoracle {
     }
 
     function initialize(ITargetExitHelper _targetExitHelper) external initializer {
-        __Ownable_init();
+        __Ownable_init(msg.sender);
         targetExitHelper = ITargetExitHelper(_targetExitHelper);
     }
 
@@ -52,7 +52,10 @@ contract Eoracle is Initializable, OwnableUpgradeable, IEoracle {
         uint256 value,
         uint256 timestamp,
         bytes memory proofData
-    ) external onlyWhitelisted {
+    )
+        external
+        onlyWhitelisted
+    {
         require(supportedSymbols[symbol], "Symbol is not supported");
         targetExitHelper.submitAndExit(proofData);
 
@@ -64,7 +67,10 @@ contract Eoracle is Initializable, OwnableUpgradeable, IEoracle {
         uint256[] memory values,
         uint256[] memory timestamps,
         bytes[] memory proofDatas
-    ) external onlyWhitelisted {
+    )
+        external
+        onlyWhitelisted
+    {
         require(
             symbols.length == values.length && values.length == timestamps.length
                 && timestamps.length == proofDatas.length,

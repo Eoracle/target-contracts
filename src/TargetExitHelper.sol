@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {ICheckpointManager} from "./interfaces/ICheckpointManager.sol";
-import {ITargetExitHelper} from "./interfaces/ITargetExitHelper.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
+import { ITargetExitHelper } from "./interfaces/ITargetExitHelper.sol";
 
-import {Merkle} from "./common/Merkle.sol";
+import { Merkle } from "./common/Merkle.sol";
 
 using Merkle for bytes32;
 
@@ -33,7 +33,7 @@ contract TargetExitHelper is ITargetExitHelper, OwnableUpgradeable {
             "ExitHelper: INVALID_ADDRESS"
         );
         checkpointManager = newCheckpointManager;
-        __Ownable_init();
+        __Ownable_init(msg.sender);
     }
 
     /**
@@ -44,7 +44,10 @@ contract TargetExitHelper is ITargetExitHelper, OwnableUpgradeable {
         uint256 leafIndex,
         bytes calldata unhashedLeaf,
         bytes32[] calldata proof
-    ) external onlyInitialized {
+    )
+        external
+        onlyInitialized
+    {
         _exit(blockNumber, leafIndex, unhashedLeaf, proof, false);
     }
 
@@ -112,7 +115,9 @@ contract TargetExitHelper is ITargetExitHelper, OwnableUpgradeable {
         bytes calldata unhashedLeaf,
         bytes32[] calldata proof,
         bool isBatch
-    ) internal {
+    )
+        internal
+    {
         (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
             abi.decode(unhashedLeaf, (uint256, address, address, bytes));
         if (isBatch) {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 // solhint-disable func-named-parameters
 
@@ -13,15 +13,13 @@ interface IBN256G2 {
         uint256 pt2xy,
         uint256 pt2yx,
         uint256 pt2yy
-    ) external view returns (uint256, uint256, uint256, uint256);
+    )
+        external
+        view
+        returns (uint256, uint256, uint256, uint256);
 }
 
 // File lib/core-contracts/contracts/common/BN256G2.sol
-
-// Original license: SPDX_License_Identifier: MIT
-// solium-disable security/no-assign-params
-// solhint-disable-next-line ordering
-pragma solidity 0.8.19;
 
 /**
  * @title Elliptic curve operations on twist points on bn256 (G2)
@@ -68,7 +66,11 @@ contract BN256G2 is IBN256G2 {
         uint256 pt2xy,
         uint256 pt2yx,
         uint256 pt2yy
-    ) external view returns (uint256, uint256, uint256, uint256) {
+    )
+        external
+        view
+        returns (uint256, uint256, uint256, uint256)
+    {
         if (pt1xx == 0 && pt1xy == 0 && pt1yx == 0 && pt1yy == 0) {
             if (!(pt2xx == 0 && pt2xy == 0 && pt2yx == 0 && pt2yy == 0)) {
                 require(_isOnCurve(pt2xx, pt2xy, pt2yx, pt2yy), "point not in curve");
@@ -103,7 +105,11 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1xy,
         uint256 pt1yx,
         uint256 pt1yy
-    ) external view returns (uint256, uint256, uint256, uint256) {
+    )
+        external
+        view
+        returns (uint256, uint256, uint256, uint256)
+    {
         uint256 pt1zx = 1;
         if (pt1xx == 0 && pt1xy == 0 && pt1yx == 0 && pt1yy == 0) {
             pt1xx = 1;
@@ -290,7 +296,11 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1yy,
         uint256 pt1zx,
         uint256 pt1zy
-    ) internal view returns (uint256, uint256, uint256, uint256) {
+    )
+        internal
+        view
+        returns (uint256, uint256, uint256, uint256)
+    {
         uint256 invzx;
         uint256 invzy;
         uint256[4] memory pt2;
@@ -330,7 +340,11 @@ contract BN256G2 is IBN256G2 {
         uint256 pt2yy,
         uint256 pt2zx,
         uint256 pt2zy
-    ) internal pure returns (uint256[6] memory pt3) {
+    )
+        internal
+        pure
+        returns (uint256[6] memory pt3)
+    {
         if (pt1zx == 0 && pt1zy == 0) {
             (pt3[PTXX], pt3[PTXY], pt3[PTYX], pt3[PTYY], pt3[PTZX], pt3[PTZY]) =
                 (pt2xx, pt2xy, pt2yx, pt2yy, pt2zx, pt2zy);
@@ -394,7 +408,11 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1yy,
         uint256 pt1zx,
         uint256 pt1zy
-    ) internal pure returns (uint256, uint256, uint256, uint256, uint256, uint256) {
+    )
+        internal
+        pure
+        returns (uint256, uint256, uint256, uint256, uint256, uint256)
+    {
         uint256[6] memory pt2;
         (pt2[0], pt2[1]) = _fq2muc(pt1xx, pt1xy, 3); // 3 * x
         (pt2[0], pt2[1]) = _fq2mul(pt2[0], pt2[1], pt1xx, pt1xy); // W = 3 * x * x
@@ -440,7 +458,11 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1yy,
         uint256 pt1zx,
         uint256 pt1zy
-    ) internal pure returns (uint256[6] memory pt2) {
+    )
+        internal
+        pure
+        returns (uint256[6] memory pt2)
+    {
         while (d != 0) {
             if ((d & 1) != 0) {
                 pt2 = ecTwistAddJacobian(

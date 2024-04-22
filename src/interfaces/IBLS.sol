@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 interface IBLS {
     /**
@@ -14,7 +14,10 @@ interface IBLS {
         uint256[2] calldata signature,
         uint256[4] calldata pubkey,
         uint256[2] calldata message
-    ) external view returns (bool, bool);
+    )
+        external
+        view
+        returns (bool, bool);
 
     /**
      * @notice verifies multiple non-aggregated signatures where each message is unique
@@ -28,7 +31,10 @@ interface IBLS {
         uint256[2] calldata signature,
         uint256[4][] calldata pubkeys,
         uint256[2][] calldata messages
-    ) external view returns (bool checkResult, bool callSuccess);
+    )
+        external
+        view
+        returns (bool checkResult, bool callSuccess);
 
     /**
      * @notice verifies an aggregated signature where the same message is signed
@@ -42,7 +48,10 @@ interface IBLS {
         uint256[2] calldata signature,
         uint256[4][] calldata pubkeys,
         uint256[2] calldata message
-    ) external view returns (bool checkResult, bool callSuccess);
+    )
+        external
+        view
+        returns (bool checkResult, bool callSuccess);
 
     /**
      * @notice checks if a signature is formatted correctly and valid

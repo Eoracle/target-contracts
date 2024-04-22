@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 /// @notice This is a mock contract of the ERC20 standard for testing purposes only, it SHOULD NOT be used in
 /// production.
@@ -114,7 +114,10 @@ contract MockERC20 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public virtual {
+    )
+        public
+        virtual
+    {
         require(deadline >= block.timestamp, "PERMIT_DEADLINE_EXPIRED");
 
         address recoveredAddress = ecrecover(

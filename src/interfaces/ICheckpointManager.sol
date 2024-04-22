@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 /**
  * @title CheckpointManager
@@ -41,7 +41,8 @@ interface ICheckpointManager {
         uint256[2] calldata signature,
         Validator[] calldata newValidatorSet,
         bytes calldata bitmap
-    ) external;
+    )
+        external;
 
     /**
      * @notice Function to get if a event is part of the event root for a block number
@@ -55,7 +56,10 @@ interface ICheckpointManager {
         bytes32 leaf,
         uint256 leafIndex,
         bytes32[] calldata proof
-    ) external view returns (bool);
+    )
+        external
+        view
+        returns (bool);
 
     /**
      * @notice Function to get if a event is part of the event root for an epoch
@@ -69,7 +73,10 @@ interface ICheckpointManager {
         bytes32 leaf,
         uint256 leafIndex,
         bytes32[] calldata proof
-    ) external view returns (bool);
+    )
+        external
+        view
+        returns (bool);
 
     /**
      * @notice Function to get the checkpoint block number for a block number.
@@ -92,5 +99,8 @@ interface ICheckpointManager {
         bytes32 leaf,
         uint256 leafIndex,
         bytes32[] calldata proof
-    ) external pure returns (bool);
+    )
+        external
+        pure
+        returns (bool);
 }

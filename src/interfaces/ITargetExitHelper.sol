@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 /**
  * @title ExitHelper
@@ -26,7 +26,8 @@ interface ITargetExitHelper {
         uint256 leafIndex,
         bytes calldata unhashedLeaf,
         bytes32[] calldata proof
-    ) external;
+    )
+        external;
 
     function submitAndExit(bytes calldata proofData) external;
 

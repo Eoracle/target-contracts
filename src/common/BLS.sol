@@ -5,7 +5,7 @@
 // File lib/core-contracts/contracts/interfaces/common/IBLS.sol
 
 // Original license: SPDX_License_Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 interface IBLS {
     /**
@@ -20,7 +20,10 @@ interface IBLS {
         uint256[2] calldata signature,
         uint256[4] calldata pubkey,
         uint256[2] calldata message
-    ) external view returns (bool, bool);
+    )
+        external
+        view
+        returns (bool, bool);
 
     /**
      * @notice verifies multiple non-aggregated signatures where each message is unique
@@ -34,7 +37,10 @@ interface IBLS {
         uint256[2] calldata signature,
         uint256[4][] calldata pubkeys,
         uint256[2][] calldata messages
-    ) external view returns (bool checkResult, bool callSuccess);
+    )
+        external
+        view
+        returns (bool checkResult, bool callSuccess);
 
     /**
      * @notice verifies an aggregated signature where the same message is signed
@@ -48,7 +54,10 @@ interface IBLS {
         uint256[2] calldata signature,
         uint256[4][] calldata pubkeys,
         uint256[2] calldata message
-    ) external view returns (bool checkResult, bool callSuccess);
+    )
+        external
+        view
+        returns (bool checkResult, bool callSuccess);
 
     /**
      * @notice maps a field element to the curve
@@ -131,10 +140,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-*/
-//solhint-disable-next-line ordering
-pragma solidity 0.8.19;
 
 /**
  * @title Compute Inverse by Modular Exponentiation
@@ -820,10 +825,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-*/
-
-pragma solidity 0.8.19;
-
 /**
  * @title  Boneh–Lynn–Shacham (BLS) signature scheme on Barreto-Naehrig 254 bit curve (BN-254)
  *     @notice BLS signature aggregation reduces the size of signature data to store on-chain
@@ -868,7 +869,11 @@ contract BLS is IBLS {
         uint256[2] calldata signature,
         uint256[4] calldata pubkey,
         uint256[2] calldata message
-    ) external view returns (bool, bool) {
+    )
+        external
+        view
+        returns (bool, bool)
+    {
         uint256[12] memory input = [
             signature[0],
             signature[1],
@@ -903,7 +908,11 @@ contract BLS is IBLS {
         uint256[2] calldata signature,
         uint256[4][] calldata pubkeys,
         uint256[2][] calldata messages
-    ) external view returns (bool checkResult, bool callSuccess) {
+    )
+        external
+        view
+        returns (bool checkResult, bool callSuccess)
+    {
         uint256 size = pubkeys.length;
         // solhint-disable-next-line reason-string
         require(size > 0, "BLS: number of public key is zero");
@@ -944,7 +953,11 @@ contract BLS is IBLS {
         uint256[2] calldata signature,
         uint256[4][] calldata pubkeys,
         uint256[2] calldata message
-    ) external view returns (bool checkResult, bool callSuccess) {
+    )
+        external
+        view
+        returns (bool checkResult, bool callSuccess)
+    {
         uint256 size = pubkeys.length;
         // solhint-disable-next-line reason-string
         require(size > 0, "BLS: number of public key is zero");

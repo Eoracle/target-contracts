@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
-import {IEoracle} from "./interfaces/IEoracle.sol";
+import { IEoracle } from "./interfaces/IEoracle.sol";
 
 contract EoracleConsumer {
     // solhint-disable-next-line var-name-mixedcase
@@ -15,7 +15,9 @@ contract EoracleConsumer {
         uint256 value,
         uint256 timestamp,
         bytes memory proofData
-    ) external {
+    )
+        external
+    {
         Eoracle.updatePriceFeed(symbol, value, timestamp, proofData);
         IEoracle.PriceFeed memory priceFeed = Eoracle.getLatestPriceFeed(symbol);
         // How to read the quotes from the Eoracle.getLatestFeed output.

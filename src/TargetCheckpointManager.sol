@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {ArraysUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ArraysUpgradeable.sol";
-import {Merkle} from "./common/Merkle.sol";
-import {ICheckpointManager} from "./interfaces/ICheckpointManager.sol";
-import {IBLS} from "./interfaces/IBLS.sol";
-import {IBN256G2} from "./interfaces/IBN256G2.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Arrays } from "@openzeppelin/contracts/utils/Arrays.sol";
+import { Merkle } from "./common/Merkle.sol";
+import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
+import { IBLS } from "./interfaces/IBLS.sol";
+import { IBN256G2 } from "./interfaces/IBN256G2.sol";
 
 contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
-    using ArraysUpgradeable for uint256[];
+    using Arrays for uint256[];
     using Merkle for bytes32;
 
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
@@ -35,7 +35,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
      * @param chainId_ Chain ID of the child chain
      */
     function initialize(IBLS newBls, IBN256G2 newBn256G2, uint256 chainId_) public initializer {
-        __Ownable_init();
+        __Ownable_init(msg.sender);
 
         // slither-disable-start events-maths
         chainId = chainId_;
@@ -52,7 +52,9 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         uint256[2] calldata signature,
         Validator[] calldata newValidatorSet,
         bytes calldata bitmap
-    ) external {
+    )
+        external
+    {
         require(currentValidatorSetHash == checkpointMetadata.currentValidatorSetHash, "INVALID_VALIDATOR_SET_HASH");
         bytes32 newValidatorSetHash;
         if (newValidatorSet.length == 0) {
@@ -109,7 +111,11 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         bytes32 leaf,
         uint256 leafIndex,
         bytes32[] calldata proof
-    ) external view returns (bool) {
+    )
+        external
+        view
+        returns (bool)
+    {
         bytes32 eventRoot = getEventRootByBlock(blockNumber);
         require(eventRoot != bytes32(0), "NO_EVENT_ROOT_FOR_BLOCK_NUMBER");
         return leaf.checkMembership(leafIndex, eventRoot, proof);
@@ -123,7 +129,11 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         bytes32 leaf,
         uint256 leafIndex,
         bytes32[] calldata proof
-    ) external view returns (bool) {
+    )
+        external
+        view
+        returns (bool)
+    {
         bytes32 eventRoot = checkpoints[epoch].eventRoot;
         require(eventRoot != bytes32(0), "NO_EVENT_ROOT_FOR_EPOCH");
         return leaf.checkMembership(leafIndex, eventRoot, proof);
@@ -145,7 +155,11 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         bytes32 leaf,
         uint256 leafIndex,
         bytes32[] calldata proof
-    ) external pure returns (bool) {
+    )
+        external
+        pure
+        returns (bool)
+    {
         require(eventRoot != bytes32(0), "INVALID_EVENT_ROOT");
         return leaf.checkMembership(leafIndex, eventRoot, proof);
     }
@@ -180,7 +194,10 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         uint256[2] memory message,
         uint256[2] calldata signature,
         bytes calldata bitmap
-    ) private view {
+    )
+        private
+        view
+    {
         uint256 length = currentValidatorSetLength;
         // slither-disable-next-line uninitialized-local
         uint256[4] memory aggPubkey;

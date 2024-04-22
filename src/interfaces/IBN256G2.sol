@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 interface IBN256G2 {
     function ecTwistAdd(
@@ -11,5 +11,8 @@ interface IBN256G2 {
         uint256 pt2xy,
         uint256 pt2yx,
         uint256 pt2yy
-    ) external view returns (uint256, uint256, uint256, uint256);
+    )
+        external
+        view
+        returns (uint256, uint256, uint256, uint256);
 }

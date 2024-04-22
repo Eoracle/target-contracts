@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity 0.8.20;
 
 /**
  * @title Merkle
@@ -20,7 +20,11 @@ library Merkle {
         uint256 index,
         bytes32 rootHash,
         bytes32[] calldata proof
-    ) internal pure returns (bool isMember) {
+    )
+        internal
+        pure
+        returns (bool isMember)
+    {
         // solhint-disable-next-line no-inline-assembly
         // slither-disable-next-line assembly
         assembly ("memory-safe") {
@@ -32,7 +36,7 @@ library Merkle {
                 let i := proof.offset
                 // prettier-ignore
                 // solhint-disable-next-line no-empty-blocks
-                for {} 1 {} {
+                for { } 1 { } {
                     // if index is odd, leaf slot is at 0x20, else 0x0
                     let leafSlot := shl(5, and(0x1, index))
                     // store the leaf at the calculated slot
@@ -70,7 +74,11 @@ library Merkle {
         uint256 numLeaves,
         bytes32 rootHash,
         bytes32[] calldata proof
-    ) internal pure returns (bool isMember) {
+    )
+        internal
+        pure
+        returns (bool isMember)
+    {
         // solhint-disable-next-line no-inline-assembly
         // slither-disable-next-line assembly
         assembly ("memory-safe") {
@@ -82,7 +90,7 @@ library Merkle {
                 let i := proof.offset
                 // prettier-ignore
                 // solhint-disable-next-line no-empty-blocks
-                for {} 1 {} {
+                for { } 1 { } {
                     // if index is odd, leaf slot is at 0x20, else 0x0
                     let leafSlot := shl(5, and(0x1, index))
                     // store the leaf at the calculated slot
