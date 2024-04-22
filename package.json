@@ -1,0 +1,50 @@
+{
+  "name": "EoracleToken",
+  "description": "EoracleToken Solidity smart contracts",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.0.0",
+    "solhint": "^3.6.2"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "forge",
+    "foundry",
+    "smart-contracts",
+    "solidity",
+    "template"
+  ],
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf cache out",
+    "build": "forge build",
+    "deploy:local": "source .env && forge script script/DeployEoracleToken.s.sol:DeployEoracleToken",
+    "deploy:sepolia": "source .env && forge script script/DeployEoracleToken.s.sol:DeployEoracleToken --rpc-url $SEPOLIA_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
+    "deploy:mainnet": "source .env && forge script script/DeployEoracleToken.s.sol:DeployEoracleToken --rpc-url $MAINNET_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
+    "lint": "npm run lint:sol && npm run prettier:check",
+    "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
+    "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
+    "prettier:write": "prettier --write \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
+    "test": "forge test",
+    "test:coverage": "forge coverage",
+    "test:coverage:report": "forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
+    "test:fork:sepolia": "source .env && forge test --match-contract Deploy --rpc-url $SEPOLIA_RPC_URL",
+    "test:fork:mainnet": "source .env && forge test --match-contract Deploy --rpc-url $MAINNET_RPC_URL",
+    "pre-commit": "npx lint-staged",
+    "pre-push": "forge build --force && forge test",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "**/*.{json,md,yml}": [
+      "prettier --write --ignore-path \".prettierignore\""
+    ],
+    "{script,src,test}/**/*.sol": [
+      "forge fmt",
+      "solhint -f table --max-warnings 0"
+    ]
+  }
+}
