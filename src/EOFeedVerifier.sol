@@ -15,7 +15,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     address internal _feedRegistry;
 
     modifier onlyInitialized() {
-        require(address(_checkpointManager) != address(0), "ExitHelper: NOT_INITIALIZED");
+        require(address(_checkpointManager) != address(0), "EOFeedVerifier: NOT_INITIALIZED");
 
         _;
     }
@@ -49,10 +49,17 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         _exit(blockNumber, leafIndex, unhashedLeaf, proof, false);
     }
 
+    /**
+     * @notice Set the address of the feed registry contract
+     * @param _feedRegistry Address of the feed registry contract
+     */
     function setFeedRegistry(address _feedRegistry) external onlyOwner {
         _feedRegistry = _feedRegistry;
     }
 
+    /**
+     * @inheritdoc IEOFeedVerifier
+     */
     function submitAndExit(bytes calldata proofData) external onlyInitialized {
         (
             uint256[2] memory signature,
@@ -94,7 +101,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @inheritdoc IEOFeedVerifier
+     * @notice Perform a batch exit for multiple events
+     * @param inputs Batch exit inputs for multiple event leaves
      */
     function batchExit(BatchExitInput[] calldata inputs) external onlyInitialized {
         uint256 length = inputs.length;
@@ -116,10 +124,18 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         return _processedExits[id];
     }
 
+    /**
+     * @notice Get the address of the checkpoint manager contract
+     * @return Address of the checkpoint manager contract
+     */
     function getCheckpointManager() external view returns (ICheckpointManager) {
         return _checkpointManager;
     }
 
+    /**
+     * @notice Get the address of the feed registry contract
+     * @return Address of the feed registry contract
+     */
     function getFeedRegistry() external view returns (address) {
         return _feedRegistry;
     }
