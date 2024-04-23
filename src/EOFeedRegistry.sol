@@ -112,7 +112,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         require(
             symbols.length == values.length && values.length == timestamps.length
                 && timestamps.length == proofDatas.length,
-            "Arrays' lengths are not equal"
+            "Arrays lengths are not equal"
         );
         for (uint256 i = 0; i < symbols.length;) {
             this.updatePriceFeed(symbols[i], values[i], timestamps[i], proofDatas[i]);
