@@ -14,6 +14,8 @@ interface IEOFeedVerifier {
         bytes32[] proof;
     }
 
+    event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
+
     /**
      * @notice Perform an exit for one event
      * @param blockNumber Block number of the exit event on L2
@@ -29,6 +31,10 @@ interface IEOFeedVerifier {
     )
         external;
 
+    /**
+     * @notice Submit a proof and exit
+     * @param proofData Proof data for the exit
+     */
     function submitAndExit(bytes calldata proofData) external;
 
     /**

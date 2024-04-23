@@ -10,14 +10,12 @@ import { Merkle } from "./common/Merkle.sol";
 using Merkle for bytes32;
 
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
-    mapping(uint256 => bool) public processedExits;
-    ICheckpointManager public checkpointManager;
-    address public feedRegistry;
-
-    event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
+    mapping(uint256 => bool) internal _processedExits;
+    ICheckpointManager internal _checkpointManager;
+    address internal _feedRegistry;
 
     modifier onlyInitialized() {
-        require(address(checkpointManager) != address(0), "ExitHelper: NOT_INITIALIZED");
+        require(address(_checkpointManager) != address(0), "ExitHelper: NOT_INITIALIZED");
 
         _;
     }
@@ -32,7 +30,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             address(newCheckpointManager) != address(0) && address(newCheckpointManager).code.length != 0,
             "ExitHelper: INVALID_ADDRESS"
         );
-        checkpointManager = newCheckpointManager;
+        _checkpointManager = newCheckpointManager;
         __Ownable_init(msg.sender);
     }
 
@@ -52,7 +50,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     function setFeedRegistry(address _feedRegistry) external onlyOwner {
-        feedRegistry = _feedRegistry;
+        _feedRegistry = _feedRegistry;
     }
 
     function submitAndExit(bytes calldata proofData) external onlyInitialized {
@@ -73,7 +71,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             (uint256[2], bytes, bytes, uint256, uint256, uint256, bytes32, uint256, bytes32, bytes32, bytes32[])
         );
 
-        checkpointManager.submit(
+        _checkpointManager.submit(
             ICheckpointManager.CheckpointMetadata(blockHash, blockRound, currentValidatorSetHash),
             ICheckpointManager.Checkpoint(epochNumber, blockNumber, eventRoot),
             signature,
@@ -84,13 +82,13 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         // COPY PASTE from _exit function
         // slither-disable-next-line calls-loop
         require(
-            checkpointManager.checkEventMembership(eventRoot, keccak256(unhashedLeaf), leafIndex, proof),
+            _checkpointManager.checkEventMembership(eventRoot, keccak256(unhashedLeaf), leafIndex, proof),
             "ExitHelper: INVALID_PROOF"
         );
 
         (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
             abi.decode(unhashedLeaf, (uint256, address, address, bytes));
-        processedExits[id] = true;
+        _processedExits[id] = true;
 
         emit ExitProcessed(id, true, data);
     }
@@ -109,6 +107,31 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         }
     }
 
+    /**
+     * @notice Check if an exit has been processed
+     * @param id ID of the exit
+     * @return Boolean value indicating if the exit has been processed
+     */
+    function isProcessedExit(uint256 id) external view returns (bool) {
+        return _processedExits[id];
+    }
+
+    function getCheckpointManager() external view returns (ICheckpointManager) {
+        return _checkpointManager;
+    }
+
+    function getFeedRegistry() external view returns (address) {
+        return _feedRegistry;
+    }
+
+    /**
+     * @notice Process an exit for one event
+     * @param blockNumber Block number of the exit event on L2
+     * @param leafIndex Index of the leaf in the exit event Merkle tree
+     * @param unhashedLeaf ABI-encoded exit event leaf
+     * @param proof Proof of the event inclusion in the tree
+     * @param isBatch Boolean value indicating if the exit is part of a batch
+     */
     function _exit(
         uint256 blockNumber,
         uint256 leafIndex,
@@ -121,20 +144,20 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
             abi.decode(unhashedLeaf, (uint256, address, address, bytes));
         if (isBatch) {
-            if (processedExits[id]) {
+            if (_processedExits[id]) {
                 return;
             }
         } else {
-            require(!processedExits[id], "ExitHelper: EXIT_ALREADY_PROCESSED");
+            require(!_processedExits[id], "ExitHelper: EXIT_ALREADY_PROCESSED");
         }
 
         // slither-disable-next-line calls-loop
         require(
-            checkpointManager.getEventMembershipByBlockNumber(blockNumber, keccak256(unhashedLeaf), leafIndex, proof),
+            _checkpointManager.getEventMembershipByBlockNumber(blockNumber, keccak256(unhashedLeaf), leafIndex, proof),
             "ExitHelper: INVALID_PROOF"
         );
 
-        processedExits[id] = true;
+        _processedExits[id] = true;
 
         emit ExitProcessed(id, true, data);
     }
