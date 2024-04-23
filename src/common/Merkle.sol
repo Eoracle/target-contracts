@@ -6,6 +6,7 @@ pragma solidity 0.8.20;
  * @author QEDK
  * @notice Gas optimized verification of proof of inclusion for a leaf in an ordered Merkle tree
  */
+// solhint-disable no-inline-assembly
 library Merkle {
     /**
      * @notice checks membership of a leaf in a merkle tree
@@ -25,7 +26,6 @@ library Merkle {
         pure
         returns (bool isMember)
     {
-        // solhint-disable-next-line no-inline-assembly
         // slither-disable-next-line assembly
         assembly ("memory-safe") {
             // if proof is empty, check if the leaf is the root
@@ -79,7 +79,6 @@ library Merkle {
         pure
         returns (bool isMember)
     {
-        // solhint-disable-next-line no-inline-assembly
         // slither-disable-next-line assembly
         assembly ("memory-safe") {
             // if proof is empty, check if the leaf is the root

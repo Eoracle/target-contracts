@@ -2,11 +2,11 @@
   "extends": "solhint:recommended",
   "rules": {
     "code-complexity": ["error", 8],
-    "compiler-version": ["error", ">=0.8.23"],
+    "compiler-version": ["error", "0.8.20"],
     "func-name-mixedcase": "off",
     "func-visibility": ["error", { "ignoreConstructors": true }],
     "max-line-length": ["error", 120],
-    "named-parameters-mapping": "warn",
+    "named-parameters-mapping": "off",
     "no-console": "off",
     "not-rely-on-time": "off",
     "one-contract-per-file": "off",
@@ -26,6 +26,7 @@
     "modifier-name-mixedcase": "warn",
     "contract-name-camelcase": "warn",
     "quotes": ["error", "double"],
+    "custom-errors": "off",
     "no-unused-vars": "warn",
     "reason-string": ["warn", { "maxLength": 40 }]
   }

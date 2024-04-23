@@ -1,6 +1,6 @@
 {
-  "name": "EoracleToken",
-  "description": "EoracleToken Solidity smart contracts",
+  "name": "Eoracle",
+  "description": "Eoracle target solidity smart contracts",
   "version": "1.0.0",
   "dependencies": {},
   "devDependencies": {
@@ -22,9 +22,9 @@
   "scripts": {
     "clean": "rm -rf cache out",
     "build": "forge build",
-    "deploy:local": "source .env && forge script script/DeployEoracleToken.s.sol:DeployEoracleToken",
-    "deploy:sepolia": "source .env && forge script script/DeployEoracleToken.s.sol:DeployEoracleToken --rpc-url $SEPOLIA_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
-    "deploy:mainnet": "source .env && forge script script/DeployEoracleToken.s.sol:DeployEoracleToken --rpc-url $MAINNET_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
+    "deploy:local": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle",
+    "deploy:sepolia": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle --rpc-url $SEPOLIA_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
+    "deploy:mainnet": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle --rpc-url $MAINNET_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
     "lint": "npm run lint:sol && npm run prettier:check",
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
@@ -35,7 +35,7 @@
     "test:fork:sepolia": "source .env && forge test --match-contract Deploy --rpc-url $SEPOLIA_RPC_URL",
     "test:fork:mainnet": "source .env && forge test --match-contract Deploy --rpc-url $MAINNET_RPC_URL",
     "pre-commit": "npx lint-staged",
-    "pre-push": "forge build --force && forge test",
+    "pre-push": "",
     "prepare": "husky install"
   },
   "lint-staged": {

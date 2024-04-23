@@ -1,6 +1,6 @@
-# EOracle Token
+# Eoracle
 
-Repository for the EOracle Token ERC20 contract
+Repository for the Eoracle target smart contracts
 
 ## Usage
 
