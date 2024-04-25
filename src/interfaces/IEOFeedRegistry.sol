@@ -8,7 +8,7 @@ interface IEOFeedRegistry {
     }
 
     function updatePriceFeed(
-        string calldata symbols,
+        string calldata symbol,
         uint256 value,
         uint256 timestamp,
         bytes memory proofData
@@ -23,6 +23,6 @@ interface IEOFeedRegistry {
     )
         external;
 
-    function getLatestPriceFeed(string calldata symbols) external view returns (PriceFeed memory);
+    function getLatestPriceFeed(string calldata symbol) external view returns (PriceFeed memory);
     function getLatestPriceFeeds(string[] calldata symbols) external view returns (PriceFeed[] memory);
 }
