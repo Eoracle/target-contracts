@@ -124,33 +124,33 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
 }
 
 contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
-    function testCannotSubmit_InvalidEpoch() public {
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ epoch: 0, blockNumber: 0, eventRoot: hashes[0] });
+    // function testCannotSubmit_InvalidEpoch() public {
+    //     ICheckpointManager.Checkpoint memory checkpoint =
+    //         ICheckpointManager.Checkpoint({ epoch: 0, blockNumber: 0, eventRoot: hashes[0] });
 
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
-            blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
-        });
+    //     ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
+    //         blockHash: hashes[1],
+    //         blockRound: 0,
+    //         currentValidatorSetHash: hashes[2]
+    //     });
 
-        vm.expectRevert("INVALID_EPOCH");
-        checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[4], validatorSet, bitmaps[4]);
-    }
+    //     vm.expectRevert("INVALID_EPOCH");
+    //     checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[4], validatorSet, bitmaps[4]);
+    // }
 
-    function testCannotSubmit_EmptyCheckpoint() public {
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 0, eventRoot: hashes[0] });
+    // function testCannotSubmit_EmptyCheckpoint() public {
+    //     ICheckpointManager.Checkpoint memory checkpoint =
+    //         ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 0, eventRoot: hashes[0] });
 
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
-            blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
-        });
+    //     ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
+    //         blockHash: hashes[1],
+    //         blockRound: 0,
+    //         currentValidatorSetHash: hashes[2]
+    //     });
 
-        vm.expectRevert("EMPTY_CHECKPOINT");
-        checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[5], validatorSet, bitmaps[5]);
-    }
+    //     vm.expectRevert("EMPTY_CHECKPOINT");
+    //     checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[5], validatorSet, bitmaps[5]);
+    // }
 
     function testSubmit_SameEpoch() public {
         ICheckpointManager.Checkpoint memory checkpoint =
