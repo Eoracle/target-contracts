@@ -22,7 +22,7 @@ abstract contract FirstSubmitted is InitializedCheckpointManager {
 }
 
 contract CheckpointManagerInitializeTest is UninitializedCheckpointManager {
-    function testInitialize() public {
+    function test_Initialize() public {
         checkpointManager.initialize(bls, bn256G2, childChainId);
         checkpointManager.setNewValidatorSet(validatorSet);
 
@@ -38,7 +38,7 @@ contract CheckpointManagerInitializeTest is UninitializedCheckpointManager {
 }
 
 contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
-    function testCannotSubmit_InvalidValidatorSetHash() public {
+    function test_Submit_RevertWhen_InvalidValidatorSetHash() public {
         ICheckpointManager.Checkpoint memory checkpoint = ICheckpointManager.Checkpoint({
             epoch: 1,
             blockNumber: 0, //For Invalid Signature
@@ -55,7 +55,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
     }
 
-    function testCannotSubmit_InvalidSignature() public {
+    function test_Submit_RevertWhen_InvalidSignature() public {
         ICheckpointManager.Checkpoint memory checkpoint = ICheckpointManager.Checkpoint({
             epoch: 1,
             blockNumber: 0, //For Invalid Signature
@@ -72,7 +72,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
     }
 
-    function testCannotSubmit_EmptyBitmap() public {
+    function test_Submit_RevertWhen_EmptyBitmap() public {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
 
@@ -85,7 +85,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[1], validatorSet, bitmaps[1]);
     }
 
-    function testCannotSubmit_NotEnoughPower() public {
+    function test_Submit_RevertWhen_NotEnoughPower() public {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
 
@@ -99,7 +99,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[2], validatorSet, bitmaps[2]);
     }
 
-    function testSubmit_First() public {
+    function test_Submit_First() public {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
 
@@ -124,7 +124,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
 }
 
 contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
-    // function testCannotSubmit_InvalidEpoch() public {
+    // function test_RevertWhen_Submit_InvalidEpoch() public {
     //     ICheckpointManager.Checkpoint memory checkpoint =
     //         ICheckpointManager.Checkpoint({ epoch: 0, blockNumber: 0, eventRoot: hashes[0] });
 
@@ -138,7 +138,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
     //     checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[4], validatorSet, bitmaps[4]);
     // }
 
-    // function testCannotSubmit_EmptyCheckpoint() public {
+    // function test_RevertWhen_Submit_EmptyCheckpoint() public {
     //     ICheckpointManager.Checkpoint memory checkpoint =
     //         ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 0, eventRoot: hashes[0] });
 
@@ -152,7 +152,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
     //     checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[5], validatorSet, bitmaps[5]);
     // }
 
-    function testSubmit_SameEpoch() public {
+    function test_Submit_SameEpoch() public {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 2, eventRoot: hashes[0] });
 
@@ -175,7 +175,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
         checkpointManager.getEventMembershipByEpoch(checkpoint.epoch, checkpoint.eventRoot, leafIndex, proof);
     }
 
-    function testSubmit_ShortBitmap() public {
+    function test_Submit_ShortBitmap() public {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 2, eventRoot: hashes[0] });
 
@@ -203,7 +203,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
         }
     }
 
-    function testCannot_InvalidEventRootByBlockNumber() public {
+    function test_RevertWhen_InvalidEventRootByBlockNumber() public {
         uint256 blockNumber = 3;
         bytes32 leaf = keccak256(abi.encodePacked(block.timestamp));
         uint256 leafIndex = 0;
@@ -212,7 +212,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
         checkpointManager.getEventMembershipByBlockNumber(blockNumber, leaf, leafIndex, proof);
     }
 
-    function testCannot_InvalidEventRootByEpoch() public {
+    function test_RevertWhen_InvalidEventRootByEpoch() public {
         uint256 epoch = 2;
         bytes32 leaf = keccak256(abi.encodePacked(block.timestamp));
         uint256 leafIndex = 0;
@@ -221,7 +221,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
         checkpointManager.getEventMembershipByEpoch(epoch, leaf, leafIndex, proof);
     }
 
-    function testGetCheckpointBlock_BlockNumberIsCheckpointBlock() public {
+    function test_GetCheckpointBlock_BlockNumberIsCheckpointBlock() public view {
         uint256 expectedCheckpointBlock = 1;
         uint256 blockNumber = 1;
 
@@ -230,7 +230,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
         assertEq(isFound, true);
     }
 
-    function testGetCheckpointBlock_NonExistingCheckpointBlock() public {
+    function test_GetCheckpointBlock_NonExistingCheckpointBlock() public view {
         uint256 expectedCheckpointBlock = 0;
         uint256 blockNumber = 5;
 
