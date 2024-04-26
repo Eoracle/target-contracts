@@ -4,7 +4,6 @@ pragma solidity 0.8.20;
 import { IEOFeedRegistry } from "../interfaces/IEOFeedRegistry.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeed } from "./interfaces/IEOFeed.sol";
-import { IEOFeed } from "./interfaces/IEOFeed.sol";
 import { FeedRegistryInterface } from "./interfaces/FeedRegistryInterface.sol";
 import { EOFeedFactoryBeacon } from "./factories/EOFeedFactoryBeacon.sol";
 
