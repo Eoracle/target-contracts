@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import { AggregatorV3Interface } from "./AggregatorV3Interface.sol";
+import { IEOFeed } from "./IEOFeed.sol";
 
 /**
  * @title FeedRegistryInterface
@@ -19,16 +19,9 @@ interface FeedRegistryInterface {
 
     function latestTimestamp(address base, address quote) external view returns (uint256 timestamp);
 
-    function getFeed(address base, address quote) external view returns (AggregatorV3Interface aggregator);
+    function getFeed(address base, address quote) external view returns (IEOFeed feed);
 
-    function isFeedEnabled(address aggregator) external view returns (bool);
+    function isFeedEnabled(address feed) external view returns (bool);
 
-    function getRoundFeed(
-        address base,
-        address quote,
-        uint80 roundId
-    )
-        external
-        view
-        returns (AggregatorV3Interface aggregator);
+    function getRoundFeed(address base, address quote, uint80 roundId) external view returns (IEOFeed feed);
 }

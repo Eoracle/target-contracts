@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-interface AggregatorV3Interface {
+interface IEOFeed {
+    function initialize(address feedRegistry, uint8 decimals, string memory description, uint256 version) external;
     function decimals() external view returns (uint8);
     function description() external view returns (string memory);
     function version() external view returns (uint256);

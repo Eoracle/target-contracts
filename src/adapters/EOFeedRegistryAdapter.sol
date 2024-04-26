@@ -3,19 +3,18 @@ pragma solidity 0.8.20;
 
 import { IEOFeedRegistry } from "../interfaces/IEOFeedRegistry.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
-import { AggregatorV3Interface } from "./interfaces/AggregatorV3Interface.sol";
+import { IEOFeed } from "./interfaces/IEOFeed.sol";
 import { IEOFeed } from "./interfaces/IEOFeed.sol";
 import { FeedRegistryInterface } from "./interfaces/FeedRegistryInterface.sol";
+import { EOFeedFactoryBeacon } from "./factories/EOFeedFactoryBeacon.sol";
 
-contract EOFeedRegistryAdapter is OwnableUpgradeable, FeedRegistryInterface {
+contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, FeedRegistryInterface {
     IEOFeedRegistry internal _feedRegistry;
-    address internal _feedImplementation;
-    mapping(string => AggregatorV3Interface) internal _pairSymbolsToFeeds;
+    mapping(string => IEOFeed) internal _pairSymbolsToFeeds;
     mapping(address => bool) internal _feedEnabled;
     mapping(address => mapping(address => string)) internal _tokenAddressesToPairSymbols;
 
-    event FeedCloned(string pairSymbol, AggregatorV3Interface feed);
+    event FeedCloned(string pairSymbol, IEOFeed feed);
     event PairSymbolAdded(address base, address quote, string pairSymbol);
 
     error FeedAlreadyExists(address feed);
@@ -25,20 +24,21 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, FeedRegistryInterface {
      * @notice Initialize the contract
      * @param feedRegistry The feed registry address
      */
-    function initialize(IEOFeedRegistry feedRegistry) external initializer {
+    function initialize(IEOFeedRegistry feedRegistry, address feedImplementation) external initializer {
         __Ownable_init(msg.sender);
+        __EOFeedFactory_init(feedImplementation, msg.sender);
         _feedRegistry = feedRegistry;
     }
 
     /**
-     * @notice Clone a deterministic feed
+     * @notice deploy EOFeed
      * @param base The base asset address
      * @param quote The quote asset address
      * @param pairSymbol The pair symbol
      * @param decimals_ The decimals
      * @param version_ The version
      */
-    function cloneDeterministicEOFeed(
+    function deployEOFeed(
         address base,
         address quote,
         string calldata pairSymbol,
@@ -55,15 +55,13 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, FeedRegistryInterface {
         if (bytes(_tokenAddressesToPairSymbols[base][quote]).length != 0) {
             revert BaseQuotePairExists();
         }
-        // TODO: move logic to the Factory and inherit from it
-        address clone =
-            Clones.cloneDeterministic(_feedImplementation, keccak256(abi.encodePacked(pairSymbol, version_)));
-        IEOFeed(clone).initialize(address(_feedRegistry), decimals_, pairSymbol, version_);
+        address feed = _deployEOFeed();
+        IEOFeed(feed).initialize(address(_feedRegistry), decimals_, pairSymbol, version_);
 
-        _feedEnabled[clone] = true;
+        _feedEnabled[feed] = true;
 
-        _pairSymbolsToFeeds[pairSymbol] = AggregatorV3Interface(clone);
-        emit FeedCloned(pairSymbol, AggregatorV3Interface(clone));
+        _pairSymbolsToFeeds[pairSymbol] = IEOFeed(feed);
+        emit FeedCloned(pairSymbol, IEOFeed(feed));
 
         _tokenAddressesToPairSymbols[base][quote] = pairSymbol;
         emit PairSymbolAdded(base, quote, pairSymbol);
@@ -72,9 +70,9 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, FeedRegistryInterface {
     /**
      * @notice Get the feed for a given pair symbol
      * @param symbol The pair symbol
-     * @return AggregatorV3Interface The feed
+     * @return IEOFeed The feed
      */
-    function getFeedByPairSymbol(string calldata symbol) external view returns (AggregatorV3Interface) {
+    function getFeedByPairSymbol(string calldata symbol) external view returns (IEOFeed) {
         return _pairSymbolsToFeeds[symbol];
     }
 
@@ -105,9 +103,9 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, FeedRegistryInterface {
      * @notice Get the feed for a given base/quote pair
      * @param base The base asset address
      * @param quote The quote asset address
-     * @return AggregatorV3Interface The feed
+     * @return IEOFeed The feed
      */
-    function getFeed(address base, address quote) external view override returns (AggregatorV3Interface) {
+    function getFeed(address base, address quote) external view override returns (IEOFeed) {
         return _getFeed(base, quote);
     }
 
@@ -158,9 +156,9 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, FeedRegistryInterface {
      * @param base The base asset address
      * @param quote The quote asset address
      * @param
-     * @return AggregatorV3Interface The feed
+     * @return IEOFeed The feed
      */
-    function getRoundFeed(address base, address quote, uint80) external view returns (AggregatorV3Interface) {
+    function getRoundFeed(address base, address quote, uint80) external view returns (IEOFeed) {
         return _getFeed(base, quote);
     }
 
@@ -168,9 +166,9 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, FeedRegistryInterface {
      * @notice Get the feed for a given base/quote pair
      * @param base The base asset address
      * @param quote The quote asset address
-     * @return AggregatorV3Interface The feed
+     * @return IEOFeed The feed
      */
-    function _getFeed(address base, address quote) internal view returns (AggregatorV3Interface) {
+    function _getFeed(address base, address quote) internal view returns (IEOFeed) {
         return _pairSymbolsToFeeds[_tokenAddressesToPairSymbols[base][quote]];
     }
 }
