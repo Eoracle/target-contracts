@@ -55,7 +55,7 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, FeedR
             revert BaseQuotePairExists();
         }
         address feed = _deployEOFeed();
-        IEOFeed(feed).initialize(address(_feedRegistry), decimals_, pairSymbol, version_);
+        IEOFeed(feed).initialize(_feedRegistry, decimals_, pairSymbol, version_);
 
         _feedEnabled[feed] = true;
 

@@ -20,7 +20,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @param version_ The version of feed
      */
     function initialize(
-        address feedRegistry,
+        IEOFeedRegistry feedRegistry,
         uint8 decimals_,
         string memory description_,
         uint256 version_
@@ -28,7 +28,7 @@ contract EOFeed is IEOFeed, Initializable {
         public
         initializer
     {
-        _feedRegistry = IEOFeedRegistry(feedRegistry);
+        _feedRegistry = feedRegistry;
         _decimals = decimals_;
         _description = description_;
         _version = version_;
