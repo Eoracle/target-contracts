@@ -3,20 +3,18 @@
   "description": "Eoracle target solidity smart contracts",
   "version": "1.0.0",
   "dependencies": {
-    "hardhat": "^2.17.2",
-    "merkletreejs": "^0.3.10",
     "keccak256": "^1.0.6",
-    "mcl-wasm": "^1.3.0"
+    "mcl-wasm": "^1.3.0",
+    "merkletreejs": "^0.3.10"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "dotenv": "^16.3.1",
+    "ethers": "^5.7.2",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "prettier": "^3.0.0",
     "solhint": "^3.6.2",
-    "ethers": "^5.7.2",
     "ts-node": "^10.7.0",
-    "dotenv": "^16.3.1",
     "typescript": "^5.1.6"
   },
   "keywords": [

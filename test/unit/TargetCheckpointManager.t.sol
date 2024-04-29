@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { UninitializedCheckpointManager, InitializedCheckpointManager } from "./CheckpointManagerBase.sol";
 
-abstract contract FirstSubmitted is InitializedCheckpointManager {
+abstract contract FirstSubmittedCheckpoint is InitializedCheckpointManager {
     function setUp() public virtual override {
         super.setUp();
 
@@ -123,7 +123,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
     }
 }
 
-contract CheckpointManagerSubmitSecondTest is FirstSubmitted {
+contract CheckpointManagerSubmitSecondTest is FirstSubmittedCheckpoint {
     // function test_RevertWhen_Submit_InvalidEpoch() public {
     //     ICheckpointManager.Checkpoint memory checkpoint =
     //         ICheckpointManager.Checkpoint({ epoch: 0, blockNumber: 0, eventRoot: hashes[0] });

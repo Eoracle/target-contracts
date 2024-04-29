@@ -34,7 +34,7 @@ abstract contract CheckpointSubmitted is InitializedFeedVerifier {
     }
 }
 
-abstract contract EOFeedVerifierExitted is CheckpointSubmitted {
+abstract contract EOFeedVerifierExited is CheckpointSubmitted {
     function setUp() public virtual override {
         super.setUp();
         uint256 id = 0;
@@ -175,7 +175,7 @@ contract EOFeedVerifierExitFailedAfterInitialized is CheckpointSubmitted {
     }
 }
 
-contract EOFeedVerifierExitFailedAfterSubmitted is EOFeedVerifierExitted {
+contract EOFeedVerifierExitFailedAfterSubmitted is EOFeedVerifierExited {
     function test_RevertWhen_Exit_AlreadyProcessed() public {
         uint256 blockNumber = 0;
         uint256 leafIndex = 0;
@@ -185,7 +185,7 @@ contract EOFeedVerifierExitFailedAfterSubmitted is EOFeedVerifierExitted {
     }
 }
 
-contract EOFeedVerifierBatchExit is EOFeedVerifierExitted {
+contract EOFeedVerifierBatchExit is EOFeedVerifierExited {
     function test_BatchExit() public {
         ICheckpointManager.Checkpoint memory checkpoint1 =
             ICheckpointManager.Checkpoint({ epoch: 2, blockNumber: 2, eventRoot: hashes[3] });
