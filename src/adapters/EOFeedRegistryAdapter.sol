@@ -4,29 +4,40 @@ pragma solidity 0.8.20;
 import { IEOFeedRegistry } from "../interfaces/IEOFeedRegistry.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeed } from "./interfaces/IEOFeed.sol";
-import { FeedRegistryInterface } from "./interfaces/FeedRegistryInterface.sol";
+import { IEOFeedRegistryAdapter } from "./interfaces/IEOFeedRegistryAdapter.sol";
 import { EOFeedFactoryBeacon } from "./factories/EOFeedFactoryBeacon.sol";
 
-contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, FeedRegistryInterface {
+contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, IEOFeedRegistryAdapter {
     IEOFeedRegistry internal _feedRegistry;
     mapping(string => IEOFeed) internal _pairSymbolsToFeeds;
     mapping(address => bool) internal _feedEnabled;
     mapping(address => mapping(address => string)) internal _tokenAddressesToPairSymbols;
 
-    event FeedCloned(string pairSymbol, IEOFeed feed);
-    event PairSymbolAdded(address base, address quote, string pairSymbol);
+    event FeedRegistrySet(address indexed feedRegistry);
+    event FeedDeployed(string indexed pairSymbol, address indexed feed);
+    event PairSymbolAdded(address indexed base, address indexed quote, string indexed pairSymbol);
 
-    error FeedAlreadyExists(address feed);
+    error FeedAlreadyExists();
     error BaseQuotePairExists();
 
     /**
      * @notice Initialize the contract
      * @param feedRegistry The feed registry address
      */
-    function initialize(IEOFeedRegistry feedRegistry, address feedImplementation) external initializer {
+    function initialize(address feedRegistry, address feedImplementation) external initializer {
         __Ownable_init(msg.sender);
         __EOFeedFactory_init(feedImplementation, msg.sender);
-        _feedRegistry = feedRegistry;
+        _feedRegistry = IEOFeedRegistry(feedRegistry);
+        emit FeedRegistrySet(feedRegistry);
+    }
+
+    /**
+     * @notice Set the feed registry
+     * @param feedRegistry The feed registry address
+     */
+    function setFeedRegistry(address feedRegistry) external onlyOwner {
+        _feedRegistry = IEOFeedRegistry(feedRegistry);
+        emit FeedRegistrySet(feedRegistry);
     }
 
     /**
@@ -36,6 +47,7 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, FeedR
      * @param pairSymbol The pair symbol
      * @param decimals_ The decimals
      * @param version_ The version
+     * @return IEOFeed The feed
      */
     function deployEOFeed(
         address base,
@@ -46,10 +58,11 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, FeedR
     )
         external
         onlyOwner
+        returns (IEOFeed)
     {
         address feedAddress = address(_pairSymbolsToFeeds[pairSymbol]);
         if (feedAddress != address(0)) {
-            revert FeedAlreadyExists(feedAddress);
+            revert FeedAlreadyExists();
         }
         if (bytes(_tokenAddressesToPairSymbols[base][quote]).length != 0) {
             revert BaseQuotePairExists();
@@ -60,10 +73,20 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, FeedR
         _feedEnabled[feed] = true;
 
         _pairSymbolsToFeeds[pairSymbol] = IEOFeed(feed);
-        emit FeedCloned(pairSymbol, IEOFeed(feed));
+        emit FeedDeployed(pairSymbol, feed);
 
         _tokenAddressesToPairSymbols[base][quote] = pairSymbol;
         emit PairSymbolAdded(base, quote, pairSymbol);
+
+        return IEOFeed(feed);
+    }
+
+    /**
+     * @notice Get the feed registry
+     * @return IEOFeedRegistry The feed registry
+     */
+    function getFeedRegistry() external view returns (IEOFeedRegistry) {
+        return _feedRegistry;
     }
 
     /**
@@ -75,7 +98,7 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, FeedR
         return _pairSymbolsToFeeds[symbol];
     }
 
-    // implement FeedRegistryInterface
+    // implement IEOFeedRegistryAdapter
     /**
      * @notice Get the latest price for a given base/quote pair
      * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself

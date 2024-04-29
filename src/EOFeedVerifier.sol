@@ -51,10 +51,10 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     /**
      * @notice Set the address of the feed registry contract
-     * @param _feedRegistry Address of the feed registry contract
+     * @param feedRegistry Address of the feed registry contract
      */
-    function setFeedRegistry(address _feedRegistry) external onlyOwner {
-        _feedRegistry = _feedRegistry;
+    function setFeedRegistry(address feedRegistry) external onlyOwner {
+        _feedRegistry = feedRegistry;
     }
 
     /**

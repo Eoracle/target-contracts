@@ -4,11 +4,11 @@ pragma solidity 0.8.20;
 import { IEOFeed } from "./IEOFeed.sol";
 
 /**
- * @title FeedRegistryInterface
+ * @title IEOFeedRegistryAdapter
  * @notice Interface for the FeedRegistry contract.
- * @dev Simplified version of FeedRegistryInterface from Chainlink.
+ * @dev Simplified version of IEOFeedRegistryAdapter from Chainlink.
  */
-interface FeedRegistryInterface {
+interface IEOFeedRegistryAdapter {
     function decimals(address base, address quote) external view returns (uint8);
 
     function description(address base, address quote) external view returns (string memory);

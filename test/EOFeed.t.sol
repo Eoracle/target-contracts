@@ -6,6 +6,7 @@ import { EOFeed } from "../src/adapters/EOFeed.sol";
 import { MockEOFeedRegistry } from "./mock/MockEOFeedRegistry.sol";
 import { IEOFeedRegistry } from "../src/interfaces/IEOFeedRegistry.sol";
 
+// solhint-disable ordering
 contract EOFeedTest is Test {
     EOFeed public feed;
     IEOFeedRegistry public feedRegistry;
@@ -27,7 +28,7 @@ contract EOFeedTest is Test {
         _lastTimestamp = block.timestamp;
     }
 
-    function testGetRoundData() public {
+    function test_GetRoundData() public view {
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(1);
         assertEq(roundId, 1);
@@ -37,7 +38,7 @@ contract EOFeedTest is Test {
         assertEq(answeredInRound, 1);
     }
 
-    function testLatestRoundData() public {
+    function test_LatestRoundData() public view {
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.latestRoundData();
         assertEq(roundId, 0);
@@ -47,7 +48,7 @@ contract EOFeedTest is Test {
         assertEq(answeredInRound, 0);
     }
 
-    function testGetRoundData2() public {
+    function test_GetRoundData2() public {
         feedRegistry.updatePriceFeed(_description_, RATE2, block.timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(2);
@@ -58,7 +59,7 @@ contract EOFeedTest is Test {
         assertEq(answeredInRound, 2);
     }
 
-    function testLatestRoundData2() public {
+    function test_LatestRoundData2() public {
         feedRegistry.updatePriceFeed(_description_, RATE2, block.timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.latestRoundData();
@@ -69,19 +70,19 @@ contract EOFeedTest is Test {
         assertEq(answeredInRound, 0);
     }
 
-    function testDecimals() public {
+    function test_Decimals() public view {
         assertEq(feed.decimals(), _decimals);
     }
 
-    function testDescription() public {
+    function test_Description() public view {
         assertEq(feed.description(), _description_);
     }
 
-    function testVersion() public {
+    function test_Version() public view {
         assertEq(feed.version(), _version);
     }
 
-    function testGetRoundDataFuzz(uint256 rate, uint256 timestamp) public {
+    function testFuzz_GetRoundData(uint256 rate, uint256 timestamp) public {
         feedRegistry.updatePriceFeed(_description_, rate, timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(3);
@@ -92,7 +93,7 @@ contract EOFeedTest is Test {
         assertEq(answeredInRound, 3);
     }
 
-    function testLatestRoundDataFuzz(uint256 rate, uint256 timestamp) public {
+    function testFuzz_LatestRoundData(uint256 rate, uint256 timestamp) public {
         feedRegistry.updatePriceFeed(_description_, rate, timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.latestRoundData();
