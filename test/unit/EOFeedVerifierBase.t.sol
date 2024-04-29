@@ -8,10 +8,10 @@ import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { Cheats } from "../utils/Cheats.sol";
+import { Utils } from "../utils/Utils.sol";
 
 // solhint-disable max-states-count
-abstract contract UninitializedFeedVerifier is Test, Cheats {
+abstract contract UninitializedFeedVerifier is Test, Utils {
     struct ProofData {
         uint256[2] signature;
         bytes bitmap;

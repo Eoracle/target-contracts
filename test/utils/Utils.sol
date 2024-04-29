@@ -11,7 +11,7 @@ import { StdCheats } from "forge-std/StdCheats.sol";
 import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
 // ⭐️ CHEATS
-abstract contract Cheats is StdCheats {
+abstract contract Utils is StdCheats {
     address public immutable PROXY_ADMIN = makeAddr("PROXY_ADMIN");
 
     function proxify(string memory what, bytes memory args) internal returns (address proxyAddr) {

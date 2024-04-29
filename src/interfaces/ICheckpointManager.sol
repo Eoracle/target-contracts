@@ -45,6 +45,12 @@ interface ICheckpointManager {
         external;
 
     /**
+     * @notice Function to set a new validator set for the CheckpointManager
+     * @param newValidatorSet The new validator set to store
+     */
+    function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
+
+    /**
      * @notice Function to get if a event is part of the event root for a block number
      * @param blockNumber The block number to get the event root from (i.e. blockN <-- eventRoot --> blockN+M)
      * @param leaf The leaf of the event (keccak256-encoded log)

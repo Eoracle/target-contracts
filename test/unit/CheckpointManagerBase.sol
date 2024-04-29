@@ -5,10 +5,10 @@ import { Test } from "forge-std/Test.sol";
 import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
 import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
-import { Cheats } from "../utils/Cheats.sol";
+import { Utils } from "../utils/Utils.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 
-abstract contract UninitializedCheckpointManager is Test, Cheats {
+abstract contract UninitializedCheckpointManager is Test, Utils {
     TargetCheckpointManager public checkpointManager;
     BLS public bls;
     BN256G2 public bn256G2;

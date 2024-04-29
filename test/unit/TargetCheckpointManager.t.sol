@@ -184,7 +184,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmittedCheckpoint {
             blockRound: 0,
             currentValidatorSetHash: hashes[2]
         });
-
+        // 2/3 of total voting power - a minimum to submit a checkpoint
         if (aggVotingPowers[7] > (checkpointManager.totalVotingPower() * 2) / 3) {
             checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[7], validatorSet, bitmaps[7]);
 
