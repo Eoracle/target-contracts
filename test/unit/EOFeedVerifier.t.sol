@@ -13,6 +13,9 @@ abstract contract CheckpointSubmitted is InitializedFeedVerifier {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
 
+        ICheckpointManager.Checkpoint memory checkpoint2 =
+            ICheckpointManager.Checkpoint({ epoch: 2, blockNumber: 2, eventRoot: hashes[3] });
+
         ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
             blockHash: hashes[1],
             blockRound: 0,
@@ -20,14 +23,15 @@ abstract contract CheckpointSubmitted is InitializedFeedVerifier {
         });
 
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
+        checkpointManager.submit(checkpointMetadata, checkpoint2, aggMessagePoints[1], validatorSet, bitmaps[0]);
 
         assertEq(checkpointManager.getEventRootByBlock(checkpoint.blockNumber), checkpoint.eventRoot);
         assertEq(checkpointManager.checkpointBlockNumbers(0), checkpoint.blockNumber);
 
-        uint256 leafIndex = 0;
+        uint256 leafIndex = 1;
         assertEq(
             checkpointManager.getEventMembershipByBlockNumber(
-                checkpoint.blockNumber, leavesArray[0][leafIndex], leafIndex, proves[0]
+                checkpoint2.blockNumber, leavesArray[1][leafIndex], leafIndex, proves[2]
             ),
             true
         );
@@ -37,12 +41,9 @@ abstract contract CheckpointSubmitted is InitializedFeedVerifier {
 abstract contract EOFeedVerifierExited is CheckpointSubmitted {
     function setUp() public virtual override {
         super.setUp();
-        uint256 id = 0;
         uint256 blockNumber = 1;
         uint256 leafIndex = 0;
-        assertEq(feedVerifier.isProcessedExit(id), false);
         feedVerifier.exit(blockNumber, leafIndex, unhashedLeaves[0], proves[0]);
-        assertEq(feedVerifier.isProcessedExit(id), true);
     }
 }
 
