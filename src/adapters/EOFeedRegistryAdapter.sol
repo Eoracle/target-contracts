@@ -45,16 +45,16 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, IEOFe
      * @param base The base asset address
      * @param quote The quote asset address
      * @param pairSymbol The pair symbol
-     * @param decimals The decimals
-     * @param version The version
+     * @param decimals_ The decimals
+     * @param version_ The version
      * @return IEOFeed The feed
      */
     function deployEOFeed(
         address base,
         address quote,
         string calldata pairSymbol,
-        uint8 decimals,
-        uint256 version
+        uint8 decimals_,
+        uint256 version_
     )
         external
         onlyOwner
@@ -68,7 +68,7 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, IEOFe
             revert BaseQuotePairExists();
         }
         address feed = _deployEOFeed();
-        IEOFeed(feed).initialize(_feedRegistry, decimals, pairSymbol, version);
+        IEOFeed(feed).initialize(_feedRegistry, decimals_, pairSymbol, version_);
 
         _feedEnabled[feed] = true;
 
