@@ -386,7 +386,8 @@ contract BN256G2 is IBN256G2 {
         (pt1yx, pt1yy) = _fq2sub(pt2yx, pt2yy, pt2xx, pt2xy); // V_squared_times_V2 - A
         (pt1yx, pt1yy) = _fq2mul(pt1xx, pt1xy, pt1yx, pt1yy); // U * (V_squared_times_V2 - A)
         (pt1xx, pt1xy) = _fq2mul(pt1zx, pt1zy, pt3[PTYX], pt3[PTYY]); // V_cubed * U2
-        (pt3[PTYX], pt3[PTYY]) = _fq2sub(pt1yx, pt1yy, pt1xx, pt1xy); // newy = U * (V_squared_times_V2 - A) - V_cubed *
+        (pt3[PTYX], pt3[PTYY]) = _fq2sub(pt1yx, pt1yy, pt1xx, pt1xy); // newy = U * (V_squared_times_V2 - A) - V_cubed
+            // *
             // U2
     }
 
