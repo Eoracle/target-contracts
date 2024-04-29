@@ -35,7 +35,7 @@
     "test:fork:sepolia": "source .env && forge test --match-contract Deploy --rpc-url $SEPOLIA_RPC_URL",
     "test:fork:mainnet": "source .env && forge test --match-contract Deploy --rpc-url $MAINNET_RPC_URL",
     "pre-commit": "npx lint-staged",
-    "pre-push": "",
+    "pre-push": "git diff HEAD --ignore-submodules --quiet && forge build --force && forge test --ffi",
     "prepare": "husky install"
   },
   "lint-staged": {
