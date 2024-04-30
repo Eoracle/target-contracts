@@ -1,0 +1,11 @@
+{
+  "ProxyAdmin": {
+    "proxyAdminOwner": ""
+  },
+
+  "CheckpointManager": {
+    "owner": ""
+  },
+
+  "chainId": 1
+}
