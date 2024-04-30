@@ -6,7 +6,7 @@ import { IEOFeed } from "./IEOFeed.sol";
 /**
  * @title IEOFeedRegistryAdapter
  * @notice Interface for the FeedRegistry contract.
- * @dev Simplified version of IEOFeedRegistryAdapter from Chainlink.
+ * @dev Simplified version of FeedRegistryInterface from CL.
  */
 interface IEOFeedRegistryAdapter {
     function decimals(address base, address quote) external view returns (uint8);

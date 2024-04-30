@@ -3,6 +3,11 @@ pragma solidity 0.8.20;
 
 import { IEOFeedRegistry } from "../../interfaces/IEOFeedRegistry.sol";
 
+/**
+ * @title IEOFeed
+ * @notice Interface for the EOFeed contract.
+ * @dev compatible of AggregatorV3Interface from CL.
+ */
 interface IEOFeed {
     function initialize(
         IEOFeedRegistry feedRegistry,

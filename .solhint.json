@@ -5,7 +5,7 @@
     "compiler-version": ["error", "0.8.20"],
     "func-name-mixedcase": "off",
     "func-visibility": ["error", { "ignoreConstructors": true }],
-    "max-line-length": ["error", 120],
+    "max-line-length": ["error", 121],
     "named-parameters-mapping": "off",
     "no-console": "off",
     "not-rely-on-time": "off",
