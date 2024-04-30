@@ -5,9 +5,14 @@ import { IEOFeedRegistry } from "../interfaces/IEOFeedRegistry.sol";
 import { IEOFeed } from "./interfaces/IEOFeed.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+/**
+ * @title EOFeed
+ * @notice The contract for the symbol pair price feed
+ */
 contract EOFeed is IEOFeed, Initializable {
+    string private _pairSymbol; // should coincide with the symbols pair identifier in the feed registry
     uint8 private _decimals;
-    string private _description; // should coincide with the symbols pair identifier in the feed registry
+    string private _description;
     uint256 private _version;
 
     IEOFeedRegistry private _feedRegistry;
@@ -21,6 +26,7 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function initialize(
         IEOFeedRegistry feedRegistry,
+        string memory pairSymbol,
         uint8 decimals_,
         string memory description_,
         uint256 version_
@@ -29,6 +35,7 @@ contract EOFeed is IEOFeed, Initializable {
         initializer
     {
         _feedRegistry = feedRegistry;
+        _pairSymbol = pairSymbol;
         _decimals = decimals_;
         _description = description_;
         _version = version_;
@@ -59,6 +66,14 @@ contract EOFeed is IEOFeed, Initializable {
     function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_description);
         return (0, int256(priceData.value), 0, priceData.timestamp, 0);
+    }
+
+    /**
+     * @notice Get the pair symbol
+     * @return string The pair symbol
+     */
+    function getPairSymbol() external view returns (string memory) {
+        return _pairSymbol;
     }
 
     /**

@@ -12,7 +12,7 @@ contract EOFeedTest is Test {
     IEOFeedRegistry public feedRegistry;
     address internal _owner;
     uint8 internal _decimals = 8;
-    string internal _description_ = "ETH/USD";
+    string internal _description = "ETH/USD";
     uint256 internal _version = 1;
     uint256 internal _lastTimestamp;
     uint256 internal constant RATE1 = 100_000_000;
@@ -23,8 +23,8 @@ contract EOFeedTest is Test {
 
         feedRegistry = new MockEOFeedRegistry();
         feed = new EOFeed();
-        feed.initialize(feedRegistry, _decimals, _description_, _version);
-        feedRegistry.updatePriceFeed(_description_, RATE1, block.timestamp, "");
+        feed.initialize(feedRegistry, _description, _decimals, _description, _version);
+        feedRegistry.updatePriceFeed(_description, RATE1, block.timestamp, "");
         _lastTimestamp = block.timestamp;
     }
 
@@ -49,7 +49,7 @@ contract EOFeedTest is Test {
     }
 
     function test_GetRoundData2() public {
-        feedRegistry.updatePriceFeed(_description_, RATE2, block.timestamp, "");
+        feedRegistry.updatePriceFeed(_description, RATE2, block.timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(2);
         assertEq(roundId, 0);
@@ -60,7 +60,7 @@ contract EOFeedTest is Test {
     }
 
     function test_LatestRoundData2() public {
-        feedRegistry.updatePriceFeed(_description_, RATE2, block.timestamp, "");
+        feedRegistry.updatePriceFeed(_description, RATE2, block.timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.latestRoundData();
         assertEq(roundId, 0);
@@ -75,7 +75,7 @@ contract EOFeedTest is Test {
     }
 
     function test_Description() public view {
-        assertEq(feed.description(), _description_);
+        assertEq(feed.description(), _description);
     }
 
     function test_Version() public view {
@@ -83,7 +83,7 @@ contract EOFeedTest is Test {
     }
 
     function testFuzz_GetRoundData(uint256 rate, uint256 timestamp) public {
-        feedRegistry.updatePriceFeed(_description_, rate, timestamp, "");
+        feedRegistry.updatePriceFeed(_description, rate, timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(3);
         assertEq(roundId, 0);
@@ -94,7 +94,7 @@ contract EOFeedTest is Test {
     }
 
     function testFuzz_LatestRoundData(uint256 rate, uint256 timestamp) public {
-        feedRegistry.updatePriceFeed(_description_, rate, timestamp, "");
+        feedRegistry.updatePriceFeed(_description, rate, timestamp, "");
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.latestRoundData();
         assertEq(roundId, 0);
