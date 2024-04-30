@@ -20,6 +20,7 @@ contract EOFeed is IEOFeed, Initializable {
     /**
      * @notice Initialize the contract
      * @param feedRegistry The feed registry address
+     * @param pairSymbol Pair Symbol
      * @param decimals_ The decimals of the reate
      * @param description_ The description of symbols pair
      * @param version_ The version of feed

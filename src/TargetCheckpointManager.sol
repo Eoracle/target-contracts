@@ -164,7 +164,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         return leaf.checkMembership(leafIndex, eventRoot, proof);
     }
 
-    function setNewValidatorSet(Validator[] calldata newValidatorSet) public onlyOwner {
+    function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner {
         uint256 length = newValidatorSet.length;
         currentValidatorSetLength = length;
         currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
