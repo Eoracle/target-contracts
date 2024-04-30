@@ -45,15 +45,8 @@ contract EOFeedRegistryAdapterTest is Test {
         _quoteAddress = _quoteAddress;
         _base2Address = makeAddr("base2");
         _quote2Address = makeAddr("quote2");
-
-        //feedRegistryAdapter.deployEOFeed
-
-        // feed.initialize(feedRegistry, _decimals, _description_, _version);
-        // feedRegistry.updatePriceFeed(_description_, RATE1, block.timestamp, "");
-        // _lastTimestamp = block.timestamp;
     }
 
-    //check _beacon owner is the deployer
     function test_Initialized() public view {
         assertEq(address(feedRegistryAdapter.getFeedRegistry()), address(feedRegistry));
         assertEq(address(feedRegistryAdapter.owner()), address(this));
