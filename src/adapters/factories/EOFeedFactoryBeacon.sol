@@ -17,8 +17,7 @@ abstract contract EOFeedFactoryBeacon is Initializable, EOFeedFactoryBase {
         _beacon = address(new UpgradeableBeacon(impl, initialOwner));
     }
 
-    // solhint-disable-next-line no-empty-blocks
-    function _deployEOFeed() internal returns (address) {
+    function _deployEOFeed() internal override returns (address) {
         // TODO: can be done with predictable address using create2
         return address(new BeaconProxy(_beacon, ""));
     }

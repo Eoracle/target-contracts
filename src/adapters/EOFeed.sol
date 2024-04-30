@@ -36,16 +36,16 @@ contract EOFeed is IEOFeed, Initializable {
 
     /**
      * @notice Get the price for the round
-     * @param _roundId The round id
+     * @param
      * @return roundId The round id
      * @return answer The price
      * @return startedAt The timestamp of the start of the round
      * @return updatedAt The timestamp of the end of the round
      * @return answeredInRound The round id in which the answer was computed
      */
-    function getRoundData(uint80 _roundId) public view override returns (uint80, int256, uint256, uint256, uint80) {
+    function getRoundData(uint80) external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_description);
-        return (_roundId, int256(priceData.value), 0, priceData.timestamp, _roundId);
+        return (0, int256(priceData.value), 0, priceData.timestamp, 0);
     }
 
     /**
@@ -56,7 +56,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return updatedAt The timestamp of the end of the round
      * @return answeredInRound The round id in which the answer was computed
      */
-    function latestRoundData() public view override returns (uint80, int256, uint256, uint256, uint80) {
+    function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_description);
         return (0, int256(priceData.value), 0, priceData.timestamp, 0);
     }
@@ -65,7 +65,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @notice Get the decimals of the rate
      * @return uint8 The decimals
      */
-    function decimals() public view override returns (uint8) {
+    function decimals() external view returns (uint8) {
         return _decimals;
     }
 
@@ -73,7 +73,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @notice Get the description of the feed symbol pairs
      * @return string The description
      */
-    function description() public view override returns (string memory) {
+    function description() external view returns (string memory) {
         return _description;
     }
 
@@ -81,7 +81,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @notice Get the version of the feed
      * @return uint256 The version
      */
-    function version() public view override returns (uint256) {
+    function version() external view returns (uint256) {
         return _version;
     }
 }

@@ -106,7 +106,7 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, IEOFe
      * @param quote The quote asset address
      * @return int256 The latest price
      */
-    function latestAnswer(address base, address quote) external view override returns (int256) {
+    function latestAnswer(address base, address quote) external view returns (int256) {
         return int256(_feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]).value);
     }
 
@@ -127,7 +127,7 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, IEOFe
      * @param quote The quote asset address
      * @return IEOFeed The feed
      */
-    function getFeed(address base, address quote) external view override returns (IEOFeed) {
+    function getFeed(address base, address quote) external view returns (IEOFeed) {
         return _getFeed(base, quote);
     }
 

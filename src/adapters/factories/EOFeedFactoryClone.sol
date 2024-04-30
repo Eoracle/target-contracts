@@ -12,8 +12,7 @@ abstract contract EOFeedFactoryClone is Initializable, EOFeedFactoryBase {
         _feedImplementation = impl;
     }
 
-    // solhint-disable-next-line no-empty-blocks
-    function _deployEOFeed() internal returns (address) {
+    function _deployEOFeed() internal override returns (address) {
         return Clones.clone(_feedImplementation);
     }
 }
