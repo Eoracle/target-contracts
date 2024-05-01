@@ -18,7 +18,7 @@ contract EOFeedTest is Test {
     uint256 internal constant RATE1 = 100_000_000;
     uint256 internal constant RATE2 = 200_000_000;
 
-    function setUp() public {
+    function setUp() public virtual {
         _owner = makeAddr("_owner");
 
         feedRegistry = new MockEOFeedRegistry();

@@ -43,8 +43,8 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         feedRegistryAdapter = _deployAdapter();
         feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl));
 
-        _baseAddress = _baseAddress;
-        _quoteAddress = _quoteAddress;
+        _baseAddress = makeAddr("base");
+        _quoteAddress = makeAddr("quote");
         _base2Address = makeAddr("base2");
         _quote2Address = makeAddr("quote2");
     }
