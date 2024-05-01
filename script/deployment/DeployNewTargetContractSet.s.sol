@@ -3,14 +3,11 @@
 pragma solidity 0.8.20;
 
 import { stdJson } from "forge-std/Script.sol";
-
 import { ProxyAdmin } from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-
-import { CheckpointManagerDeployer } from "./DeployCheckpointManager.s.sol";
-import { FeedVerifierDeployer } from "./DeployFeedVerifier.s.sol";
-import { FeedRegistryDeployer } from "./DeployFeedRegistry.s.sol";
-
+import { CheckpointManagerDeployer } from "./base/DeployCheckpointManager.s.sol";
+import { FeedVerifierDeployer } from "./base/DeployFeedVerifier.s.sol";
+import { FeedRegistryDeployer } from "./base/DeployFeedRegistry.s.sol";
 import { BN256G2 } from "src/common/BN256G2.sol";
 import { BLS } from "src/common/BLS.sol";
 import { IBN256G2 } from "src/interfaces/IBN256G2.sol";
@@ -36,6 +33,8 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
 
         address proxyAdminOwner = config.readAddress(".proxyAdminOwner");
         proxyAdmin = address(new ProxyAdmin(proxyAdminOwner));
+        string memory addressString = Strings.toHexString(uint256(uint160(proxyAdmin)), 20);
+        vm.writeJson(addressString, "script/config/targetContractAddresses.json", ".proxyAdmin");
 
         BN256G2 bn256G2 = new BN256G2();
         BLS bls = new BLS();
@@ -43,21 +42,19 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
         vm.stopBroadcast();
 
         uint256 chainId = config.readUint(".chainId");
-        address checkpointManagerOwner = config.readAddress(".checkpointManagerOwner");
+        address targetContractsOwner = config.readAddress(".targetContractsOwner");
 
         checkpointManagerProxy =
-            deployCheckpointManager(proxyAdmin, IBLS(bls), IBN256G2(bn256G2), chainId, checkpointManagerOwner);
-        string memory addressString = Strings.toHexString(uint256(uint160(checkpointManagerProxy)), 20);
+            deployCheckpointManager(proxyAdmin, IBLS(bls), IBN256G2(bn256G2), chainId, targetContractsOwner);
+        addressString = Strings.toHexString(uint256(uint160(checkpointManagerProxy)), 20);
         vm.writeJson(addressString, "script/config/targetContractAddresses.json", ".checkpointManager");
 
-        address feedVerifierOwner = config.readAddress(".feedVerifierOwner");
         feedVerifierProxy =
-            deployFeedVerifier(proxyAdmin, ICheckpointManager(checkpointManagerProxy), feedVerifierOwner);
+            deployFeedVerifier(proxyAdmin, ICheckpointManager(checkpointManagerProxy), targetContractsOwner);
         addressString = Strings.toHexString(uint256(uint160(feedVerifierProxy)), 20);
         vm.writeJson(addressString, "script/config/targetContractAddresses.json", ".feedVerifier");
 
-        address feedRegistryOwner = config.readAddress(".feedRegistryOwner");
-        feedRegistryProxy = deployFeedRegistry(proxyAdmin, IEOFeedVerifier(feedVerifierProxy), feedRegistryOwner);
+        feedRegistryProxy = deployFeedRegistry(proxyAdmin, IEOFeedVerifier(feedVerifierProxy), targetContractsOwner);
         addressString = Strings.toHexString(uint256(uint160(feedRegistryProxy)), 20);
         vm.writeJson(addressString, "script/config/targetContractAddresses.json", ".feedRegistry");
     }

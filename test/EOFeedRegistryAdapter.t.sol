@@ -39,7 +39,7 @@ contract EOFeedRegistryAdapterTest is Test {
         feedRegistry = new MockEOFeedRegistry();
         feedImpl = new EOFeed();
         feedRegistryAdapter = new EOFeedRegistryAdapter();
-        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl));
+        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl), address(this));
 
         _baseAddress = _baseAddress;
         _quoteAddress = _quoteAddress;

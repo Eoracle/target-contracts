@@ -6,7 +6,7 @@ import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
 import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
-import { DeployCheckpointManager } from "../../script/deployment/DeployCheckpointManager.s.sol";
+import { DeployCheckpointManager } from "../../script/deployment/base/DeployCheckpointManager.s.sol";
 
 abstract contract UninitializedCheckpointManager is Test {
     TargetCheckpointManager public checkpointManager;

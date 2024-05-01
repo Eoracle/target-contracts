@@ -8,7 +8,7 @@ import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { DeployFeedVerifier } from "../../script/deployment/DeployFeedVerifier.s.sol";
+import { DeployFeedVerifier } from "../../script/deployment/base/DeployFeedVerifier.s.sol";
 
 // solhint-disable max-states-count
 abstract contract UninitializedFeedVerifier is Test {
