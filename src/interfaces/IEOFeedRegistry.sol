@@ -9,10 +9,10 @@ interface IEOFeedRegistry {
         uint256 timestamp;
     }
 
-    function updatePriceFeed(bytes calldata proofData) external;
+    function updatePriceFeed(IEOFeedVerifier.LeafInput memory input, bytes calldata checkpointData) external;
 
     function updatePriceFeeds(
-        IEOFeedVerifier.BatchExitInput[] calldata proofDatas,
+        IEOFeedVerifier.LeafInput[] calldata proofDatas,
         bytes calldata checkpointData
     )
         external;

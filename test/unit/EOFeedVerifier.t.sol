@@ -81,8 +81,8 @@ contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier 
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
         vm.expectRevert("EOFeedVerifier: NOT_INITIALIZED");
-        batchExitInput.push(IEOFeedVerifier.BatchExitInput(blockNumber, leafIndex, unhashedLeaf, proof));
-        feedVerifier.batchExit(batchExitInput);
+        LeafInput.push(IEOFeedVerifier.LeafInput(blockNumber, leafIndex, unhashedLeaf, proof));
+        feedVerifier.batchExit(LeafInput);
     }
 }
 
@@ -118,46 +118,39 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
     }
 
     function test_SubmitAndExit() public {
-        ProofData memory proofData = ProofData({
-            signature: aggMessagePoints[0],
-            bitmap: bitmaps[0],
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaves[0],
             leafIndex: 0,
-            epochNumber: 1,
             blockNumber: 1,
-            blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2],
-            eventRoot: hashes[0],
             proof: proves[0]
         });
+
+        bytes32 eventRoot = hashes[0];
+        uint256 blockNumber = 1;
         // solhint-disable-next-line func-named-parameters
-        bytes memory proofDataEncoded = abi.encode(
-            proofData.signature,
-            proofData.bitmap,
-            proofData.unhashedLeaf,
-            proofData.leafIndex,
-            proofData.epochNumber,
-            proofData.blockNumber,
-            proofData.blockHash,
-            proofData.blockRound,
-            proofData.currentValidatorSetHash,
-            proofData.eventRoot,
-            proofData.proof
+        bytes memory checkpointData = abi.encode(
+            aggMessagePoints[0], // signature
+            bitmaps[0], // bitmap
+            1, // epochNumber
+            blockNumber,
+            hashes[1], // blockHash
+            0, // blockRound
+            hashes[2], // currentValidatorSetHash
+            eventRoot
         );
 
-        (uint256 id,,, bytes memory data) = abi.decode(proofData.unhashedLeaf, (uint256, address, address, bytes));
+        (uint256 id,,, bytes memory data) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
         vm.expectEmit(true, true, true, true);
         emit ExitProcessed(id, true, data);
-        bytes memory leafData = feedVerifier.submitAndExit(proofDataEncoded);
-        assertEq(leafData, sliceLastBytes(proofData.unhashedLeaf, 32));
+        bytes memory leafData = feedVerifier.submitAndExit(input, checkpointData);
+        assertEq(leafData, data);
 
-        assertEq(checkpointManager.getEventRootByBlock(proofData.blockNumber), proofData.eventRoot);
-        assertEq(checkpointManager.checkpointBlockNumbers(0), proofData.blockNumber);
+        assertEq(checkpointManager.getEventRootByBlock(blockNumber), hashes[0]);
+        assertEq(checkpointManager.checkpointBlockNumbers(0), blockNumber);
 
         assertEq(
             checkpointManager.getEventMembershipByBlockNumber(
-                proofData.blockNumber, leavesArray[0][proofData.leafIndex], proofData.leafIndex, proofData.proof
+                blockNumber, leavesArray[0][input.leafIndex], input.leafIndex, input.proof
             ),
             true
         );
@@ -221,24 +214,20 @@ contract EOFeedVerifierBatchExit is EOFeedVerifierExited {
             true
         );
 
-        batchExitInput.push(
-            IEOFeedVerifier.BatchExitInput(checkpoint1.blockNumber, leafIndex1, unhashedLeaves[1], proves[1])
-        );
+        LeafInput.push(IEOFeedVerifier.LeafInput(checkpoint1.blockNumber, leafIndex1, unhashedLeaves[1], proves[1]));
 
         uint256 id = 1;
         assertEq(feedVerifier.isProcessedExit(id), false);
         assertEq(feedVerifier.isProcessedExit(id + 1), false);
 
-        feedVerifier.batchExit(batchExitInput);
+        feedVerifier.batchExit(LeafInput);
 
         assertEq(feedVerifier.isProcessedExit(id), true);
         assertEq(feedVerifier.isProcessedExit(id + 1), false);
 
-        batchExitInput.push(
-            IEOFeedVerifier.BatchExitInput(checkpoint2.blockNumber, leafIndex2, unhashedLeaves[2], proves[2])
-        );
+        LeafInput.push(IEOFeedVerifier.LeafInput(checkpoint2.blockNumber, leafIndex2, unhashedLeaves[2], proves[2]));
 
-        feedVerifier.batchExit(batchExitInput);
+        feedVerifier.batchExit(LeafInput);
 
         assertEq(feedVerifier.isProcessedExit(id), true);
         assertEq(feedVerifier.isProcessedExit(id + 1), true);

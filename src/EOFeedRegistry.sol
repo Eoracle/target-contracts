@@ -66,10 +66,16 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     /**
      * @notice Update the price feed for a symbol
-     * @param proofData Proof data (data + proof) for the price feed
+     * @param checkpointData Proof data (data + proof) for the price feed
      */
-    function updatePriceFeed(bytes memory proofData) external onlyWhitelisted {
-        bytes memory encodedRate = _feedVerifier.submitAndExit(proofData);
+    function updatePriceFeed(
+        IEOFeedVerifier.LeafInput memory input,
+        bytes memory checkpointData
+    )
+        external
+        onlyWhitelisted
+    {
+        bytes memory encodedRate = _feedVerifier.submitAndExit(input, checkpointData);
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(encodedRate, (uint16, uint256, uint256));
         require(_supportedSymbols[symbol], "Symbol is not supported");
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
@@ -77,18 +83,20 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     /**
      * @notice Update the price feeds for multiple symbols
-     * @param proofDatas Array of proof data (data + proof) for the price feeds
+     * @param inputs Array of leafs to prove the price feeds
      * @param checkpointData Checkpoint data for verifying the price feeds
      */
     function updatePriceFeeds(
-        IEOFeedVerifier.BatchExitInput[] calldata proofDatas,
+        IEOFeedVerifier.LeafInput[] calldata inputs,
         bytes calldata checkpointData
     )
         external
         onlyWhitelisted
     {
-        require(proofDatas.length > 0, "No proof data provided");
+        require(inputs.length > 0, "No proof data provided");
         require(checkpointData.length > 0, "No checkpoint data provided");
+
+        _feedVerifier.submitAndBatchExit(inputs, checkpointData);
     }
 
     /**

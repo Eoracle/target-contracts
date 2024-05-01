@@ -4,6 +4,7 @@ pragma solidity 0.8.20;
 import { Test } from "forge-std/Test.sol";
 import { Utils } from "../utils/Utils.sol";
 import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
+import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
@@ -81,65 +82,76 @@ contract EOFeedRegistryTests is Test, Utils {
     function test_updatePriceFeedRevertIfNotWhitelisted() public {
         bytes memory ratesData = abi.encode(symbol, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
-        bytes memory proofData = abi.encode(
+        bytes memory checkpointData = abi.encode(
             [uint256(1), uint256(2)], // signature
             bytes("1"), // bitmap
-            unhashedLeaf,
-            uint256(1), // leafIndex
             epochNumber,
             blockNumber,
             blockHash,
             blockRound,
             validatorSetHash,
-            eventRoot,
-            new bytes32[](0)
+            eventRoot
         );
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaf,
+            leafIndex: 1,
+            blockNumber: blockNumber,
+            proof: new bytes32[](0)
+        });
         vm.expectRevert("Caller is not whitelisted");
-        registry.updatePriceFeed(proofData);
+        registry.updatePriceFeed(input, checkpointData);
     }
 
     function test_updatePriceFeedRevertIfSymbolNotSupported() public {
         bytes memory ratesData = abi.encode(symbol, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
-        bytes memory proofData = abi.encode(
+        bytes memory checkpointData = abi.encode(
             [uint256(1), uint256(2)], // signature
             bytes("1"), // bitmap
-            unhashedLeaf,
-            uint256(1), // leafIndex
             epochNumber,
             blockNumber,
             blockHash,
             blockRound,
             validatorSetHash,
-            eventRoot,
-            new bytes32[](0)
+            eventRoot
         );
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaf,
+            leafIndex: 1,
+            blockNumber: blockNumber,
+            proof: new bytes32[](0)
+        });
+
         _whitelistPublisher(owner, publisher);
         vm.expectRevert("Symbol is not supported");
         vm.prank(publisher);
-        registry.updatePriceFeed(proofData);
+        registry.updatePriceFeed(input, checkpointData);
     }
 
     function test_updatePriceFeed() public {
         bytes memory ratesData = abi.encode(symbol, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
-        bytes memory proofData = abi.encode(
+
+        bytes memory checkpointData = abi.encode(
             [uint256(1), uint256(2)], // signature
             bytes("1"), // bitmap
-            unhashedLeaf,
-            uint256(1), // leafIndex
             epochNumber,
             blockNumber,
             blockHash,
             blockRound,
             validatorSetHash,
-            eventRoot,
-            new bytes32[](0)
+            eventRoot
         );
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaf,
+            leafIndex: 1,
+            blockNumber: blockNumber,
+            proof: new bytes32[](0)
+        });
         _whitelistPublisher(owner, publisher);
         _setSupportedSymbol(owner, symbol);
         vm.prank(publisher);
-        registry.updatePriceFeed(proofData);
+        registry.updatePriceFeed(input, checkpointData);
         IEOFeedRegistry.PriceFeed memory feed = registry.getLatestPriceFeed(1);
         assertEq(feed.value, rate);
     }
