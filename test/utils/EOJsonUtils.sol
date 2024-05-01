@@ -10,15 +10,15 @@ library EOJsonUtils {
 
     // Cheat code address, 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D.
     address internal constant VM_ADDRESS = address(uint160(uint256(keccak256("hevm cheat code"))));
-    Vm internal vm = Vm(VM_ADDRESS);
+    Vm internal constant VM = Vm(VM_ADDRESS);
 
     function writeConfig(string memory value, string memory fileName, string memory key) internal {
         string memory path = string.concat("script/config/", Strings.toString(block.chainid), "/", fileName);
-        vm.writeJson(value, path, key);
+        VM.writeJson(value, path, key);
     }
 
     function getConfig(string memory fileName) internal view returns (string memory) {
         string memory path = string.concat("script/config/", Strings.toString(block.chainid), "/", fileName);
-        return vm.readFile(path);
+        return VM.readFile(path);
     }
 }
