@@ -17,8 +17,6 @@ contract EOFeed is IEOFeed, Initializable {
     string private _description;
     uint8 private _decimals;
 
-    uint256[50] private __gap;
-
     /**
      * @notice Initialize the contract
      * @param feedRegistry The feed registry address

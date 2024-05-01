@@ -198,4 +198,8 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     function _getFeed(address base, address quote) internal view returns (IEOFeed) {
         return _pairSymbolsToFeeds[_tokenAddressesToPairSymbols[base][quote]];
     }
+
+    // slither-disable-next-line unused-state,naming-convention
+    // solhint-disable-next-line ordering
+    uint256[50] private __gap;
 }
