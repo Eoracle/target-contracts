@@ -51,15 +51,16 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
     function test_RevertWhen_Initialize_InvalidAddress() public {
         TargetCheckpointManager checkpointManagerNull;
         vm.expectRevert("ExitHelper: INVALID_ADDRESS");
-        feedVerifier.initialize(checkpointManagerNull);
+        feedVerifier.initialize(checkpointManagerNull, address(this));
     }
 
-    function testInitialize() public {
-        feedVerifier.initialize(checkpointManager);
+    function test_Initialize() public {
+        feedVerifier.initialize(checkpointManager, address(this));
         assertEq(
             keccak256(abi.encode(feedVerifier.getCheckpointManager())),
             keccak256(abi.encode(address(checkpointManager)))
         );
+        assertEq(feedVerifier.owner(), address(this));
     }
 }
 

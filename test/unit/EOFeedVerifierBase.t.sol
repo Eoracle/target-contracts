@@ -8,10 +8,10 @@ import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { Utils } from "../utils/Utils.sol";
+import { DeployFeedVerifier } from "../../script/deployment/DeployFeedVerifier.s.sol";
 
 // solhint-disable max-states-count
-abstract contract UninitializedFeedVerifier is Test, Utils {
+abstract contract UninitializedFeedVerifier is Test {
     struct ProofData {
         uint256[2] signature;
         bytes bitmap;
@@ -30,6 +30,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     TargetCheckpointManager public checkpointManager;
     BLS public bls;
     BN256G2 public bn256G2;
+    DeployFeedVerifier public deployer;
 
     uint256 public childChainId = 1;
     uint256 public validatorSetSize;
@@ -53,7 +54,8 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     function setUp() public virtual {
         bls = new BLS();
         bn256G2 = new BN256G2();
-        feedVerifier = EOFeedVerifier(proxify("EOFeedVerifier.sol", ""));
+        feedVerifier = new EOFeedVerifier();
+        deployer = new DeployFeedVerifier();
 
         admin = makeAddr("admin");
         alice = makeAddr("Alice");
@@ -87,8 +89,8 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
             validatorSet.push(validatorSetTmp[i]);
         }
 
-        checkpointManager = TargetCheckpointManager(proxify("TargetCheckpointManager.sol", abi.encode(address(0))));
-        checkpointManager.initialize(bls, bn256G2, childChainId);
+        checkpointManager = new TargetCheckpointManager();
+        checkpointManager.initialize(bls, bn256G2, childChainId, address(this));
         checkpointManager.setNewValidatorSet(validatorSet);
     }
 }
@@ -96,6 +98,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
 abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
     function setUp() public virtual override {
         super.setUp();
-        feedVerifier.initialize(checkpointManager);
+        address proxyAddress = deployer.run(admin, checkpointManager, address(this));
+        feedVerifier = EOFeedVerifier(proxyAddress);
     }
 }

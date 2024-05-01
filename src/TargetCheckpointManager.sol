@@ -33,9 +33,10 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
      * @param newBls Address of the BLS library contract
      * @param newBn256G2 Address of the BLS library contract
      * @param chainId_ Chain ID of the child chain
+     * @param owner Owner of the contract
      */
-    function initialize(IBLS newBls, IBN256G2 newBn256G2, uint256 chainId_) public initializer {
-        __Ownable_init(msg.sender);
+    function initialize(IBLS newBls, IBN256G2 newBn256G2, uint256 chainId_, address owner) public initializer {
+        __Ownable_init(owner);
 
         // slither-disable-start events-maths
         chainId = chainId_;

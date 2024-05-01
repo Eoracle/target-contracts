@@ -5,8 +5,7 @@ pragma solidity 0.8.20;
 import { Script } from "forge-std/Script.sol";
 
 import { TargetCheckpointManager } from "src/TargetCheckpointManager.sol";
-import { TransparentUpgradeableProxy } from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { IBLS } from "src/interfaces/IBLS.sol";
 import { IBN256G2 } from "src/interfaces/IBN256G2.sol";
 
@@ -19,33 +18,11 @@ abstract contract CheckpointManagerDeployer is Script {
         address owner
     )
         internal
-        returns (address logicAddr, address proxyAddr)
+        returns (address proxyAddr)
     {
-        bytes memory initData = abi.encodeCall(TargetCheckpointManager.initialize, (newBls, newBn256G2, chainId));
+        bytes memory initData = abi.encodeCall(TargetCheckpointManager.initialize, (newBls, newBn256G2, chainId, owner));
 
-        return _deployCheckpointManager(proxyAdmin, initData, owner);
-    }
-
-    function _deployCheckpointManager(
-        address proxyAdmin,
-        bytes memory initData,
-        address owner
-    )
-        private
-        returns (address logicAddr, address proxyAddr)
-    {
-        vm.startBroadcast();
-
-        TargetCheckpointManager checkpointManager = new TargetCheckpointManager();
-
-        TransparentUpgradeableProxy proxy =
-            new TransparentUpgradeableProxy(address(checkpointManager), proxyAdmin, initData);
-
-        TargetCheckpointManager(proxy).transferOwnership(owner);
-        vm.stopBroadcast();
-
-        logicAddr = address(checkpointManager);
-        proxyAddr = address(proxy);
+        proxyAddr = Upgrades.deployTransparentProxy("TargetCheckpointManager.sol", proxyAdmin, initData);
     }
 }
 
@@ -58,7 +35,7 @@ contract DeployCheckpointManager is CheckpointManagerDeployer {
         address owner
     )
         external
-        returns (address logicAddr, address proxyAddr)
+        returns (address proxyAddr)
     {
         return deployCheckpointManager(proxyAdmin, newBls, newBn256G2, chainId, owner);
     }

@@ -1,0 +1,7 @@
+{
+  "proxyAdminOwner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "checkpointManagerOwner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "feedVerifierOwner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "feedRegistryOwner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "chainId": 1
+}
