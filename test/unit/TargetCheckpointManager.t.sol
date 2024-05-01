@@ -23,12 +23,13 @@ abstract contract FirstSubmittedCheckpoint is InitializedCheckpointManager {
 
 contract CheckpointManagerInitializeTest is UninitializedCheckpointManager {
     function test_Initialize() public {
-        checkpointManager.initialize(bls, bn256G2, childChainId);
+        checkpointManager.initialize(bls, bn256G2, childChainId, address(this));
         checkpointManager.setNewValidatorSet(validatorSet);
 
         assertEq(keccak256(abi.encode(checkpointManager.bls())), keccak256(abi.encode(address(bls))));
         assertEq(keccak256(abi.encode(checkpointManager.bn256G2())), keccak256(abi.encode(address(bn256G2))));
         assertEq(checkpointManager.currentValidatorSetLength(), validatorSetSize);
+        assertEq(checkpointManager.owner(), address(this));
         for (uint256 i = 0; i < validatorSetSize; i++) {
             (address _address, uint256 votingPower) = checkpointManager.currentValidatorSet(i);
             assertEq(_address, validatorSet[i]._address);

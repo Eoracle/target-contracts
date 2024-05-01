@@ -24,14 +24,15 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @notice Initialize the contract with the checkpoint manager address
      * @dev The checkpoint manager contract must be deployed first
      * @param newCheckpointManager Address of the checkpoint manager contract
+     * @param owner Owner of the contract
      */
-    function initialize(ICheckpointManager newCheckpointManager) external initializer {
+    function initialize(ICheckpointManager newCheckpointManager, address owner) external initializer {
         require(
             address(newCheckpointManager) != address(0) && address(newCheckpointManager).code.length != 0,
             "ExitHelper: INVALID_ADDRESS"
         );
         _checkpointManager = newCheckpointManager;
-        __Ownable_init(msg.sender);
+        __Ownable_init(owner);
     }
 
     /**

@@ -5,10 +5,10 @@ import { Test } from "forge-std/Test.sol";
 import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
 import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
-import { Utils } from "../utils/Utils.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
+import { DeployCheckpointManager } from "../../script/deployment/base/DeployCheckpointManager.s.sol";
 
-abstract contract UninitializedCheckpointManager is Test, Utils {
+abstract contract UninitializedCheckpointManager is Test {
     TargetCheckpointManager public checkpointManager;
     BLS public bls;
     BN256G2 public bn256G2;
@@ -26,11 +26,13 @@ abstract contract UninitializedCheckpointManager is Test, Utils {
     uint256[2][] public aggMessagePoints;
     uint256[] public aggVotingPowers;
     uint256 public childChainId;
+    DeployCheckpointManager public deployer;
 
     function setUp() public virtual {
         bls = new BLS();
         bn256G2 = new BN256G2();
-        checkpointManager = TargetCheckpointManager(proxify("TargetCheckpointManager.sol", abi.encode(address(0))));
+        deployer = new DeployCheckpointManager();
+        checkpointManager = new TargetCheckpointManager();
 
         admin = makeAddr("admin");
         alice = makeAddr("Alice");
@@ -58,7 +60,8 @@ abstract contract UninitializedCheckpointManager is Test, Utils {
 abstract contract InitializedCheckpointManager is UninitializedCheckpointManager {
     function setUp() public virtual override {
         super.setUp();
-        checkpointManager.initialize(bls, bn256G2, childChainId);
+        address proxyAddress = deployer.run(admin, bls, bn256G2, childChainId, address(this));
+        checkpointManager = TargetCheckpointManager(proxyAddress);
         checkpointManager.setNewValidatorSet(validatorSet);
     }
 }

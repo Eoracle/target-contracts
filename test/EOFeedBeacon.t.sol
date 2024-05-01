@@ -22,7 +22,7 @@ contract EOFeedBeaconTest is EOFeedTest {
         IEOFeed feedImpl = new EOFeed();
 
         EOFeedRegistryAdapter feedRegistryAdapter = new EOFeedRegistryAdapter();
-        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl));
+        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl), address(this));
         feed = EOFeed(
             address(
                 feedRegistryAdapter.deployEOFeed(
