@@ -14,7 +14,7 @@ import { IBN256G2 } from "src/interfaces/IBN256G2.sol";
 import { IBLS } from "src/interfaces/IBLS.sol";
 import { ICheckpointManager } from "src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "src/interfaces/IEOFeedVerifier.sol";
-import { EOJsonUtils } from "test/utils/EOJsonUtils.sol";
+import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 
 contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDeployer, FeedRegistryDeployer {
     using stdJson for string;

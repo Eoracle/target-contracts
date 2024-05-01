@@ -8,7 +8,7 @@ import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { EOFeed } from "src/adapters/EOFeed.sol";
 import { EOFeedRegistryAdapterBase } from "src/adapters/EOFeedRegistryAdapterBase.sol";
-import { EOJsonUtils } from "test/utils/EOJsonUtils.sol";
+import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 
 contract DeployFeedRegistryAdapter is Script {
     using stdJson for string;

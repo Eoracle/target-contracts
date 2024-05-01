@@ -5,7 +5,7 @@ pragma solidity 0.8.20;
 import { Script } from "forge-std/Script.sol";
 import { stdJson } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
-import { EOJsonUtils } from "test/utils/EOJsonUtils.sol";
+import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 
 contract UpgradeCheckpointManager is Script {
     using stdJson for string;

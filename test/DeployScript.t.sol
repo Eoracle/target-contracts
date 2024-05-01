@@ -9,7 +9,7 @@ import { TargetCheckpointManager } from "../src/TargetCheckpointManager.sol";
 import { EOFeedVerifier } from "../src/EOFeedVerifier.sol";
 import { EOFeedRegistry } from "../src/EOFeedRegistry.sol";
 import { EOFeedRegistryAdapter } from "../src/adapters/EOFeedRegistryAdapter.sol";
-import { EOJsonUtils } from "test/utils/EOJsonUtils.sol";
+import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 
 contract DeployScriptTest is Test {
     using stdJson for string;
