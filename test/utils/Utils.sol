@@ -19,4 +19,22 @@ abstract contract Utils is StdCheats {
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(logicAddr, PROXY_ADMIN, "");
         proxyAddr = address(proxy);
     }
+
+    // Function to return the last X bytes of a given bytes array
+    function sliceLastBytes(bytes memory data, uint256 x) internal pure returns (bytes memory) {
+        require(x <= data.length, "Slice length exceeds array length");
+
+        // Start index for the slice
+        uint256 startIndex = data.length - x;
+
+        // Create a new bytes array for the result
+        bytes memory result = new bytes(x);
+
+        // Copy the last X bytes
+        for (uint256 i = 0; i < x; i++) {
+            result[i] = data[startIndex + i];
+        }
+
+        return result;
+    }
 }

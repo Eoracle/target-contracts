@@ -12,18 +12,15 @@ import { Utils } from "../utils/Utils.sol";
 
 // solhint-disable max-states-count
 abstract contract UninitializedFeedVerifier is Test, Utils {
-    struct ProofData {
+    struct CheckpointData {
         uint256[2] signature;
         bytes bitmap;
-        bytes unhashedLeaf;
-        uint256 leafIndex;
         uint256 epochNumber;
         uint256 blockNumber;
         bytes32 blockHash;
         uint256 blockRound;
         bytes32 currentValidatorSetHash;
         bytes32 eventRoot;
-        bytes32[] proof;
     }
 
     EOFeedVerifier public feedVerifier;
@@ -34,7 +31,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     uint256 public childChainId = 1;
     uint256 public validatorSetSize;
     ICheckpointManager.Validator[] public validatorSet;
-    IEOFeedVerifier.BatchExitInput[] public batchExitInput;
+    IEOFeedVerifier.LeafInput[] public leafInputs;
 
     address public admin;
     address public alice;

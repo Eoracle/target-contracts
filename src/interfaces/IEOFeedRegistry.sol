@@ -1,28 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
+import { IEOFeedVerifier } from "./IEOFeedVerifier.sol";
+
 interface IEOFeedRegistry {
     struct PriceFeed {
         uint256 value;
         uint256 timestamp;
     }
 
-    function updatePriceFeed(
-        string calldata symbol,
-        uint256 value,
-        uint256 timestamp,
-        bytes memory proofData
-    )
-        external;
+    function updatePriceFeed(IEOFeedVerifier.LeafInput memory input, bytes calldata checkpointData) external;
 
     function updatePriceFeeds(
-        string[] calldata symbols,
-        uint256[] calldata values,
-        uint256[] calldata timestamps,
-        bytes[] memory proofDatas
+        IEOFeedVerifier.LeafInput[] calldata proofDatas,
+        bytes calldata checkpointData
     )
         external;
 
-    function getLatestPriceFeed(string calldata symbol) external view returns (PriceFeed memory);
-    function getLatestPriceFeeds(string[] calldata symbols) external view returns (PriceFeed[] memory);
+    function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external;
+
+    function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory);
+    function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory);
+
+    function isWhitelistedPublisher(address publisher) external view returns (bool);
 }

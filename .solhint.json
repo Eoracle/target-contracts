@@ -4,7 +4,12 @@
     "code-complexity": ["error", 8],
     "compiler-version": ["error", "0.8.20"],
     "func-name-mixedcase": "off",
-    "func-visibility": ["error", { "ignoreConstructors": true }],
+    "func-visibility": [
+      "error",
+      {
+        "ignoreConstructors": true
+      }
+    ],
     "max-line-length": ["error", 121],
     "named-parameters-mapping": "off",
     "no-console": "off",
@@ -22,12 +27,17 @@
     "const-name-snakecase": "warn",
     "event-name-camelcase": "warn",
     "func-param-name-mixedcase": "warn",
-    "func-named-parameters": ["warn", 5],
+    "func-named-parameters": ["off"],
     "modifier-name-mixedcase": "warn",
     "contract-name-camelcase": "warn",
     "quotes": ["error", "double"],
     "custom-errors": "off",
     "no-unused-vars": "warn",
-    "reason-string": ["warn", { "maxLength": 40 }]
+    "reason-string": [
+      "warn",
+      {
+        "maxLength": 40
+      }
+    ]
   }
 }

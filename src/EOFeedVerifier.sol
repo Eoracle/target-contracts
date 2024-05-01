@@ -60,59 +60,42 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     /**
      * @inheritdoc IEOFeedVerifier
      */
-    function submitAndExit(bytes calldata proofData) external onlyInitialized {
-        (
-            uint256[2] memory signature,
-            bytes memory bitmap,
-            bytes memory unhashedLeaf,
-            uint256 leafIndex,
-            uint256 epochNumber,
-            uint256 blockNumber,
-            bytes32 blockHash,
-            uint256 blockRound,
-            bytes32 currentValidatorSetHash,
-            bytes32 eventRoot,
-            bytes32[] memory proof
-        ) = abi.decode(
-            proofData,
-            (uint256[2], bytes, bytes, uint256, uint256, uint256, bytes32, uint256, bytes32, bytes32, bytes32[])
-        );
-
-        _checkpointManager.submit(
-            ICheckpointManager.CheckpointMetadata(blockHash, blockRound, currentValidatorSetHash),
-            ICheckpointManager.Checkpoint(epochNumber, blockNumber, eventRoot),
-            signature,
-            new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
-            bitmap
-        );
-
-        // COPY PASTE from _exit function
-        // slither-disable-next-line calls-loop
-        require(
-            _checkpointManager.checkEventMembership(eventRoot, keccak256(unhashedLeaf), leafIndex, proof),
-            "ExitHelper: INVALID_PROOF"
-        );
-
+    function submitAndExit(
+        LeafInput calldata input,
+        bytes calldata checkpointData
+    )
+        external
+        onlyInitialized
+        returns (bytes memory)
+    {
+        ICheckpointManager.Checkpoint memory checkpoint = _submitCheckpoint(checkpointData);
+        _verify(input, checkpoint);
         (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
-            abi.decode(unhashedLeaf, (uint256, address, address, bytes));
+            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
+
         _processedExits[id] = true;
 
         emit ExitProcessed(id, true, data);
+
+        return data;
     }
 
     /**
      * @notice Perform a batch exit for multiple events
      * @param inputs Batch exit inputs for multiple event leaves
      */
-    function batchExit(BatchExitInput[] calldata inputs) external onlyInitialized {
-        uint256 length = inputs.length;
+    function batchExit(LeafInput[] calldata inputs) external onlyInitialized {
+        _batchExit(inputs, ICheckpointManager.Checkpoint(0, 0, 0x0));
+    }
 
-        for (uint256 i = 0; i < length;) {
-            _exit(inputs[i].blockNumber, inputs[i].leafIndex, inputs[i].unhashedLeaf, inputs[i].proof, true);
-            unchecked {
-                ++i;
-            }
-        }
+    /**
+     * @notice Perform a batch exit for multiple events + submit checkpoint for them
+     * @param inputs Batch exit inputs for multiple event leaves
+     * @param checkpointData Checkpoint data for verifying the batch exits
+     */
+    function submitAndBatchExit(LeafInput[] calldata inputs, bytes calldata checkpointData) external onlyInitialized {
+        ICheckpointManager.Checkpoint memory checkpoint = _submitCheckpoint(checkpointData);
+        _batchExit(inputs, checkpoint);
     }
 
     /**
@@ -138,6 +121,24 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function getFeedRegistry() external view returns (address) {
         return _feedRegistry;
+    }
+
+    /**
+     * @notice Process a batch of exits
+     * @param inputs Batch exit inputs for multiple event leaves
+     */
+    function _batchExit(LeafInput[] calldata inputs, ICheckpointManager.Checkpoint memory checkpoint) internal {
+        uint256 length = inputs.length;
+
+        for (uint256 i = 0; i < length;) {
+            if (checkpoint.eventRoot != 0x0) {
+                _verify(inputs[i], checkpoint);
+            }
+            _exit(inputs[i].blockNumber, inputs[i].leafIndex, inputs[i].unhashedLeaf, inputs[i].proof, true);
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     /**
@@ -170,12 +171,46 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         // slither-disable-next-line calls-loop
         require(
             _checkpointManager.getEventMembershipByBlockNumber(blockNumber, keccak256(unhashedLeaf), leafIndex, proof),
-            "ExitHelper: INVALID_PROOF"
+            "EOFeedVerifier: INVALID_PROOF"
         );
 
         _processedExits[id] = true;
 
         emit ExitProcessed(id, true, data);
+    }
+
+    function _submitCheckpoint(bytes calldata checkpointData) internal returns (ICheckpointManager.Checkpoint memory) {
+        (
+            uint256[2] memory signature,
+            bytes memory bitmap,
+            uint256 epochNumber,
+            uint256 blockNumber,
+            bytes32 blockHash,
+            uint256 blockRound,
+            bytes32 currentValidatorSetHash,
+            bytes32 eventRoot
+        ) = abi.decode(checkpointData, (uint256[2], bytes, uint256, uint256, bytes32, uint256, bytes32, bytes32));
+        ICheckpointManager.Checkpoint memory checkpoint =
+            ICheckpointManager.Checkpoint(epochNumber, blockNumber, eventRoot);
+        _checkpointManager.submit(
+            ICheckpointManager.CheckpointMetadata(blockHash, blockRound, currentValidatorSetHash),
+            checkpoint,
+            signature,
+            new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
+            bitmap
+        );
+
+        return checkpoint;
+    }
+
+    function _verify(LeafInput calldata input, ICheckpointManager.Checkpoint memory checkpoint) internal view {
+        // slither-disable-next-line calls-loop
+        require(
+            _checkpointManager.checkEventMembership(
+                checkpoint.eventRoot, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
+            ),
+            "EOFeedVerifier: INVALID_PROOF"
+        );
     }
 
     // slither-disable-next-line unused-state,naming-convention
