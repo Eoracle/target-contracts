@@ -26,11 +26,11 @@ contract EOFeedCloneTest is EOFeedTest {
         feed = EOFeed(
             address(
                 feedRegistryAdapter.deployEOFeed(
-                    _baseAddress, _quoteAddress, _description, _description, _decimals, _version
+                    _baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, _version
                 )
             )
         );
-        feedRegistry.updatePriceFeed(_description, RATE1, block.timestamp, "");
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
         _lastTimestamp = block.timestamp;
     }
 }

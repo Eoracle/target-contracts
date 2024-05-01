@@ -2,36 +2,43 @@
 pragma solidity 0.8.20;
 
 import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
+import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
+// solhint-disable ordering
+// solhint-disable no-empty-blocks
 
 contract MockEOFeedRegistry is IEOFeedRegistry {
-    mapping(string => PriceFeed) public priceFeeds;
+    mapping(uint16 => PriceFeed) public priceFeeds;
 
-    function updatePriceFeed(string calldata symbol, uint256 value, uint256 timestamp, bytes memory) external {
-        priceFeeds[symbol] = PriceFeed(value, timestamp);
+    function updatePriceFeed(IEOFeedVerifier.LeafInput memory input, bytes calldata) external {
+        (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(input.unhashedLeaf, (uint16, uint256, uint256));
+
+        priceFeeds[symbol] = PriceFeed(rate, timestamp);
     }
 
-    function updatePriceFeeds(
-        string[] calldata symbols,
-        uint256[] calldata values,
-        uint256[] calldata timestamps,
-        bytes[] memory
-    )
-        external
-    {
-        for (uint256 i = 0; i < symbols.length; i++) {
-            priceFeeds[symbols[i]] = PriceFeed(values[i], timestamps[i]);
+    function updatePriceFeeds(IEOFeedVerifier.LeafInput[] calldata inputs, bytes calldata) external {
+        for (uint256 i = 0; i < inputs.length; i++) {
+            (uint16 symbol, uint256 rate, uint256 timestamp) =
+                abi.decode(inputs[i].unhashedLeaf, (uint16, uint256, uint256));
+
+            priceFeeds[symbol] = PriceFeed(rate, timestamp);
         }
     }
 
-    function getLatestPriceFeed(string calldata symbol) external view returns (PriceFeed memory) {
+    function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
         return priceFeeds[symbol];
     }
 
-    function getLatestPriceFeeds(string[] calldata symbols) external view returns (PriceFeed[] memory) {
+    function getLatestPriceFeeds(uint16[] memory symbols) external view returns (PriceFeed[] memory) {
         PriceFeed[] memory feeds = new PriceFeed[](symbols.length);
         for (uint256 i = 0; i < symbols.length; i++) {
             feeds[i] = priceFeeds[symbols[i]];
         }
         return feeds;
+    }
+
+    function whitelistPublishers(address[] memory, bool[] memory) external { }
+
+    function isWhitelistedPublisher(address) external view returns (bool) {
+        return true;
     }
 }

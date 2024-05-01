@@ -5,13 +5,15 @@ import { Test } from "forge-std/Test.sol";
 import { EOFeed } from "../src/adapters/EOFeed.sol";
 import { MockEOFeedRegistry } from "./mock/MockEOFeedRegistry.sol";
 import { IEOFeedRegistry } from "../src/interfaces/IEOFeedRegistry.sol";
-
+import { IEOFeedVerifier } from "../src/interfaces/IEOFeedVerifier.sol";
 // solhint-disable ordering
+
 contract EOFeedTest is Test {
     EOFeed public feed;
     IEOFeedRegistry public feedRegistry;
     address internal _owner;
     uint8 internal _decimals = 8;
+    uint16 internal _pairSymbol = 1;
     string internal _description = "ETH/USD";
     uint256 internal _version = 1;
     uint256 internal _lastTimestamp;
@@ -23,8 +25,8 @@ contract EOFeedTest is Test {
 
         feedRegistry = new MockEOFeedRegistry();
         feed = new EOFeed();
-        feed.initialize(feedRegistry, _description, _decimals, _description, _version);
-        feedRegistry.updatePriceFeed(_description, RATE1, block.timestamp, "");
+        feed.initialize(feedRegistry, _pairSymbol, _decimals, _description, _version);
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
         _lastTimestamp = block.timestamp;
     }
 
@@ -49,7 +51,7 @@ contract EOFeedTest is Test {
     }
 
     function test_GetRoundData2() public {
-        feedRegistry.updatePriceFeed(_description, RATE2, block.timestamp, "");
+        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(2);
         assertEq(roundId, 0);
@@ -60,7 +62,7 @@ contract EOFeedTest is Test {
     }
 
     function test_LatestRoundData2() public {
-        feedRegistry.updatePriceFeed(_description, RATE2, block.timestamp, "");
+        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.latestRoundData();
         assertEq(roundId, 0);
@@ -83,7 +85,7 @@ contract EOFeedTest is Test {
     }
 
     function testFuzz_GetRoundData(uint256 rate, uint256 timestamp) public {
-        feedRegistry.updatePriceFeed(_description, rate, timestamp, "");
+        _updatePriceFeed(_pairSymbol, rate, timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(3);
         assertEq(roundId, 0);
@@ -94,7 +96,7 @@ contract EOFeedTest is Test {
     }
 
     function testFuzz_LatestRoundData(uint256 rate, uint256 timestamp) public {
-        feedRegistry.updatePriceFeed(_description, rate, timestamp, "");
+        _updatePriceFeed(_pairSymbol, rate, timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.latestRoundData();
         assertEq(roundId, 0);
@@ -102,5 +104,11 @@ contract EOFeedTest is Test {
         assertEq(startedAt, 0);
         assertEq(updatedAt, timestamp);
         assertEq(answeredInRound, 0);
+    }
+
+    function _updatePriceFeed(uint16 pairSymbol, uint256 rate, uint256 timestamp) internal {
+        IEOFeedVerifier.LeafInput memory input;
+        input.unhashedLeaf = abi.encode(pairSymbol, rate, timestamp);
+        feedRegistry.updatePriceFeed(input, "");
     }
 }

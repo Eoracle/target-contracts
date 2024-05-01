@@ -13,8 +13,9 @@ contract EOFeed is IEOFeed, Initializable {
     IEOFeedRegistry private _feedRegistry;
 
     uint256 private _version;
-    string private _pairSymbol; // should coincide with the symbols pair identifier in the feed registry
     string private _description;
+    // next 2 variables will be packed in 1 slot
+    uint16 private _pairSymbol; // should coincide with the symbols pair identifier in the feed registry
     uint8 private _decimals;
 
     /**
@@ -27,7 +28,7 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function initialize(
         IEOFeedRegistry feedRegistry,
-        string memory pairSymbol,
+        uint16 pairSymbol,
         uint8 decimals_,
         string memory description_,
         uint256 version_
@@ -52,7 +53,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return answeredInRound The round id in which the answer was computed
      */
     function getRoundData(uint80) external view returns (uint80, int256, uint256, uint256, uint80) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_description);
+        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
         return (0, int256(priceData.value), 0, priceData.timestamp, 0);
     }
 
@@ -65,7 +66,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return answeredInRound The round id in which the answer was computed
      */
     function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_description);
+        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
         return (0, int256(priceData.value), 0, priceData.timestamp, 0);
     }
 
@@ -73,7 +74,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @notice Get the pair symbol
      * @return string The pair symbol
      */
-    function getPairSymbol() external view returns (string memory) {
+    function getPairSymbol() external view returns (uint16) {
         return _pairSymbol;
     }
 

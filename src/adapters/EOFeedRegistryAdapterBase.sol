@@ -13,13 +13,13 @@ import { EOFeedFactoryBase } from "./factories/EOFeedFactoryBase.sol";
  */
 abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactoryBase, IEOFeedRegistryAdapter {
     IEOFeedRegistry internal _feedRegistry;
-    mapping(string => IEOFeed) internal _pairSymbolsToFeeds;
+    mapping(uint16 => IEOFeed) internal _pairSymbolsToFeeds;
     mapping(address => bool) internal _feedEnabled;
-    mapping(address => mapping(address => string)) internal _tokenAddressesToPairSymbols;
+    mapping(address => mapping(address => uint16)) internal _tokenAddressesToPairSymbols;
 
     event FeedRegistrySet(address indexed feedRegistry);
-    event FeedDeployed(string indexed pairSymbol, address indexed feed);
-    event PairSymbolAdded(address indexed base, address indexed quote, string indexed pairSymbol);
+    event FeedDeployed(uint16 indexed pairSymbol, address indexed feed);
+    event PairSymbolAdded(address indexed base, address indexed quote, uint16 indexed pairSymbol);
 
     error FeedAlreadyExists();
     error BaseQuotePairExists();
@@ -56,7 +56,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     function deployEOFeed(
         address base,
         address quote,
-        string calldata pairSymbol,
+        uint16 pairSymbol,
         string calldata description_,
         uint8 decimals_,
         uint256 version_
@@ -65,11 +65,10 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
         onlyOwner
         returns (IEOFeed)
     {
-        address feedAddress = address(_pairSymbolsToFeeds[pairSymbol]);
-        if (feedAddress != address(0)) {
+        if (address(_pairSymbolsToFeeds[pairSymbol]) != address(0)) {
             revert FeedAlreadyExists();
         }
-        if (bytes(_tokenAddressesToPairSymbols[base][quote]).length != 0) {
+        if (_tokenAddressesToPairSymbols[base][quote] != 0) {
             revert BaseQuotePairExists();
         }
         address feed = _deployEOFeed();
@@ -99,7 +98,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @param symbol The pair symbol
      * @return IEOFeed The feed
      */
-    function getFeedByPairSymbol(string calldata symbol) external view returns (IEOFeed) {
+    function getFeedByPairSymbol(uint16 symbol) external view returns (IEOFeed) {
         return _pairSymbolsToFeeds[symbol];
     }
 
