@@ -97,6 +97,17 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         require(checkpointData.length > 0, "No checkpoint data provided");
 
         _feedVerifier.submitAndBatchExit(inputs, checkpointData);
+        for (uint256 i = 0; i < inputs.length;) {
+            ( /*uint256 id*/ , /* address sender */, /* address receiver */, bytes memory data) =
+                abi.decode(inputs[i].unhashedLeaf, (uint256, address, address, bytes));
+            (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
+            require(_supportedSymbols[symbol], "Symbol is not supported");
+            _priceFeeds[symbol] = PriceFeed(rate, timestamp);
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     /**

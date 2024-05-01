@@ -33,7 +33,7 @@ contract MockCheckpointManager is ICheckpointManager {
     }
 
     function getEventMembershipByBlockNumber(
-        uint256 _blockNumber,
+        uint256, /*_blockNumber*/
         bytes32, /* _leaf */
         uint256, /*_leafIndex */
         bytes32[] memory /*_proof */
@@ -43,7 +43,7 @@ contract MockCheckpointManager is ICheckpointManager {
         override
         returns (bool)
     {
-        return eventMembership[_blockNumber];
+        return true;
     }
 
     function getEventMembershipByEpoch(

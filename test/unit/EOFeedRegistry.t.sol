@@ -156,6 +156,47 @@ contract EOFeedRegistryTests is Test, Utils {
         assertEq(feed.value, rate);
     }
 
+    function test_updatePriceFeeds() public {
+        bytes memory ratesData0 = abi.encode(symbol, rate, timestamp);
+        bytes memory unhashedLeaf0 = abi.encode(1, address(0), address(0), ratesData0);
+        bytes memory ratesData1 = abi.encode(symbol + 1, rate + 1, timestamp + 1);
+        bytes memory unhashedLeaf1 = abi.encode(1, address(0), address(0), ratesData1);
+
+        bytes memory checkpointData = abi.encode(
+            [uint256(1), uint256(2)], // signature
+            bytes("1"), // bitmap
+            epochNumber,
+            blockNumber,
+            blockHash,
+            blockRound,
+            validatorSetHash,
+            eventRoot
+        );
+        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](2);
+        inputs[0] = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaf0,
+            leafIndex: 0,
+            blockNumber: blockNumber,
+            proof: new bytes32[](0)
+        });
+        inputs[1] = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaf1,
+            leafIndex: 1,
+            blockNumber: blockNumber,
+            proof: new bytes32[](0)
+        });
+
+        _whitelistPublisher(owner, publisher);
+        _setSupportedSymbol(owner, symbol);
+        _setSupportedSymbol(owner, symbol + 1);
+        vm.prank(publisher);
+        registry.updatePriceFeeds(inputs, checkpointData);
+        IEOFeedRegistry.PriceFeed memory feed0 = registry.getLatestPriceFeed(symbol);
+        IEOFeedRegistry.PriceFeed memory feed1 = registry.getLatestPriceFeed(symbol + 1);
+        assertEq(feed0.value, rate);
+        assertEq(feed1.value, rate + 1);
+    }
+
     function _whitelistPublisher(address _executer, address _publisher) private {
         address[] memory publishers = new address[](1);
         bool[] memory isWhitelisted = new bool[](1);
