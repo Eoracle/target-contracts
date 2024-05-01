@@ -28,7 +28,7 @@ contract EOFeedRegistryAdapter is OwnableUpgradeable, EOFeedFactoryBeacon, IEOFe
      */
     function initialize(address feedRegistry, address feedImplementation, address owner) external initializer {
         __Ownable_init(owner);
-        __EOFeedFactory_init(feedImplementation, msg.sender);
+        __EOFeedFactory_init(feedImplementation, owner);
         _feedRegistry = IEOFeedRegistry(feedRegistry);
         emit FeedRegistrySet(feedRegistry);
     }
