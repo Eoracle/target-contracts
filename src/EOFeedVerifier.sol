@@ -171,7 +171,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         // slither-disable-next-line calls-loop
         require(
             _checkpointManager.getEventMembershipByBlockNumber(blockNumber, keccak256(unhashedLeaf), leafIndex, proof),
-            "ExitHelper: INVALID_PROOF"
+            "EOFeedVerifier: INVALID_PROOF"
         );
 
         _processedExits[id] = true;
@@ -209,7 +209,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             _checkpointManager.checkEventMembership(
                 checkpoint.eventRoot, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
             ),
-            "ExitHelper: INVALID_PROOF"
+            "EOFeedVerifier: INVALID_PROOF"
         );
     }
 
