@@ -31,7 +31,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     uint256 public childChainId = 1;
     uint256 public validatorSetSize;
     ICheckpointManager.Validator[] public validatorSet;
-    IEOFeedVerifier.LeafInput[] public leafInput;
+    IEOFeedVerifier.LeafInput[] public leafInputs;
 
     address public admin;
     address public alice;

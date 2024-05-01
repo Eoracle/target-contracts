@@ -81,8 +81,8 @@ contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier 
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
         vm.expectRevert("EOFeedVerifier: NOT_INITIALIZED");
-        LeafInput.push(IEOFeedVerifier.LeafInput(blockNumber, leafIndex, unhashedLeaf, proof));
-        feedVerifier.batchExit(LeafInput);
+        leafInputs.push(IEOFeedVerifier.LeafInput(blockNumber, leafIndex, unhashedLeaf, proof));
+        feedVerifier.batchExit(leafInputs);
     }
 }
 
@@ -214,20 +214,20 @@ contract EOFeedVerifierBatchExit is EOFeedVerifierExited {
             true
         );
 
-        LeafInput.push(IEOFeedVerifier.LeafInput(checkpoint1.blockNumber, leafIndex1, unhashedLeaves[1], proves[1]));
+        leafInputs.push(IEOFeedVerifier.LeafInput(checkpoint1.blockNumber, leafIndex1, unhashedLeaves[1], proves[1]));
 
         uint256 id = 1;
         assertEq(feedVerifier.isProcessedExit(id), false);
         assertEq(feedVerifier.isProcessedExit(id + 1), false);
 
-        feedVerifier.batchExit(LeafInput);
+        feedVerifier.batchExit(leafInputs);
 
         assertEq(feedVerifier.isProcessedExit(id), true);
         assertEq(feedVerifier.isProcessedExit(id + 1), false);
 
-        LeafInput.push(IEOFeedVerifier.LeafInput(checkpoint2.blockNumber, leafIndex2, unhashedLeaves[2], proves[2]));
+        leafInputs.push(IEOFeedVerifier.LeafInput(checkpoint2.blockNumber, leafIndex2, unhashedLeaves[2], proves[2]));
 
-        feedVerifier.batchExit(LeafInput);
+        feedVerifier.batchExit(leafInputs);
 
         assertEq(feedVerifier.isProcessedExit(id), true);
         assertEq(feedVerifier.isProcessedExit(id + 1), true);
