@@ -24,7 +24,7 @@ abstract contract EOFeedFactoryBeacon is Initializable, EOFeedFactoryBase {
     }
 
     /**
-     * @dev Deploys a new feed instance via Clones library.
+     * @dev Deploys a new feed instance via Beacon proxy.
      */
     function _deployEOFeed() internal override returns (address) {
         // TODO: can be done with predictable address using create2
