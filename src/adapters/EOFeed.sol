@@ -10,12 +10,14 @@ import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/I
  * @notice The contract for the symbol pair price feed
  */
 contract EOFeed is IEOFeed, Initializable {
-    string private _pairSymbol; // should coincide with the symbols pair identifier in the feed registry
-    uint8 private _decimals;
-    string private _description;
-    uint256 private _version;
-
     IEOFeedRegistry private _feedRegistry;
+
+    uint256 private _version;
+    string private _pairSymbol; // should coincide with the symbols pair identifier in the feed registry
+    string private _description;
+    uint8 private _decimals;
+
+    uint256[50] private __gap;
 
     /**
      * @notice Initialize the contract
