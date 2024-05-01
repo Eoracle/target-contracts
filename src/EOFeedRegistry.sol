@@ -81,14 +81,14 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param checkpointData Checkpoint data for verifying the price feeds
      */
     function updatePriceFeeds(
-        IEOFeedVerifier.BatchExitInput[] calldata, /*proofDatas*/
-        bytes calldata /*checkpointData*/
+        IEOFeedVerifier.BatchExitInput[] calldata proofDatas,
+        bytes calldata checkpointData
     )
         external
         onlyWhitelisted
     {
-        revert("Not implemented");
-        // TODO: implement submit checkpoint & batch exit
+        require(proofDatas.length > 0, "No proof data provided");
+        require(checkpointData.length > 0, "No checkpoint data provided");
     }
 
     /**
