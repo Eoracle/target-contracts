@@ -3,12 +3,12 @@ pragma solidity 0.8.20;
 
 import { Test } from "forge-std/Test.sol";
 import { stdJson } from "forge-std/Script.sol";
-import { DeployNewTargetContractSet } from "../../script/deployment/DeployNewTargetContractSet.s.sol";
-import { DeployFeedRegistryAdapter } from "../../script/deployment/DeployFeedRegistryAdapter.s.sol";
-import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
-import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
-import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
-import { EOFeedRegistryAdapter } from "../../src/adapters/EOFeedRegistryAdapter.sol";
+import { DeployNewTargetContractSet } from "../script/deployment/DeployNewTargetContractSet.s.sol";
+import { DeployFeedRegistryAdapter } from "../script/deployment/DeployFeedRegistryAdapter.s.sol";
+import { TargetCheckpointManager } from "../src/TargetCheckpointManager.sol";
+import { EOFeedVerifier } from "../src/EOFeedVerifier.sol";
+import { EOFeedRegistry } from "../src/EOFeedRegistry.sol";
+import { EOFeedRegistryAdapter } from "../src/adapters/EOFeedRegistryAdapter.sol";
 
 contract DeployScriptTest is Test {
     using stdJson for string;
