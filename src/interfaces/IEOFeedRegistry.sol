@@ -17,6 +17,10 @@ interface IEOFeedRegistry {
     )
         external;
 
+    function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external;
+
     function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory);
     function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory);
+
+    function isWhitelistedPublisher(address publisher) external view returns (bool);
 }
