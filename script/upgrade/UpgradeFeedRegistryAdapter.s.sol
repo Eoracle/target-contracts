@@ -11,7 +11,7 @@ contract UpgradeFeedRegistryAdapter is Script {
     using stdJson for string;
 
     function run() external {
-        string memory config = EOJsonUtils.getConfig("targetContractAddresses.json");
+        string memory config = EOJsonUtils.getOutputConfig();
         address proxyAddress = config.readAddress(".feedRegistryAdapter");
         Upgrades.upgradeProxy(proxyAddress, "EOFeedRegistryAdapterV2.sol", "");
     }

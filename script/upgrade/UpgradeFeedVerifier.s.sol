@@ -11,7 +11,7 @@ contract UpgradeFeedVerifier is Script {
     using stdJson for string;
 
     function run() external {
-        string memory config = EOJsonUtils.getConfig("targetContractAddresses.json");
+        string memory config = EOJsonUtils.getOutputConfig();
         address proxyAddress = config.readAddress(".feedVerifier");
         Upgrades.upgradeProxy(proxyAddress, "EOFeedVerifierV2.sol", "");
     }

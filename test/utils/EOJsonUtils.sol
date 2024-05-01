@@ -12,13 +12,21 @@ library EOJsonUtils {
     address internal constant VM_ADDRESS = address(uint160(uint256(keccak256("hevm cheat code"))));
     Vm internal constant VM = Vm(VM_ADDRESS);
 
-    function writeConfig(string memory value, string memory fileName, string memory key) internal {
-        string memory path = string.concat("script/config/", Strings.toString(block.chainid), "/", fileName);
+    function writeConfig(string memory value, string memory key) internal {
+        string memory path =
+            string.concat("script/config/", Strings.toString(block.chainid), "/targetContractAddresses.json");
         VM.writeJson(value, path, key);
     }
 
-    function getConfig(string memory fileName) internal view returns (string memory) {
-        string memory path = string.concat("script/config/", Strings.toString(block.chainid), "/", fileName);
+    function getConfig() internal view returns (string memory) {
+        string memory path =
+            string.concat("script/config/", Strings.toString(block.chainid), "/targetContractSetConfig.json");
+        return VM.readFile(path);
+    }
+
+    function getOutputConfig() internal view returns (string memory) {
+        string memory path =
+            string.concat("script/config/", Strings.toString(block.chainid), "/targetContractAddresses.json");
         return VM.readFile(path);
     }
 }

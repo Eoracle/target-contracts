@@ -11,7 +11,7 @@ contract UpgradeFeedRegistry is Script {
     using stdJson for string;
 
     function run() external {
-        string memory config = EOJsonUtils.getConfig("targetContractAddresses.json");
+        string memory config = EOJsonUtils.getOutputConfig();
         address proxyAddress = config.readAddress(".feedRegistry");
         Upgrades.upgradeProxy(proxyAddress, "EOFeedRegistryV2.sol", "");
     }
