@@ -11,6 +11,7 @@ import { IEOFeedRegistry } from "../../interfaces/IEOFeedRegistry.sol";
 interface IEOFeed {
     function initialize(
         IEOFeedRegistry feedRegistry,
+        string memory pairSymbol,
         uint8 decimals,
         string memory description,
         uint256 version

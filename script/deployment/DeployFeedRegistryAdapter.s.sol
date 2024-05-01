@@ -7,7 +7,7 @@ import { stdJson } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { EOFeed } from "src/adapters/EOFeed.sol";
-import { EOFeedRegistryAdapter } from "src/adapters/EOFeedRegistryAdapter.sol";
+import { EOFeedRegistryAdapterBase } from "src/adapters/EOFeedRegistryAdapterBase.sol";
 
 contract DeployFeedRegistryAdapter is Script {
     using stdJson for string;
@@ -27,8 +27,9 @@ contract DeployFeedRegistryAdapter is Script {
         string memory config = vm.readFile("script/config/targetContractSetConfig.json");
         address targetContractsOwner = config.readAddress(".targetContractsOwner");
 
-        bytes memory initData =
-            abi.encodeCall(EOFeedRegistryAdapter.initialize, (feedRegistry, feedImplementation, targetContractsOwner));
+        bytes memory initData = abi.encodeCall(
+            EOFeedRegistryAdapterBase.initialize, (feedRegistry, feedImplementation, targetContractsOwner)
+        );
         adapterProxy = Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdmin, initData);
 
         addressString = Strings.toHexString(uint256(uint160(adapterProxy)), 20);
