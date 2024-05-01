@@ -12,9 +12,9 @@ import { EOFeedRegistryAdapter } from "src/adapters/EOFeedRegistryAdapter.sol";
 contract DeployFeedRegistryAdapter is Script {
     using stdJson for string;
 
-    function run() external returns (address adapterProxy) {
+    function run() external returns (address feedImplementation, address adapterProxy) {
         vm.startBroadcast();
-        address feedImplementation = address(new EOFeed());
+        feedImplementation = address(new EOFeed());
         vm.stopBroadcast();
 
         string memory addressString = Strings.toHexString(uint256(uint160(feedImplementation)), 20);

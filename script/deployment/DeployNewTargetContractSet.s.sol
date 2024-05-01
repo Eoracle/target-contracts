@@ -21,6 +21,8 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
     function run()
         external
         returns (
+            address bls,
+            address bn256G2,
             address proxyAdmin,
             address checkpointManagerProxy,
             address feedVerifierProxy,
@@ -36,8 +38,8 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
         string memory addressString = Strings.toHexString(uint256(uint160(proxyAdmin)), 20);
         vm.writeJson(addressString, "script/config/targetContractAddresses.json", ".proxyAdmin");
 
-        BN256G2 bn256G2 = new BN256G2();
-        BLS bls = new BLS();
+        bn256G2 = address(new BN256G2());
+        bls = address(new BLS());
 
         vm.stopBroadcast();
 
