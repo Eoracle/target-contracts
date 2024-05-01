@@ -149,7 +149,8 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
         (uint256 id,,, bytes memory data) = abi.decode(proofData.unhashedLeaf, (uint256, address, address, bytes));
         vm.expectEmit(true, true, true, true);
         emit ExitProcessed(id, true, data);
-        feedVerifier.submitAndExit(proofDataEncoded);
+        bytes memory leafData = feedVerifier.submitAndExit(proofDataEncoded);
+        assertEq(leafData, sliceLastBytes(proofData.unhashedLeaf, 32));
 
         assertEq(checkpointManager.getEventRootByBlock(proofData.blockNumber), proofData.eventRoot);
         assertEq(checkpointManager.checkpointBlockNumbers(0), proofData.blockNumber);

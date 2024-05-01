@@ -35,7 +35,7 @@ interface IEOFeedVerifier {
      * @notice Submit a proof and exit
      * @param proofData Proof data for the exit
      */
-    function submitAndExit(bytes calldata proofData) external;
+    function submitAndExit(bytes calldata proofData) external returns (bytes memory leafData);
 
     /**
      * @notice Perform a batch exit for multiple events

@@ -60,7 +60,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     /**
      * @inheritdoc IEOFeedVerifier
      */
-    function submitAndExit(bytes calldata proofData) external onlyInitialized {
+    function submitAndExit(bytes calldata proofData) external onlyInitialized returns (bytes memory) {
         (
             uint256[2] memory signature,
             bytes memory bitmap,
@@ -98,6 +98,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         _processedExits[id] = true;
 
         emit ExitProcessed(id, true, data);
+
+        return data;
     }
 
     /**

@@ -5,5 +5,6 @@
   "[solidity]": {
     "editor.defaultFormatter": "JuanBlanco.solidity"
   },
-  "solidity.formatter": "forge"
+  "solidity.formatter": "forge",
+  "solidity.compileUsingRemoteVersion": "v0.8.20+commit.a1b79de6"
 }
