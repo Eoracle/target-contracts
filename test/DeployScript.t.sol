@@ -9,6 +9,7 @@ import { TargetCheckpointManager } from "../src/TargetCheckpointManager.sol";
 import { EOFeedVerifier } from "../src/EOFeedVerifier.sol";
 import { EOFeedRegistry } from "../src/EOFeedRegistry.sol";
 import { EOFeedRegistryAdapter } from "../src/adapters/EOFeedRegistryAdapter.sol";
+import { EOJsonUtils } from "test/utils/EOJsonUtils.sol";
 
 contract DeployScriptTest is Test {
     using stdJson for string;
@@ -34,10 +35,10 @@ contract DeployScriptTest is Test {
         (bls, bn256G2, proxyAdmin, checkpointManagerProxy, feedVerifierProxy, feedRegistryProxy) = mainDeployer.run();
         (feedImplementation, adapterProxy) = adapterDeployer.run();
 
-        config = vm.readFile("script/config/targetContractSetConfig.json");
+        config = EOJsonUtils.getConfig("targetContractSetConfig.json");
         targetContractsOwner = config.readAddress(".targetContractsOwner");
 
-        addressesConfig = vm.readFile("script/config/targetContractAddresses.json");
+        addressesConfig = EOJsonUtils.getConfig("targetContractAddresses.json");
     }
 
     function test_Deploy_CheckpointManager() public view {
