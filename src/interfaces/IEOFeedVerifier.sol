@@ -20,18 +20,9 @@ interface IEOFeedVerifier {
 
     /**
      * @notice Perform an exit for one event
-     * @param blockNumber Block number of the exit event on L2
-     * @param leafIndex Index of the leaf in the exit event Merkle tree
-     * @param unhashedLeaf ABI-encoded exit event leaf
-     * @param proof Proof of the event inclusion in the tree
+     * @param input Exit leaf input
      */
-    function exit(
-        uint256 blockNumber,
-        uint256 leafIndex,
-        bytes calldata unhashedLeaf,
-        bytes32[] calldata proof
-    )
-        external;
+    function exit(LeafInput calldata input) external;
 
     /**
      * @notice Submit a proof and exit leaf
@@ -44,6 +35,7 @@ interface IEOFeedVerifier {
     )
         external
         returns (bytes memory leafData);
+
     /**
      * @notice Submit checkpoint and exit multiple leaves
      * @param inputs Exit leaves inputs

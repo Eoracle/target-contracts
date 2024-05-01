@@ -43,7 +43,13 @@ abstract contract EOFeedVerifierExited is CheckpointSubmitted {
         super.setUp();
         uint256 blockNumber = 1;
         uint256 leafIndex = 0;
-        feedVerifier.exit(blockNumber, leafIndex, unhashedLeaves[0], proves[0]);
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaves[0],
+            leafIndex: leafIndex,
+            blockNumber: blockNumber,
+            proof: proves[0]
+        });
+        feedVerifier.exit(input);
     }
 }
 
@@ -71,7 +77,13 @@ contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier 
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
         vm.expectRevert("EOFeedVerifier: NOT_INITIALIZED");
-        feedVerifier.exit(blockNumber, leafIndex, unhashedLeaf, proof);
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaf,
+            leafIndex: leafIndex,
+            blockNumber: blockNumber,
+            proof: proof
+        });
+        feedVerifier.exit(input);
     }
 
     function test_RevertWhen_BatchExit_Uninitialized() public {
@@ -113,7 +125,13 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
         uint256 id = 0;
         assertEq(feedVerifier.isProcessedExit(id), false);
 
-        feedVerifier.exit(checkpoint.blockNumber, leafIndex, unhashedLeaves[0], proves[0]);
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaves[0],
+            leafIndex: leafIndex,
+            blockNumber: checkpoint.blockNumber,
+            proof: proves[0]
+        });
+        feedVerifier.exit(input);
         assertEq(feedVerifier.isProcessedExit(id), true);
     }
 
@@ -235,7 +253,13 @@ contract EOFeedVerifierExitFailedAfterInitialized is CheckpointSubmitted {
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
         vm.expectRevert("EOFeedVerifier: INVALID_PROOF");
-        feedVerifier.exit(blockNumber, leafIndex, unhashedLeaves[0], proof);
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaves[0],
+            leafIndex: leafIndex,
+            blockNumber: blockNumber,
+            proof: proof
+        });
+        feedVerifier.exit(input);
     }
 }
 
@@ -243,9 +267,14 @@ contract EOFeedVerifierExitFailedAfterSubmitted is EOFeedVerifierExited {
     function test_RevertWhen_Exit_AlreadyProcessed() public {
         uint256 blockNumber = 0;
         uint256 leafIndex = 0;
-
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaves[0],
+            leafIndex: leafIndex,
+            blockNumber: blockNumber,
+            proof: proves[0]
+        });
         vm.expectRevert("ExitHelper: EXIT_ALREADY_PROCESSED");
-        feedVerifier.exit(blockNumber, leafIndex, unhashedLeaves[0], proves[0]);
+        feedVerifier.exit(input);
     }
 }
 
