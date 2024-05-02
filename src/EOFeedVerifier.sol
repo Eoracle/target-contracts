@@ -12,10 +12,9 @@ using Merkle for bytes32;
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     mapping(uint256 => bool) internal _processedExits;
     ICheckpointManager internal _checkpointManager;
-    address internal _feedRegistry;
 
     modifier onlyInitialized() {
-        require(address(_checkpointManager) != address(0), "EOFeedVerifier: NOT_INITIALIZED");
+        require(address(_checkpointManager) != address(0), "NOT_INITIALIZED");
 
         _;
     }
@@ -28,7 +27,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     function initialize(ICheckpointManager newCheckpointManager) external initializer {
         require(
             address(newCheckpointManager) != address(0) && address(newCheckpointManager).code.length != 0,
-            "ExitHelper: INVALID_ADDRESS"
+            "INVALID_ADDRESS"
         );
         _checkpointManager = newCheckpointManager;
         __Ownable_init(msg.sender);
@@ -36,25 +35,11 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     /**
      * @inheritdoc IEOFeedVerifier
+     * @dev This function is used to process an exit for one event
+     * @param input Exit leaf input
      */
-    function exit(
-        uint256 blockNumber,
-        uint256 leafIndex,
-        bytes calldata unhashedLeaf,
-        bytes32[] calldata proof
-    )
-        external
-        onlyInitialized
-    {
-        _exit(blockNumber, leafIndex, unhashedLeaf, proof, false);
-    }
-
-    /**
-     * @notice Set the address of the feed registry contract
-     * @param feedRegistry Address of the feed registry contract
-     */
-    function setFeedRegistry(address feedRegistry) external onlyOwner {
-        _feedRegistry = feedRegistry;
+    function exit(LeafInput calldata input) external onlyInitialized {
+        _exit(input, false);
     }
 
     /**
@@ -68,15 +53,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         onlyInitialized
         returns (bytes memory)
     {
-        ICheckpointManager.Checkpoint memory checkpoint = _submitCheckpoint(checkpointData);
-        _verify(input, checkpoint);
-        (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
-            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
-
-        _processedExits[id] = true;
-
-        emit ExitProcessed(id, true, data);
-
+        _submitCheckpoint(checkpointData);
+        bytes memory data = _exit(input, false);
         return data;
     }
 
@@ -85,7 +63,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param inputs Batch exit inputs for multiple event leaves
      */
     function batchExit(LeafInput[] calldata inputs) external onlyInitialized {
-        _batchExit(inputs, ICheckpointManager.Checkpoint(0, 0, 0x0));
+        _batchExit(inputs);
     }
 
     /**
@@ -94,8 +72,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param checkpointData Checkpoint data for verifying the batch exits
      */
     function submitAndBatchExit(LeafInput[] calldata inputs, bytes calldata checkpointData) external onlyInitialized {
-        ICheckpointManager.Checkpoint memory checkpoint = _submitCheckpoint(checkpointData);
-        _batchExit(inputs, checkpoint);
+        _submitCheckpoint(checkpointData);
+        _batchExit(inputs);
     }
 
     /**
@@ -116,25 +94,14 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Get the address of the feed registry contract
-     * @return Address of the feed registry contract
-     */
-    function getFeedRegistry() external view returns (address) {
-        return _feedRegistry;
-    }
-
-    /**
      * @notice Process a batch of exits
      * @param inputs Batch exit inputs for multiple event leaves
      */
-    function _batchExit(LeafInput[] calldata inputs, ICheckpointManager.Checkpoint memory checkpoint) internal {
+    function _batchExit(LeafInput[] calldata inputs) internal {
         uint256 length = inputs.length;
 
         for (uint256 i = 0; i < length;) {
-            if (checkpoint.eventRoot != 0x0) {
-                _verify(inputs[i], checkpoint);
-            }
-            _exit(inputs[i].blockNumber, inputs[i].leafIndex, inputs[i].unhashedLeaf, inputs[i].proof, true);
+            _exit(inputs[i], true);
             unchecked {
                 ++i;
             }
@@ -143,40 +110,33 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     /**
      * @notice Process an exit for one event
-     * @param blockNumber Block number of the exit event on L2
-     * @param leafIndex Index of the leaf in the exit event Merkle tree
-     * @param unhashedLeaf ABI-encoded exit event leaf
-     * @param proof Proof of the event inclusion in the tree
+     * @param input Exit leaf input
      * @param isBatch Boolean value indicating if the exit is part of a batch
      */
-    function _exit(
-        uint256 blockNumber,
-        uint256 leafIndex,
-        bytes calldata unhashedLeaf,
-        bytes32[] calldata proof,
-        bool isBatch
-    )
-        internal
-    {
+    function _exit(LeafInput calldata input, bool isBatch) internal returns (bytes memory) {
         (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
-            abi.decode(unhashedLeaf, (uint256, address, address, bytes));
+            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
         if (isBatch) {
             if (_processedExits[id]) {
-                return;
+                return new bytes(0x00);
             }
         } else {
-            require(!_processedExits[id], "ExitHelper: EXIT_ALREADY_PROCESSED");
+            require(!_processedExits[id], "EXIT_ALREADY_PROCESSED");
         }
 
         // slither-disable-next-line calls-loop
         require(
-            _checkpointManager.getEventMembershipByBlockNumber(blockNumber, keccak256(unhashedLeaf), leafIndex, proof),
-            "EOFeedVerifier: INVALID_PROOF"
+            _checkpointManager.getEventMembershipByBlockNumber(
+                input.blockNumber, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
+            ),
+            "INVALID_PROOF"
         );
 
         _processedExits[id] = true;
 
         emit ExitProcessed(id, true, data);
+
+        return data;
     }
 
     function _submitCheckpoint(bytes calldata checkpointData) internal returns (ICheckpointManager.Checkpoint memory) {
@@ -201,16 +161,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         );
 
         return checkpoint;
-    }
-
-    function _verify(LeafInput calldata input, ICheckpointManager.Checkpoint memory checkpoint) internal view {
-        // slither-disable-next-line calls-loop
-        require(
-            _checkpointManager.checkEventMembership(
-                checkpoint.eventRoot, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
-            ),
-            "EOFeedVerifier: INVALID_PROOF"
-        );
     }
 
     // slither-disable-next-line unused-state,naming-convention

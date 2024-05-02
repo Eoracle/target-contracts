@@ -20,8 +20,8 @@ contract EoracleConsumer {
 
         EOFeedRegistry.updatePriceFeed(input, checkpointData);
         IEOFeedRegistry.PriceFeed memory priceFeed = EOFeedRegistry.getLatestPriceFeed(symbol);
-        require(priceFeed.timestamp == timestamp, "Invalid timestamp");
-        require(priceFeed.value == rate, "Invalid rate");
+        require(priceFeed.timestamp == timestamp, "INVALID_TIMESTAMP");
+        require(priceFeed.value == rate, "INVALID_RATE");
         // How to read the quotes from the EOFeedRegistry.getLatestFeed output.
         emit PriceFeedUsage(symbol, priceFeed.value, priceFeed.timestamp);
     }
