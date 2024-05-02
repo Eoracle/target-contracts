@@ -77,7 +77,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     {
         bytes memory encodedRate = _feedVerifier.submitAndExit(input, checkpointData);
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(encodedRate, (uint16, uint256, uint256));
-        require(_supportedSymbols[symbol], "Symbol is not supported");
+        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
     }
 
@@ -101,7 +101,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
             ( /*uint256 id*/ , /* address sender */, /* address receiver */, bytes memory data) =
                 abi.decode(inputs[i].unhashedLeaf, (uint256, address, address, bytes));
             (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
-            require(_supportedSymbols[symbol], "Symbol is not supported");
+            require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
             _priceFeeds[symbol] = PriceFeed(rate, timestamp);
 
             unchecked {
@@ -117,7 +117,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     // TODO: it is not compatible with CL
     function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
-        require(_supportedSymbols[symbol], "Symbol is not supported");
+        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
         return _priceFeeds[symbol];
     }
 

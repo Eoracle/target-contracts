@@ -12,10 +12,9 @@ using Merkle for bytes32;
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     mapping(uint256 => bool) internal _processedExits;
     ICheckpointManager internal _checkpointManager;
-    address internal _feedRegistry;
 
     modifier onlyInitialized() {
-        require(address(_checkpointManager) != address(0), "EOFeedVerifier: NOT_INITIALIZED");
+        require(address(_checkpointManager) != address(0), "NOT_INITIALIZED");
 
         _;
     }
@@ -28,7 +27,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     function initialize(ICheckpointManager newCheckpointManager) external initializer {
         require(
             address(newCheckpointManager) != address(0) && address(newCheckpointManager).code.length != 0,
-            "ExitHelper: INVALID_ADDRESS"
+            "INVALID_ADDRESS"
         );
         _checkpointManager = newCheckpointManager;
         __Ownable_init(msg.sender);
@@ -41,14 +40,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function exit(LeafInput calldata input) external onlyInitialized {
         _exit(input, false);
-    }
-
-    /**
-     * @notice Set the address of the feed registry contract
-     * @param feedRegistry Address of the feed registry contract
-     */
-    function setFeedRegistry(address feedRegistry) external onlyOwner {
-        _feedRegistry = feedRegistry;
     }
 
     /**
@@ -103,14 +94,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Get the address of the feed registry contract
-     * @return Address of the feed registry contract
-     */
-    function getFeedRegistry() external view returns (address) {
-        return _feedRegistry;
-    }
-
-    /**
      * @notice Process a batch of exits
      * @param inputs Batch exit inputs for multiple event leaves
      */
@@ -138,7 +121,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
                 return new bytes(0x00);
             }
         } else {
-            require(!_processedExits[id], "ExitHelper: EXIT_ALREADY_PROCESSED");
+            require(!_processedExits[id], "EXIT_ALREADY_PROCESSED");
         }
 
         // slither-disable-next-line calls-loop
@@ -146,7 +129,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             _checkpointManager.getEventMembershipByBlockNumber(
                 input.blockNumber, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
             ),
-            "EOFeedVerifier: INVALID_PROOF"
+            "INVALID_PROOF"
         );
 
         _processedExits[id] = true;

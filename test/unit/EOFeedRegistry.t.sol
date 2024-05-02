@@ -123,7 +123,7 @@ contract EOFeedRegistryTests is Test, Utils {
         });
 
         _whitelistPublisher(owner, publisher);
-        vm.expectRevert("Symbol is not supported");
+        vm.expectRevert("SYMBOL_NOT_SUPPORTED");
         vm.prank(publisher);
         registry.updatePriceFeed(input, checkpointData);
     }

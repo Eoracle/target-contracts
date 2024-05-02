@@ -56,7 +56,7 @@ abstract contract EOFeedVerifierExited is CheckpointSubmitted {
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
     function test_RevertWhen_Initialize_InvalidAddress() public {
         TargetCheckpointManager checkpointManagerNull;
-        vm.expectRevert("ExitHelper: INVALID_ADDRESS");
+        vm.expectRevert("INVALID_ADDRESS");
         feedVerifier.initialize(checkpointManagerNull);
     }
 
@@ -76,7 +76,7 @@ contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier 
         bytes memory unhashedLeaf = abi.encodePacked(block.timestamp);
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
-        vm.expectRevert("EOFeedVerifier: NOT_INITIALIZED");
+        vm.expectRevert("NOT_INITIALIZED");
         IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaf,
             leafIndex: leafIndex,
@@ -92,7 +92,7 @@ contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier 
         bytes memory unhashedLeaf = abi.encodePacked(block.timestamp);
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
-        vm.expectRevert("EOFeedVerifier: NOT_INITIALIZED");
+        vm.expectRevert("NOT_INITIALIZED");
         leafInputs.push(IEOFeedVerifier.LeafInput(blockNumber, leafIndex, unhashedLeaf, proof));
         feedVerifier.batchExit(leafInputs);
     }
@@ -198,7 +198,7 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
             hashes[0] // eventRoot
         );
 
-        vm.expectRevert("EOFeedVerifier: INVALID_PROOF");
+        vm.expectRevert("INVALID_PROOF");
         feedVerifier.submitAndExit(input, checkpointData);
     }
 
@@ -252,7 +252,7 @@ contract EOFeedVerifierExitFailedAfterInitialized is CheckpointSubmitted {
         uint256 leafIndex = 0;
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
-        vm.expectRevert("EOFeedVerifier: INVALID_PROOF");
+        vm.expectRevert("INVALID_PROOF");
         IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaves[0],
             leafIndex: leafIndex,
@@ -273,7 +273,7 @@ contract EOFeedVerifierExitFailedAfterSubmitted is EOFeedVerifierExited {
             blockNumber: blockNumber,
             proof: proves[0]
         });
-        vm.expectRevert("ExitHelper: EXIT_ALREADY_PROCESSED");
+        vm.expectRevert("EXIT_ALREADY_PROCESSED");
         feedVerifier.exit(input);
     }
 }
