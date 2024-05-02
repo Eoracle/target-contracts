@@ -75,10 +75,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        bytes memory encodedRate = _feedVerifier.submitAndExit(input, checkpointData);
-        (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(encodedRate, (uint16, uint256, uint256));
-        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
-        _priceFeeds[symbol] = PriceFeed(rate, timestamp);
+        _feedVerifier.submitAndExit(input, checkpointData);
+        _processVerifiedLeaf(input);
     }
 
     /**
@@ -93,17 +91,12 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        require(inputs.length > 0, "No proof data provided");
-        require(checkpointData.length > 0, "No checkpoint data provided");
+        require(inputs.length > 0, "MISSING_INPUTS");
+        require(checkpointData.length > 0, "MISSING_CHECKPOINT");
 
         _feedVerifier.submitAndBatchExit(inputs, checkpointData);
         for (uint256 i = 0; i < inputs.length;) {
-            ( /*uint256 id*/ , /* address sender */, /* address receiver */, bytes memory data) =
-                abi.decode(inputs[i].unhashedLeaf, (uint256, address, address, bytes));
-            (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
-            require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
-            _priceFeeds[symbol] = PriceFeed(rate, timestamp);
-
+            _processVerifiedLeaf(inputs[i]);
             unchecked {
                 ++i;
             }
@@ -161,5 +154,13 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     function getFeedVerifier() external view returns (IEOFeedVerifier) {
         return _feedVerifier;
+    }
+
+    function _processVerifiedLeaf(IEOFeedVerifier.LeafInput memory input) internal {
+        ( /*uint256 id*/ , /* address sender */, /* address receiver */, bytes memory data) =
+            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
+        (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
+        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
+        _priceFeeds[symbol] = PriceFeed(rate, timestamp);
     }
 }
