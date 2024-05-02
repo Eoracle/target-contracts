@@ -93,8 +93,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        require(inputs.length > 0, "No proof data provided");
-        require(checkpointData.length > 0, "No checkpoint data provided");
+        require(inputs.length > 0, "MISSING_INPUTS");
+        require(checkpointData.length > 0, "MISSING_CHECKPOINT");
 
         _feedVerifier.submitAndBatchExit(inputs, checkpointData);
         for (uint256 i = 0; i < inputs.length;) {
