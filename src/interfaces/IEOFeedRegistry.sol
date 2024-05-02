@@ -11,11 +11,7 @@ interface IEOFeedRegistry {
 
     function updatePriceFeed(IEOFeedVerifier.LeafInput memory input, bytes calldata checkpointData) external;
 
-    function updatePriceFeeds(
-        IEOFeedVerifier.LeafInput[] calldata proofDatas,
-        bytes calldata checkpointData
-    )
-        external;
+    function updatePriceFeeds(IEOFeedVerifier.LeafInput[] calldata inputs, bytes calldata checkpointData) external;
 
     function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external;
 
