@@ -2,10 +2,10 @@
 pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
-import { EOFeed } from "../src/adapters/EOFeed.sol";
-import { MockEOFeedRegistry } from "./mock/MockEOFeedRegistry.sol";
-import { IEOFeedRegistry } from "../src/interfaces/IEOFeedRegistry.sol";
-import { IEOFeedVerifier } from "../src/interfaces/IEOFeedVerifier.sol";
+import { EOFeed } from "../../../src/adapters/EOFeed.sol";
+import { MockEOFeedRegistry } from "../../mock/MockEOFeedRegistry.sol";
+import { IEOFeedRegistry } from "../../../src/interfaces/IEOFeedRegistry.sol";
+import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 // solhint-disable ordering
 
 contract EOFeedTest is Test {

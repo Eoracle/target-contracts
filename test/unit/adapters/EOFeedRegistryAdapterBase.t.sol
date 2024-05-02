@@ -2,14 +2,14 @@
 pragma solidity ^0.8.20;
 
 import { Test } from "forge-std/Test.sol";
-import { EOFeed } from "../src/adapters/EOFeed.sol";
-import { IEOFeed } from "../src/adapters/interfaces/IEOFeed.sol";
-import { MockEOFeedRegistry } from "./mock/MockEOFeedRegistry.sol";
-import { IEOFeedRegistry } from "../src/interfaces/IEOFeedRegistry.sol";
-import { EOFeedRegistryAdapterBase } from "../src/adapters/EOFeedRegistryAdapterBase.sol";
+import { EOFeed } from "../../../src/adapters/EOFeed.sol";
+import { IEOFeed } from "../../../src/adapters/interfaces/IEOFeed.sol";
+import { MockEOFeedRegistry } from "../../mock/MockEOFeedRegistry.sol";
+import { IEOFeedRegistry } from "../../../src/interfaces/IEOFeedRegistry.sol";
+import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
 //beacon
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { IEOFeedVerifier } from "../src/interfaces/IEOFeedVerifier.sol";
+import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
@@ -34,8 +34,8 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     uint256 internal _test;
 
     event FeedRegistrySet(address indexed feedRegistry);
-    event FeedDeployed(string indexed pairSymbol, address indexed feed);
-    event PairSymbolAdded(address indexed base, address indexed quote, string indexed pairSymbol);
+    event FeedDeployed(uint16 indexed pairSymbol, address indexed feed);
+    event PairSymbolAdded(address indexed base, address indexed quote, uint16 indexed pairSymbol);
 
     function setUp() public virtual {
         _test = 10;
@@ -76,13 +76,13 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     }
 
     function test_DeployFeed() public {
-        address unknownExpepctedFeedAddress = address(0);
+        address unknownExpectedFeedAddress = address(0);
         // second topic is false (don't check) as we deploy without predictable address feature, create, not create2
         vm.expectEmit(true, false, false, false);
-        emit FeedDeployed(_description, unknownExpepctedFeedAddress);
+        emit FeedDeployed(_pairSymbol, unknownExpectedFeedAddress);
 
         vm.expectEmit();
-        emit PairSymbolAdded(_baseAddress, _quoteAddress, _description);
+        emit PairSymbolAdded(_baseAddress, _quoteAddress, _pairSymbol);
 
         IEOFeed feed = _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
 
