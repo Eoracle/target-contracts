@@ -2,10 +2,10 @@
 pragma solidity ^0.8.20;
 
 import { EOFeedTest } from "./EOFeed.t.sol";
-import { MockEOFeedRegistry } from "./mock/MockEOFeedRegistry.sol";
-import { EOFeed } from "../src/adapters/EOFeed.sol";
-import { IEOFeed } from "../src/adapters/interfaces/IEOFeed.sol";
-import { EOFeedRegistryAdapterClone } from "../src/adapters/EOFeedRegistryAdapterClone.sol";
+import { MockEOFeedRegistry } from "../../mock/MockEOFeedRegistry.sol";
+import { EOFeed } from "../../../src/adapters/EOFeed.sol";
+import { IEOFeed } from "../../../src/adapters/interfaces/IEOFeed.sol";
+import { EOFeedRegistryAdapterClone } from "../../../src/adapters/EOFeedRegistryAdapterClone.sol";
 
 // solhint-disable ordering
 // solhint-disable func-named-parameters
@@ -26,11 +26,11 @@ contract EOFeedCloneTest is EOFeedTest {
         feed = EOFeed(
             address(
                 feedRegistryAdapter.deployEOFeed(
-                    _baseAddress, _quoteAddress, _description, _description, _decimals, _version
+                    _baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, _version
                 )
             )
         );
-        feedRegistry.updatePriceFeed(_description, RATE1, block.timestamp, "");
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
         _lastTimestamp = block.timestamp;
     }
 }

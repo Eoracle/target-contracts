@@ -9,21 +9,15 @@ import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
 contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     //  TODO: for chainlink compatibility should have such mapping
     //      mapping(address => mapping(address => mapping(uint16 => IEOFeed)));
-    mapping(string => PriceFeed) internal _priceFeeds;
+
+    mapping(uint16 => PriceFeed) internal _priceFeeds;
     mapping(address => bool) internal _whitelistedPublishers;
     // TODO: is it symbol or pair of symbols? "btc" or "btc/usd"
-    mapping(string => bool) internal _supportedSymbols;
+    mapping(uint16 => bool) internal _supportedSymbols;
     // TODO: supportedFeeds mapping(address => bool) internal _supportedFeeds; ?
 
     // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
-
-    // This is for debugging
-    // event DebugLatency(
-    //     uint256 originalTimestamp,
-    //     uint256 currentTimestamp,
-    //     uint256 latency
-    // );
 
     modifier onlyWhitelisted() {
         require(_whitelistedPublishers[msg.sender], "Caller is not whitelisted");
@@ -46,7 +40,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param symbols Array of symbols
      * @param isSupported Array of booleans indicating whether the symbol is supported
      */
-    function setSupportedSymbols(string[] calldata symbols, bool[] calldata isSupported) external onlyOwner {
+    function setSupportedSymbols(uint16[] calldata symbols, bool[] calldata isSupported) external onlyOwner {
         for (uint256 i = 0; i < symbols.length;) {
             // TODO: check if it not already the needed value
             _supportedSymbols[symbols[i]] = isSupported[i];
@@ -74,49 +68,37 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     /**
      * @notice Update the price feed for a symbol
-     * @param symbol Symbol of the price feed
-     * @param value Price of the symbol
-     * @param timestamp Timestamp of the price feed
-     * @param proofData Proof data (data + proof) for the price feed
+     * @param checkpointData Proof data (data + proof) for the price feed
      */
     function updatePriceFeed(
-        string calldata symbol,
-        uint256 value,
-        uint256 timestamp,
-        bytes memory proofData
+        IEOFeedVerifier.LeafInput memory input,
+        bytes memory checkpointData
     )
         external
         onlyWhitelisted
     {
-        require(_supportedSymbols[symbol], "Symbol is not supported");
-        _feedVerifier.submitAndExit(proofData);
-
-        _priceFeeds[symbol] = PriceFeed(value, timestamp);
+        bytes memory data = _feedVerifier.submitAndExit(input, checkpointData);
+        _processVerifiedRate(data);
     }
 
     /**
      * @notice Update the price feeds for multiple symbols
-     * @param symbols Array of symbols
-     * @param values Array of prices
-     * @param timestamps Array of timestamps
-     * @param proofDatas Array of proof data (data + proof) for the price feeds
+     * @param inputs Array of leafs to prove the price feeds
+     * @param checkpointData Checkpoint data for verifying the price feeds
      */
     function updatePriceFeeds(
-        string[] calldata symbols,
-        uint256[] memory values,
-        uint256[] memory timestamps,
-        bytes[] memory proofDatas
+        IEOFeedVerifier.LeafInput[] calldata inputs,
+        bytes calldata checkpointData
     )
         external
         onlyWhitelisted
     {
-        require(
-            symbols.length == values.length && values.length == timestamps.length
-                && timestamps.length == proofDatas.length,
-            "Arrays lengths are not equal"
-        );
-        for (uint256 i = 0; i < symbols.length;) {
-            this.updatePriceFeed(symbols[i], values[i], timestamps[i], proofDatas[i]);
+        require(inputs.length > 0, "MISSING_INPUTS");
+        require(checkpointData.length > 0, "MISSING_CHECKPOINT");
+
+        bytes[] memory data = _feedVerifier.submitAndBatchExit(inputs, checkpointData);
+        for (uint256 i = 0; i < data.length;) {
+            _processVerifiedRate(data[i]);
             unchecked {
                 ++i;
             }
@@ -129,8 +111,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @return Price feed struct
      */
     // TODO: it is not compatible with CL
-    function getLatestPriceFeed(string calldata symbol) external view override returns (PriceFeed memory) {
-        require(_supportedSymbols[symbol], "Symbol is not supported");
+    function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
+        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
         return _priceFeeds[symbol];
     }
 
@@ -139,7 +121,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param symbols Array of symbols
      * @return Array of price feed structs
      */
-    function getLatestPriceFeeds(string[] calldata symbols) external view override returns (PriceFeed[] memory) {
+    function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory) {
         PriceFeed[] memory retVal = new PriceFeed[](symbols.length);
         for (uint256 i = 0; i < symbols.length;) {
             retVal[i] = this.getLatestPriceFeed(symbols[i]);
@@ -164,7 +146,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param symbol Symbol to check
      * @return Boolean indicating whether the symbol is supported
      */
-    function isSupportedSymbol(string calldata symbol) external view returns (bool) {
+    function isSupportedSymbol(uint16 symbol) external view returns (bool) {
         return _supportedSymbols[symbol];
     }
 
@@ -174,5 +156,11 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     function getFeedVerifier() external view returns (IEOFeedVerifier) {
         return _feedVerifier;
+    }
+
+    function _processVerifiedRate(bytes memory data) internal {
+        (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
+        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
+        _priceFeeds[symbol] = PriceFeed(rate, timestamp);
     }
 }

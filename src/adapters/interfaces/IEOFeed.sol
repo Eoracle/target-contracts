@@ -11,12 +11,13 @@ import { IEOFeedRegistry } from "../../interfaces/IEOFeedRegistry.sol";
 interface IEOFeed {
     function initialize(
         IEOFeedRegistry feedRegistry,
-        string memory pairSymbol,
+        uint16 pairSymbol,
         uint8 decimals,
         string memory description,
         uint256 version
     )
         external;
+    function getPairSymbol() external view returns (uint16);
     function decimals() external view returns (uint8);
     function description() external view returns (string memory);
     function version() external view returns (uint256);

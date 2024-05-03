@@ -2,8 +2,8 @@
 pragma solidity ^0.8.20;
 
 import { EOFeedRegistryAdapterBaseTest } from "./EOFeedRegistryAdapterBase.t.sol";
-import { EOFeedRegistryAdapterBase } from "../src/adapters/EOFeedRegistryAdapterBase.sol";
-import { EOFeedRegistryAdapter } from "../src/adapters/EOFeedRegistryAdapter.sol";
+import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
+import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapter.sol";
 import { UpgradeableBeacon } from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 
 // solhint-disable ordering

@@ -9,21 +9,19 @@ import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { DeployFeedVerifier } from "../../script/deployment/base/DeployFeedVerifier.s.sol";
+import { Utils } from "../utils/Utils.sol";
 
 // solhint-disable max-states-count
-abstract contract UninitializedFeedVerifier is Test {
-    struct ProofData {
+abstract contract UninitializedFeedVerifier is Test, Utils {
+    struct CheckpointData {
         uint256[2] signature;
         bytes bitmap;
-        bytes unhashedLeaf;
-        uint256 leafIndex;
         uint256 epochNumber;
         uint256 blockNumber;
         bytes32 blockHash;
         uint256 blockRound;
         bytes32 currentValidatorSetHash;
         bytes32 eventRoot;
-        bytes32[] proof;
     }
 
     EOFeedVerifier public feedVerifier;
@@ -35,7 +33,7 @@ abstract contract UninitializedFeedVerifier is Test {
     uint256 public childChainId = 1;
     uint256 public validatorSetSize;
     ICheckpointManager.Validator[] public validatorSet;
-    IEOFeedVerifier.BatchExitInput[] public batchExitInput;
+    IEOFeedVerifier.LeafInput[] public leafInputs;
 
     address public admin;
     address public alice;
