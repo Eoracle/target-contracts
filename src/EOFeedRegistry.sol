@@ -28,9 +28,10 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @notice Initialize the contract with the feed verifier address
      * @dev The feed verifier contract must be deployed first
      * @param feedVerifier Address of the feed verifier contract
+     * @param owner Owner of the contract
      */
-    function initialize(IEOFeedVerifier feedVerifier) external initializer {
-        __Ownable_init(msg.sender);
+    function initialize(IEOFeedVerifier feedVerifier, address owner) external initializer {
+        __Ownable_init(owner);
         _feedVerifier = IEOFeedVerifier(feedVerifier);
     }
 

@@ -22,7 +22,7 @@ contract EOFeedCloneTest is EOFeedTest {
         IEOFeed feedImpl = new EOFeed();
 
         EOFeedRegistryAdapterClone feedRegistryAdapter = new EOFeedRegistryAdapterClone();
-        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl));
+        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl), address(this));
         feed = EOFeed(
             address(
                 feedRegistryAdapter.deployEOFeed(

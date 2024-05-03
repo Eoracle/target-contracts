@@ -44,7 +44,7 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         feedRegistry = new MockEOFeedRegistry();
         feedImpl = new EOFeed();
         feedRegistryAdapter = _deployAdapter();
-        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl));
+        feedRegistryAdapter.initialize(address(feedRegistry), address(feedImpl), address(this));
 
         _baseAddress = makeAddr("base");
         _quoteAddress = makeAddr("quote");

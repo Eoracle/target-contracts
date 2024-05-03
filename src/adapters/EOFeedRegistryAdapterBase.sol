@@ -27,10 +27,12 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     /**
      * @notice Initialize the contract
      * @param feedRegistry The feed registry address
+     * @param feedImplementation The feed implementation address
+     * @param owner Owner of the contract
      */
-    function initialize(address feedRegistry, address feedImplementation) external initializer {
-        __Ownable_init(msg.sender);
-        __EOFeedFactory_init(feedImplementation, msg.sender);
+    function initialize(address feedRegistry, address feedImplementation, address owner) external initializer {
+        __Ownable_init(owner);
+        __EOFeedFactory_init(feedImplementation, owner);
         _feedRegistry = IEOFeedRegistry(feedRegistry);
         emit FeedRegistrySet(feedRegistry);
     }

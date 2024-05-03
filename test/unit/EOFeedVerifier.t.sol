@@ -60,12 +60,13 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
         feedVerifier.initialize(checkpointManagerNull);
     }
 
-    function testInitialize() public {
-        feedVerifier.initialize(checkpointManager);
+    function test_Initialize() public {
+        feedVerifier.initialize(checkpointManager, address(this));
         assertEq(
             keccak256(abi.encode(feedVerifier.getCheckpointManager())),
             keccak256(abi.encode(address(checkpointManager)))
         );
+        assertEq(feedVerifier.owner(), address(this));
     }
 }
 
