@@ -7,15 +7,9 @@ import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
 
 contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
-    //  TODO: for chainlink compatibility should have such mapping
-    //      mapping(address => mapping(address => mapping(uint16 => IEOFeed)));
-
     mapping(uint16 => PriceFeed) internal _priceFeeds;
     mapping(address => bool) internal _whitelistedPublishers;
-    // TODO: is it symbol or pair of symbols? "btc" or "btc/usd"
     mapping(uint16 => bool) internal _supportedSymbols;
-    // TODO: supportedFeeds mapping(address => bool) internal _supportedFeeds; ?
-
     // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
 
