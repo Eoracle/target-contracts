@@ -57,7 +57,7 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
     function test_RevertWhen_Initialize_InvalidAddress() public {
         TargetCheckpointManager checkpointManagerNull;
         vm.expectRevert("INVALID_ADDRESS");
-        feedVerifier.initialize(checkpointManagerNull);
+        feedVerifier.initialize(checkpointManagerNull, address(this));
     }
 
     function test_Initialize() public {

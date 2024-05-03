@@ -31,11 +31,11 @@ contract EOFeedRegistryTests is Test, Utils {
 
     function setUp() public {
         checkpointManager = new MockCheckpointManager();
-        verifier = EOFeedVerifier(proxify("EOFeedVerifier.sol", ""));
-        registry = EOFeedRegistry(proxify("EOFeedRegistry.sol", ""));
+        verifier = new EOFeedVerifier();
+        registry = new EOFeedRegistry();
         vm.startPrank(owner);
-        verifier.initialize(checkpointManager);
-        registry.initialize(verifier);
+        verifier.initialize(checkpointManager, owner);
+        registry.initialize(verifier, owner);
         vm.stopPrank();
     }
 
