@@ -9,6 +9,7 @@ import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
 contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     //  TODO: for chainlink compatibility should have such mapping
     //      mapping(address => mapping(address => mapping(uint16 => IEOFeed)));
+
     mapping(uint16 => PriceFeed) internal _priceFeeds;
     mapping(address => bool) internal _whitelistedPublishers;
     // TODO: is it symbol or pair of symbols? "btc" or "btc/usd"
@@ -75,8 +76,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        _feedVerifier.submitAndExit(input, checkpointData);
-        _processVerifiedLeaf(input);
+        bytes memory data = _feedVerifier.submitAndExit(input, checkpointData);
+        _processVerifiedRate(data);
     }
 
     /**
@@ -94,9 +95,9 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         require(inputs.length > 0, "MISSING_INPUTS");
         require(checkpointData.length > 0, "MISSING_CHECKPOINT");
 
-        _feedVerifier.submitAndBatchExit(inputs, checkpointData);
-        for (uint256 i = 0; i < inputs.length;) {
-            _processVerifiedLeaf(inputs[i]);
+        bytes[] memory data = _feedVerifier.submitAndBatchExit(inputs, checkpointData);
+        for (uint256 i = 0; i < data.length;) {
+            _processVerifiedRate(data[i]);
             unchecked {
                 ++i;
             }
@@ -156,9 +157,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         return _feedVerifier;
     }
 
-    function _processVerifiedLeaf(IEOFeedVerifier.LeafInput memory input) internal {
-        ( /*uint256 id*/ , /* address sender */, /* address receiver */, bytes memory data) =
-            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
+    function _processVerifiedRate(bytes memory data) internal {
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
         require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);

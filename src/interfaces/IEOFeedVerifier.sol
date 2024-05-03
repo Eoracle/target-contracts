@@ -41,7 +41,12 @@ interface IEOFeedVerifier {
      * @param inputs Exit leaves inputs
      * @param checkpointData checkpoint data for verifying the exit
      */
-    function submitAndBatchExit(LeafInput[] memory inputs, bytes calldata checkpointData) external;
+    function submitAndBatchExit(
+        LeafInput[] memory inputs,
+        bytes calldata checkpointData
+    )
+        external
+        returns (bytes[] memory);
 
     /**
      * @notice Perform a batch exit for multiple events

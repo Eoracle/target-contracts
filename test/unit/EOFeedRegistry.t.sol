@@ -160,7 +160,7 @@ contract EOFeedRegistryTests is Test, Utils {
         bytes memory ratesData0 = abi.encode(symbol, rate, timestamp);
         bytes memory unhashedLeaf0 = abi.encode(1, address(0), address(0), ratesData0);
         bytes memory ratesData1 = abi.encode(symbol + 1, rate + 1, timestamp + 1);
-        bytes memory unhashedLeaf1 = abi.encode(1, address(0), address(0), ratesData1);
+        bytes memory unhashedLeaf1 = abi.encode(2, address(0), address(0), ratesData1);
 
         bytes memory checkpointData = abi.encode(
             [uint256(1), uint256(2)], // signature

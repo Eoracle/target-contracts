@@ -70,10 +70,18 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @notice Perform a batch exit for multiple events + submit checkpoint for them
      * @param inputs Batch exit inputs for multiple event leaves
      * @param checkpointData Checkpoint data for verifying the batch exits
+     * @return Array of the leaf data fields of all submitted leaves
      */
-    function submitAndBatchExit(LeafInput[] calldata inputs, bytes calldata checkpointData) external onlyInitialized {
+    function submitAndBatchExit(
+        LeafInput[] calldata inputs,
+        bytes calldata checkpointData
+    )
+        external
+        onlyInitialized
+        returns (bytes[] memory)
+    {
         _submitCheckpoint(checkpointData);
-        _batchExit(inputs);
+        return _batchExit(inputs);
     }
 
     /**
@@ -96,16 +104,18 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     /**
      * @notice Process a batch of exits
      * @param inputs Batch exit inputs for multiple event leaves
+     * @return Array of the leaf data fields of all submitted leaves
      */
-    function _batchExit(LeafInput[] calldata inputs) internal {
+    function _batchExit(LeafInput[] calldata inputs) internal returns (bytes[] memory) {
         uint256 length = inputs.length;
-
+        bytes[] memory returnData = new bytes[](length);
         for (uint256 i = 0; i < length;) {
-            _exit(inputs[i], true);
+            returnData[i] = _exit(inputs[i], true);
             unchecked {
                 ++i;
             }
         }
+        return returnData;
     }
 
     /**
