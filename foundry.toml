@@ -18,6 +18,8 @@
   fs_permissions = [{ access = "read-write", path = "./" }]
   ffi = true
   ast = true
+
+[profile.deployment]
   build_info = true
   extra_output = ["storageLayout"]
 
