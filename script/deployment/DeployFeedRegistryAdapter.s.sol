@@ -22,16 +22,16 @@ contract DeployFeedRegistryAdapter is Script {
         EOJsonUtils.writeConfig(addressString, ".feedImplementation");
 
         string memory outputConfig = EOJsonUtils.getOutputConfig();
-        address proxyAdmin = outputConfig.readAddress(".proxyAdmin");
         address feedRegistry = outputConfig.readAddress(".feedRegistry");
 
         string memory config = EOJsonUtils.getConfig();
         address targetContractsOwner = config.readAddress(".targetContractsOwner");
+        address proxyAdminOwner = config.readAddress(".proxyAdminOwner");
 
         bytes memory initData = abi.encodeCall(
             EOFeedRegistryAdapterBase.initialize, (feedRegistry, feedImplementation, targetContractsOwner)
         );
-        adapterProxy = Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdmin, initData);
+        adapterProxy = Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdminOwner, initData);
 
         addressString = Strings.toHexString(uint256(uint160(adapterProxy)), 20);
         EOJsonUtils.writeConfig(addressString, ".feedRegistryAdapter");
