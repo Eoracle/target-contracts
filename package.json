@@ -1,6 +1,6 @@
 {
-  "name": "Eoracle",
-  "description": "Eoracle target solidity smart contracts",
+  "name": "eoracle",
+  "description": "eoracle target solidity smart contracts",
   "version": "1.0.0",
   "dependencies": {
     "keccak256": "^1.0.6",
