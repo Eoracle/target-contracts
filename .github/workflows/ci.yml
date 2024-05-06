@@ -2,7 +2,7 @@ name: "CI"
 
 env:
   API_KEY_ALCHEMY: ${{ secrets.API_KEY_ALCHEMY }}
-  FOUNDRY_PROFILE: "ci"
+  FOUNDRY_PROFILE: "full_test"
 
 on:
   workflow_dispatch:
@@ -18,8 +18,15 @@ jobs:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
 
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v2
+        with:
+          node-version: "21.x"
+
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
+        with:
+          version: "nightly-cafc2606a2187a42b236df4aa65f4e8cdfcea970"
 
       - name: "Install the Node.js dependencies"
         run: "npm install"
@@ -38,8 +45,15 @@ jobs:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
 
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v2
+        with:
+          node-version: "21.x"
+
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
+        with:
+          version: "nightly-cafc2606a2187a42b236df4aa65f4e8cdfcea970"
 
       - name: "Install the Node.js dependencies"
         run: "npm install"
@@ -59,8 +73,15 @@ jobs:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
 
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v2
+        with:
+          node-version: "21.x"
+
       - name: "Install Foundry"
         uses: "foundry-rs/foundry-toolchain@v1"
+        with:
+          version: "nightly-cafc2606a2187a42b236df4aa65f4e8cdfcea970"
 
       - name: "Install the Node.js dependencies"
         run: "npm install"
