@@ -13,20 +13,19 @@
   script = "script"
   solc = "0.8.20"
   src = "src"
-  test = "test"
+  test = "test/unit"
   libs = ["lib"]
   fs_permissions = [{ access = "read-write", path = "./" }]
   ffi = true
   ast = true
 
-[profile.deployment]
+[profile.full_test]
+  test = "test"
   build_info = true
   extra_output = ["storageLayout"]
-
-[profile.ci]
   fuzz = { runs = 10_000 }
   verbosity = 4
-
+  
 [fmt]
   bracket_spacing = true
   int_types = "long"
