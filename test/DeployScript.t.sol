@@ -42,10 +42,10 @@ contract DeployScriptTest is Test {
     }
 
     function test_Deploy_CheckpointManager() public view {
-        uint256 chainId = config.readUint(".chainId");
+        uint256 childChainId = config.readUint(".childChainId");
 
         assertEq(TargetCheckpointManager(checkpointManagerProxy).owner(), targetContractsOwner);
-        assertEq(TargetCheckpointManager(checkpointManagerProxy).chainId(), chainId);
+        assertEq(TargetCheckpointManager(checkpointManagerProxy).chainId(), childChainId);
         assertEq(address(TargetCheckpointManager(checkpointManagerProxy).bls()), bls);
         assertEq(address(TargetCheckpointManager(checkpointManagerProxy).bn256G2()), bn256G2);
         assertEq(checkpointManagerProxy, outputConfig.readAddress(".checkpointManager"));
