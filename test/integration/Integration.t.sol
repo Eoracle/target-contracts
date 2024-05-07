@@ -14,8 +14,8 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed() public {
         vm.prank(publisher);
-        registry.updatePriceFeed(input[0], checkpointData[0]);
-        IEOFeedRegistry.PriceFeed memory feed = registry.getLatestPriceFeed(symbols[0]);
+        feedRegistry.updatePriceFeed(input[0], checkpointData[0]);
+        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
     }
 
@@ -24,8 +24,8 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed2() public {
         vm.prank(publisher);
-        registry.updatePriceFeed(input[1], checkpointData[0]);
-        IEOFeedRegistry.PriceFeed memory feed = registry.getLatestPriceFeed(symbols[1]);
+        feedRegistry.updatePriceFeed(input[1], checkpointData[0]);
+        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[1]);
         assertEq(feed.value, rates[1]);
     }
 
@@ -50,10 +50,10 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeeds() public {
         vm.prank(publisher);
-        registry.updatePriceFeeds(input, checkpointData[0]);
-        IEOFeedRegistry.PriceFeed memory feed = registry.getLatestPriceFeed(symbols[0]);
+        feedRegistry.updatePriceFeeds(input, checkpointData[0]);
+        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
-        feed = registry.getLatestPriceFeed(symbols[1]);
+        feed = feedRegistry.getLatestPriceFeed(symbols[1]);
         assertEq(feed.value, rates[1]);
     }
 
@@ -127,7 +127,6 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         symbols = [1, 2];
         rates = [100, 101];
         timestamps = [9_999_999_999, 9_999_999_999];
-
         for (uint256 i = 0; i < symbols.length; i++) {
             symbolData.push(abi.encode(symbols[i], rates[i], timestamps[i]));
         }
