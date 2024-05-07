@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Arrays } from "@openzeppelin/contracts/utils/Arrays.sol";
@@ -203,7 +203,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         // slither-disable-next-line uninitialized-local
         uint256[4] memory aggPubkey;
         uint256 aggVotingPower = 0;
-        for (uint256 i = 0; i < length;) {
+        for (uint256 i = 0; i < length; i++) {
             if (_getValueFromBitmap(bitmap, i)) {
                 if (aggVotingPower == 0) {
                     aggPubkey = currentValidatorSet[i].blsKey;
@@ -222,9 +222,6 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
                     });
                 }
                 aggVotingPower += currentValidatorSet[i].votingPower;
-            }
-            unchecked {
-                ++i;
             }
         }
 

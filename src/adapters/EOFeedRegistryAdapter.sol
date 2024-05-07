@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { EOFeedFactoryBeacon } from "./factories/EOFeedFactoryBeacon.sol";
 import { EOFeedRegistryAdapterBase } from "./EOFeedRegistryAdapterBase.sol";

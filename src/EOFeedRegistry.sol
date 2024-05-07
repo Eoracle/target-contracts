@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -41,12 +41,9 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param isSupported Array of booleans indicating whether the symbol is supported
      */
     function setSupportedSymbols(uint16[] calldata symbols, bool[] calldata isSupported) external onlyOwner {
-        for (uint256 i = 0; i < symbols.length;) {
+        for (uint256 i = 0; i < symbols.length; i++) {
             // TODO: check if it not already the needed value
             _supportedSymbols[symbols[i]] = isSupported[i];
-            unchecked {
-                ++i;
-            }
         }
     }
 
@@ -57,12 +54,9 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     // TODO: it's better to use add/remove logic for whitelisted publishers
     function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external onlyOwner {
-        for (uint256 i = 0; i < publishers.length;) {
+        for (uint256 i = 0; i < publishers.length; i++) {
             // TODO: check if it not already the needed value
             _whitelistedPublishers[publishers[i]] = isWhitelisted[i];
-            unchecked {
-                ++i;
-            }
         }
     }
 
@@ -97,11 +91,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         require(checkpointData.length > 0, "MISSING_CHECKPOINT");
 
         bytes[] memory data = _feedVerifier.submitAndBatchExit(inputs, checkpointData);
-        for (uint256 i = 0; i < data.length;) {
+        for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
-            unchecked {
-                ++i;
-            }
         }
     }
 
@@ -123,11 +114,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory) {
         PriceFeed[] memory retVal = new PriceFeed[](symbols.length);
-        for (uint256 i = 0; i < symbols.length;) {
+        for (uint256 i = 0; i < symbols.length; i++) {
             retVal[i] = this.getLatestPriceFeed(symbols[i]);
-            unchecked {
-                ++i;
-            }
         }
         return retVal;
     }
