@@ -331,4 +331,19 @@ contract EOFeedVerifierBatchExit is EOFeedVerifierExited {
         assertEq(feedVerifier.isProcessedExit(id), true);
         assertEq(feedVerifier.isProcessedExit(id + 1), true);
     }
+
+    function test_BatchExit_AlreadyProcessed() public {
+        uint256 blockNumber = 0;
+        uint256 leafIndex = 0;
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
+            unhashedLeaf: unhashedLeaves[0],
+            leafIndex: leafIndex,
+            blockNumber: blockNumber,
+            proof: proves[0]
+        });
+        leafInputs.push(input);
+        feedVerifier.batchExit(leafInputs);
+        (uint256 id,,,) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
+        assertEq(feedVerifier.isProcessedExit(id), true);
+    }
 }

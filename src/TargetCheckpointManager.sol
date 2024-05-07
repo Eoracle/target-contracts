@@ -83,8 +83,6 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
 
         uint256 prevEpoch = currentEpoch;
 
-        // _verifyCheckpoint(prevEpoch, checkpoint);
-
         checkpoints[checkpoint.epoch] = checkpoint;
 
         if (checkpoint.epoch > prevEpoch) {
@@ -234,19 +232,6 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         (bool callSuccess, bool result) = bls.verifySingle(signature, aggPubkey, message);
 
         require(callSuccess && result, "SIGNATURE_VERIFICATION_FAILED");
-    }
-
-    /**
-     * @notice Internal function that performs checks on the checkpoint
-     * @param prevId Current checkpoint ID
-     * @param checkpoint The checkpoint to store
-     */
-    function _verifyCheckpoint(uint256 prevId, Checkpoint calldata checkpoint) private view {
-        Checkpoint memory oldCheckpoint = checkpoints[prevId];
-        require(
-            checkpoint.epoch == oldCheckpoint.epoch || checkpoint.epoch == (oldCheckpoint.epoch + 1), "INVALID_EPOCH"
-        );
-        require(checkpoint.blockNumber > oldCheckpoint.blockNumber, "EMPTY_CHECKPOINT");
     }
 
     function _getValueFromBitmap(bytes calldata bitmap, uint256 index) private pure returns (bool) {
