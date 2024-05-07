@@ -66,7 +66,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
         address feedVerifierAddr;
         address feedRegistryAddr;
 
-        (,,, checkpointManagerAddr, feedVerifierAddr, feedRegistryAddr) = mainDeployer.run();
+        (,, checkpointManagerAddr, feedVerifierAddr, feedRegistryAddr) = mainDeployer.run();
         // todo: impement tests for adapters
         // (address feedImplementation, address adapterProxy) = adapterDeployer.run();
 
