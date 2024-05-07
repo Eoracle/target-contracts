@@ -18,7 +18,6 @@ contract DeployScriptTest is Test {
     DeployFeedRegistryAdapter public adapterDeployer;
     address public bls;
     address public bn256G2;
-    address public proxyAdmin;
     address public checkpointManagerProxy;
     address public feedVerifierProxy;
     address public feedRegistryProxy;
@@ -32,7 +31,7 @@ contract DeployScriptTest is Test {
         mainDeployer = new DeployNewTargetContractSet();
         adapterDeployer = new DeployFeedRegistryAdapter();
 
-        (bls, bn256G2, proxyAdmin, checkpointManagerProxy, feedVerifierProxy, feedRegistryProxy) = mainDeployer.run();
+        (bls, bn256G2, checkpointManagerProxy, feedVerifierProxy, feedRegistryProxy) = mainDeployer.run();
         (feedImplementation, adapterProxy) = adapterDeployer.run();
 
         config = EOJsonUtils.getConfig();
@@ -42,10 +41,10 @@ contract DeployScriptTest is Test {
     }
 
     function test_Deploy_CheckpointManager() public view {
-        uint256 chainId = config.readUint(".chainId");
+        uint256 childChainId = config.readUint(".childChainId");
 
         assertEq(TargetCheckpointManager(checkpointManagerProxy).owner(), targetContractsOwner);
-        assertEq(TargetCheckpointManager(checkpointManagerProxy).chainId(), chainId);
+        assertEq(TargetCheckpointManager(checkpointManagerProxy).chainId(), childChainId);
         assertEq(address(TargetCheckpointManager(checkpointManagerProxy).bls()), bls);
         assertEq(address(TargetCheckpointManager(checkpointManagerProxy).bn256G2()), bn256G2);
         assertEq(checkpointManagerProxy, outputConfig.readAddress(".checkpointManager"));
