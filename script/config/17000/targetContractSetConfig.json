@@ -1,6 +1,6 @@
 {
-  "proxyAdminOwner": "0xE34aaF64b29273B7D567FCFc40544c014EEe9970",
-  "targetContractsOwner": "0xE34aaF64b29273B7D567FCFc40544c014EEe9970",
+  "proxyAdminOwner": "0xAC02A85993e88740206895229a48057059d30fe5",
+  "targetContractsOwner": "0xAC02A85993e88740206895229a48057059d30fe5",
   "childChainId": 42420,
   "targetChainId": 17000
 }
