@@ -56,6 +56,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
     )
         external
     {
+        require(currentValidatorSetHash != bytes32(0), "VALIDATOR_SET_NOT_INITIALIZED");
         require(currentValidatorSetHash == checkpointMetadata.currentValidatorSetHash, "INVALID_VALIDATOR_SET_HASH");
         bytes32 newValidatorSetHash;
         if (newValidatorSet.length == 0) {

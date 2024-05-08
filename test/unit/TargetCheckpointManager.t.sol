@@ -56,6 +56,14 @@ contract CheckpointManagerSetNewValidatorSetTest is UninitializedCheckpointManag
         vm.expectRevert("VOTING_POWER_ZERO");
         checkpointManager.setNewValidatorSet(validatorSet);
     }
+
+    function test_Submit_RevertWhen_ValidatorSetNotInitialized() public {
+        ICheckpointManager.Checkpoint memory checkpoint;
+        ICheckpointManager.CheckpointMetadata memory checkpointMetadata;
+
+        vm.expectRevert("VALIDATOR_SET_NOT_INITIALIZED");
+        checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
+    }
 }
 
 contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
