@@ -191,10 +191,30 @@ contract EOFeedRegistryTests is Test, Utils {
         _setSupportedSymbol(owner, symbol + 1);
         vm.prank(publisher);
         registry.updatePriceFeeds(inputs, checkpointData);
-        IEOFeedRegistry.PriceFeed memory feed0 = registry.getLatestPriceFeed(symbol);
-        IEOFeedRegistry.PriceFeed memory feed1 = registry.getLatestPriceFeed(symbol + 1);
-        assertEq(feed0.value, rate);
-        assertEq(feed1.value, rate + 1);
+        uint16[] memory symbols = new uint16[](2);
+        symbols[0] = symbol;
+        symbols[1] = symbol + 1;
+        IEOFeedRegistry.PriceFeed[] memory feeds = registry.getLatestPriceFeeds(symbols);
+        assertEq(feeds[0].value, rate);
+        assertEq(feeds[1].value, rate + 1);
+    }
+
+    function test_RevertWhen_IncorrectInput_updatePriceFeeds() public {
+        _whitelistPublisher(owner, publisher);
+        vm.startPrank(publisher);
+        bytes memory checkpointData;
+        IEOFeedVerifier.LeafInput[] memory inputs;
+        vm.expectRevert("MISSING_INPUTS");
+        registry.updatePriceFeeds(inputs, checkpointData);
+
+        inputs = new IEOFeedVerifier.LeafInput[](2);
+        vm.expectRevert("MISSING_CHECKPOINT");
+        registry.updatePriceFeeds(inputs, checkpointData);
+    }
+
+    function test_RevertWhen_SymbolNotSupported_GetLatestPriceFeed() public {
+        vm.expectRevert("SYMBOL_NOT_SUPPORTED");
+        registry.getLatestPriceFeed(999);
     }
 
     function _whitelistPublisher(address _executer, address _publisher) private {
