@@ -43,7 +43,7 @@
     "test:fork:sepolia": "source .env && forge test --match-contract Deploy --rpc-url $SEPOLIA_RPC_URL",
     "test:fork:mainnet": "source .env && forge test --match-contract Deploy --rpc-url $MAINNET_RPC_URL",
     "pre-commit": "npx lint-staged",
-    "pre-push": "git diff HEAD --ignore-submodules --quiet; FOUNDRY_PROFILE='full_test' forge test --ffi --force",
+    "pre-push": "git diff HEAD --ignore-submodules --quiet && FOUNDRY_PROFILE='full_test' forge test --ffi --force",
     "prepare": "husky install"
   },
   "lint-staged": {
