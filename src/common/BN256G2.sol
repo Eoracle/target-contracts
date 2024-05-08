@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { IBN256G2 } from "../interfaces/IBN256G2.sol";
 // solhint-disable func-named-parameters

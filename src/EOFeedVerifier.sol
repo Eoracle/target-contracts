@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
@@ -109,11 +109,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     function _batchExit(LeafInput[] calldata inputs) internal returns (bytes[] memory) {
         uint256 length = inputs.length;
         bytes[] memory returnData = new bytes[](length);
-        for (uint256 i = 0; i < length;) {
+        for (uint256 i = 0; i < length; i++) {
             returnData[i] = _exit(inputs[i], true);
-            unchecked {
-                ++i;
-            }
         }
         return returnData;
     }

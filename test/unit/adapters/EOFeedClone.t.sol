@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.25;
 
 import { EOFeedTest } from "./EOFeed.t.sol";
 import { MockEOFeedRegistry } from "../../mock/MockEOFeedRegistry.sol";
