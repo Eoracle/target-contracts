@@ -23,7 +23,7 @@ let accounts: any[] = [
   "0x71bE63f3384f5fb98995898A86B02Fb2426c5788",
 ];
 let validatorSet: any[] = [];
-const chainId = 1;
+const chainId = 42420;
 const domainArgPosition = 2;
 const validatorSetSizeArgPosition = 3;
 const symbolArgsPosition = 4;

@@ -45,6 +45,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
     uint256 public epochNumber = 1;
     // TODO: pass to ts as argument
     uint256 public blockNumber = 1;
+    uint256 public childChainId;
     uint256 public validatorSetSize;
     bytes[] public symbolData;
     ICheckpointManager.Validator[] public validatorSet;
@@ -75,6 +76,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
 
         config = EOJsonUtils.getConfig();
         owner = config.readAddress(".targetContractsOwner");
+        childChainId = config.readUint(".childChainId");
 
         _seedSymbolData();
         _generatePayload(symbolData);
