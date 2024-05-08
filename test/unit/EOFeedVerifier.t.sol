@@ -5,6 +5,12 @@ import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { UninitializedFeedVerifier, InitializedFeedVerifier } from "./EOFeedVerifierBase.t.sol";
+import {
+    FeedVerifierNotInitialized,
+    ExitAlreadyProcessed,
+    InvalidProof,
+    InvalidAddress
+} from "../../src/interfaces/Errors.sol";
 
 abstract contract CheckpointSubmitted is InitializedFeedVerifier {
     function setUp() public virtual override {
@@ -56,7 +62,7 @@ abstract contract EOFeedVerifierExited is CheckpointSubmitted {
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
     function test_RevertWhen_Initialize_InvalidAddress() public {
         TargetCheckpointManager checkpointManagerNull;
-        vm.expectRevert("INVALID_ADDRESS");
+        vm.expectRevert(InvalidAddress.selector);
         feedVerifier.initialize(checkpointManagerNull, address(this));
     }
 
@@ -77,7 +83,7 @@ contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier 
         bytes memory unhashedLeaf = abi.encodePacked(block.timestamp);
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
-        vm.expectRevert("NOT_INITIALIZED");
+        vm.expectRevert(FeedVerifierNotInitialized.selector);
         IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaf,
             leafIndex: leafIndex,
@@ -93,7 +99,7 @@ contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier 
         bytes memory unhashedLeaf = abi.encodePacked(block.timestamp);
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
-        vm.expectRevert("NOT_INITIALIZED");
+        vm.expectRevert(FeedVerifierNotInitialized.selector);
         leafInputs.push(IEOFeedVerifier.LeafInput(blockNumber, leafIndex, unhashedLeaf, proof));
         feedVerifier.batchExit(leafInputs);
     }
@@ -199,7 +205,7 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
             hashes[0] // eventRoot
         );
 
-        vm.expectRevert("INVALID_PROOF");
+        vm.expectRevert(InvalidProof.selector);
         feedVerifier.submitAndExit(input, checkpointData);
     }
 
@@ -253,7 +259,7 @@ contract EOFeedVerifierExitFailedAfterInitialized is CheckpointSubmitted {
         uint256 leafIndex = 0;
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
 
-        vm.expectRevert("INVALID_PROOF");
+        vm.expectRevert(InvalidProof.selector);
         IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaves[0],
             leafIndex: leafIndex,
@@ -274,7 +280,7 @@ contract EOFeedVerifierExitFailedAfterSubmitted is EOFeedVerifierExited {
             blockNumber: blockNumber,
             proof: proves[0]
         });
-        vm.expectRevert("EXIT_ALREADY_PROCESSED");
+        vm.expectRevert(ExitAlreadyProcessed.selector);
         feedVerifier.exit(input);
     }
 }

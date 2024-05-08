@@ -9,8 +9,7 @@ import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { MockCheckpointManager } from "../mock/MockCheckpointManager.sol";
-
-error OwnableUnauthorizedAccount(address);
+import { OwnableUnauthorizedAccount, CallerIsNotWhitelisted, SymbolNotSupported } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedRegistryTests is Test, Utils {
     EOFeedRegistry private registry;
@@ -98,7 +97,7 @@ contract EOFeedRegistryTests is Test, Utils {
             blockNumber: blockNumber,
             proof: new bytes32[](0)
         });
-        vm.expectRevert("Caller is not whitelisted");
+        vm.expectRevert(CallerIsNotWhitelisted.selector);
         registry.updatePriceFeed(input, checkpointData);
     }
 
@@ -123,7 +122,7 @@ contract EOFeedRegistryTests is Test, Utils {
         });
 
         _whitelistPublisher(owner, publisher);
-        vm.expectRevert("SYMBOL_NOT_SUPPORTED");
+        vm.expectRevert(SymbolNotSupported.selector);
         vm.prank(publisher);
         registry.updatePriceFeed(input, checkpointData);
     }
