@@ -42,6 +42,7 @@ library Merkle {
                     // store the leaf at the calculated slot
                     mstore(leafSlot, leaf)
                     // store proof element in whichever slot is not occupied by the leaf
+                    //slither-disable-next-line incorrect-exp
                     mstore(xor(leafSlot, 32), calldataload(i))
                     // hash the first 64 bytes in memory
                     leaf := keccak256(0, 64)
@@ -95,6 +96,7 @@ library Merkle {
                     // store the leaf at the calculated slot
                     mstore(leafSlot, leaf)
                     // store proof element in whichever slot is not occupied by the leaf
+                    //slither-disable-next-line incorrect-exp
                     mstore(xor(leafSlot, 32), calldataload(i))
                     // hash the first 64 bytes in memory
                     leaf := keccak256(0, 64)

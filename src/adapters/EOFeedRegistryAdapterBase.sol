@@ -55,6 +55,9 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @param version_ The version
      * @return IEOFeed The feed
      */
+    // This function can reenter through the external call to the deployed EOFeed, but the external contract is being
+    // deployed by this contract, so it is considered safe
+    // slither-disable-next-line reentrancy-no-eth
     function deployEOFeed(
         address base,
         address quote,

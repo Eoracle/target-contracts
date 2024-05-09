@@ -9,12 +9,13 @@ import { IEOFeedRegistry } from "../../interfaces/IEOFeedRegistry.sol";
  * @dev compatible of AggregatorV3Interface from CL.
  */
 interface IEOFeed {
+    // slither-disable-next-line missing-inheritance
     function initialize(
         IEOFeedRegistry feedRegistry,
         uint16 pairSymbol,
-        uint8 decimals,
-        string memory description,
-        uint256 version
+        uint8 decimals_,
+        string memory description_,
+        uint256 version_
     )
         external;
     function getPairSymbol() external view returns (uint16);
