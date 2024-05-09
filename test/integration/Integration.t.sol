@@ -109,17 +109,14 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
 
             // solhint-disable-next-line func-named-parameters
         }
-        checkpointData.push(
-            abi.encode(
-                aggMessagePoints[0], // signature
-                bitmaps[0], // bitmap
-                1, // epochNumber
-                1,
-                hashes[1], // blockHash
-                0, // blockRound
-                hashes[2], // currentValidatorSetHash
-                hashes[0]
-            )
+        signatures.push(aggMessagePoints[0]);
+        checkpoints.push(ICheckpointManager.Checkpoint({ blockNumber: 1, epoch: 1, eventRoot: hashes[0] }));
+        checkpointMetas.push(
+            ICheckpointManager.CheckpointMetadata({
+                blockHash: hashes[1],
+                blockRound: 0,
+                currentValidatorSetHash: hashes[2]
+            })
         );
     }
 
