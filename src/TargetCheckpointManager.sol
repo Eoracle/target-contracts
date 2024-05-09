@@ -46,6 +46,11 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
 
     /**
      * @inheritdoc ICheckpointManager
+     * @param checkpointMetadata Metadata for the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param newValidatorSet New validator set
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function submit(
         CheckpointMetadata calldata checkpointMetadata,
