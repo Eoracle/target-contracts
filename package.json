@@ -30,11 +30,9 @@
   "scripts": {
     "clean": "rm -rf cache out",
     "build": "forge build",
-    "deploy:local": "source .env && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployNewTargetContractSet.s.sol:DeployNewTargetContractSet --rpc-url 127.0.0.1:8545  --broadcast --private-key $PRIVATE_KEY",
-    "deploy:local:adapters": "source .env && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployFeedRegistryAdapter.s.sol:DeployFeedRegistryAdapter --rpc-url 127.0.0.1:8545  --broadcast --private-key $PRIVATE_KEY",
-    "deploy:local:setup": "source .env && forge script script/deployment/setup/SetupContracts.s.sol:SetupContracts -vvvv --rpc-url 127.0.0.1:8545  --broadcast --private-key $PRIVATE_KEY",
-    "deploy:sepolia": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle --rpc-url $SEPOLIA_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
-    "deploy:mainnet": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle --rpc-url $MAINNET_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
+    "deploy": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployNewTargetContractSet.s.sol:DeployNewTargetContractSet --rpc-url $RPC_URL  --broadcast --private-key $PRIVATE_KEY",
+    "deploy:adapters": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployFeedRegistryAdapter.s.sol:DeployFeedRegistryAdapter --rpc-url $RPC_URL  --broadcast --private-key $PRIVATE_KEY",
+    "deploy:setup": "source .env && forge clean && forge script script/deployment/setup/SetupContracts.s.sol:SetupContracts -vvvv --rpc-url $RPC_URL --broadcast --private-key $OWNER_PRIVATE_KEY",
     "lint": "npm run lint:sol && npm run prettier:check",
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
@@ -45,7 +43,7 @@
     "test:fork:sepolia": "source .env && forge test --match-contract Deploy --rpc-url $SEPOLIA_RPC_URL",
     "test:fork:mainnet": "source .env && forge test --match-contract Deploy --rpc-url $MAINNET_RPC_URL",
     "pre-commit": "npx lint-staged",
-    "pre-push": "git diff HEAD --ignore-submodules --quiet && FOUNDRY_PROFILE='full_test' forge test --ffi --force",
+    "pre-push": "git diff HEAD --ignore-submodules --quiet && forge clean && FOUNDRY_PROFILE='full_test' forge test --ffi --force",
     "prepare": "husky install"
   },
   "lint-staged": {
