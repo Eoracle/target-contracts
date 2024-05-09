@@ -3,19 +3,37 @@ pragma solidity 0.8.25;
 
 import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
+import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
+
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
 
 contract MockEOFeedRegistry is IEOFeedRegistry {
     mapping(uint16 => PriceFeed) public priceFeeds;
 
-    function updatePriceFeed(IEOFeedVerifier.LeafInput memory input, bytes calldata) external {
+    function updatePriceFeed(
+        IEOFeedVerifier.LeafInput calldata input,
+        ICheckpointManager.CheckpointMetadata calldata,
+        ICheckpointManager.Checkpoint calldata,
+        uint256[2] calldata,
+        bytes calldata
+    )
+        external
+    {
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(input.unhashedLeaf, (uint16, uint256, uint256));
 
         priceFeeds[symbol] = PriceFeed(rate, timestamp);
     }
 
-    function updatePriceFeeds(IEOFeedVerifier.LeafInput[] calldata inputs, bytes calldata) external {
+    function updatePriceFeeds(
+        IEOFeedVerifier.LeafInput[] calldata inputs,
+        ICheckpointManager.CheckpointMetadata calldata,
+        ICheckpointManager.Checkpoint calldata,
+        uint256[2] calldata,
+        bytes calldata
+    )
+        external
+    {
         for (uint256 i = 0; i < inputs.length; i++) {
             (uint16 symbol, uint256 rate, uint256 timestamp) =
                 abi.decode(inputs[i].unhashedLeaf, (uint16, uint256, uint256));
@@ -38,7 +56,7 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
 
     function whitelistPublishers(address[] memory, bool[] memory) external { }
 
-    function isWhitelistedPublisher(address) external view returns (bool) {
+    function isWhitelistedPublisher(address) external pure returns (bool) {
         return true;
     }
 

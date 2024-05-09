@@ -14,7 +14,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[0], checkpointData[0]);
+        feedRegistry.updatePriceFeed(input[0], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
     }
@@ -24,7 +24,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed2() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[1], checkpointData[0]);
+        feedRegistry.updatePriceFeed(input[1], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[1]);
         assertEq(feed.value, rates[1]);
     }
@@ -50,7 +50,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeeds() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeeds(input, checkpointData[0]);
+        feedRegistry.updatePriceFeeds(input, checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
         feed = feedRegistry.getLatestPriceFeed(symbols[1]);
@@ -74,12 +74,12 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         bytes[] memory unhashedLeaves;
         bytes32[][] memory proves;
         bytes32[] memory hashes;
-        bytes[] memory bitmaps;
+        bytes[] memory _bitmaps;
         uint256[2][] memory aggMessagePoints;
 
         ICheckpointManager.Validator[] memory validatorSetTmp;
 
-        (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, bitmaps, unhashedLeaves, proves,) = abi.decode(
+        (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, _bitmaps, unhashedLeaves, proves,) = abi.decode(
             out,
             (
                 uint256,
@@ -109,18 +109,16 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
 
             // solhint-disable-next-line func-named-parameters
         }
-        checkpointData.push(
-            abi.encode(
-                aggMessagePoints[0], // signature
-                bitmaps[0], // bitmap
-                1, // epochNumber
-                1,
-                hashes[1], // blockHash
-                0, // blockRound
-                hashes[2], // currentValidatorSetHash
-                hashes[0]
-            )
+        signatures.push(aggMessagePoints[0]);
+        checkpoints.push(ICheckpointManager.Checkpoint({ blockNumber: 1, epoch: 1, eventRoot: hashes[0] }));
+        checkpointMetas.push(
+            ICheckpointManager.CheckpointMetadata({
+                blockHash: hashes[1],
+                blockRound: 0,
+                currentValidatorSetHash: hashes[2]
+            })
         );
+        bitmaps.push(_bitmaps[0]);
     }
 
     function _seedSymbolData() internal override {

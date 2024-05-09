@@ -45,16 +45,29 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     /**
      * @inheritdoc IEOFeedVerifier
+     * @param checkpointMetadata Metadata for the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function submitAndExit(
         LeafInput calldata input,
-        bytes calldata checkpointData
+        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
+        ICheckpointManager.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyInitialized
         returns (bytes memory)
     {
-        _submitCheckpoint(checkpointData);
+        _checkpointManager.submit(
+            checkpointMetadata,
+            checkpoint,
+            signature,
+            new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
+            bitmap
+        );
         bytes memory data = _exit(input, false);
         return data;
     }
@@ -70,18 +83,30 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     /**
      * @notice Perform a batch exit for multiple events + submit checkpoint for them
      * @param inputs Batch exit inputs for multiple event leaves
-     * @param checkpointData Checkpoint data for verifying the batch exits
+     * @param checkpointMetadata Metadata for the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      * @return Array of the leaf data fields of all submitted leaves
      */
     function submitAndBatchExit(
         LeafInput[] calldata inputs,
-        bytes calldata checkpointData
+        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
+        ICheckpointManager.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyInitialized
         returns (bytes[] memory)
     {
-        _submitCheckpoint(checkpointData);
+        _checkpointManager.submit(
+            checkpointMetadata,
+            checkpoint,
+            signature,
+            new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
+            bitmap
+        );
         return _batchExit(inputs);
     }
 
@@ -145,30 +170,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         emit ExitProcessed(id, true, data);
 
         return data;
-    }
-
-    function _submitCheckpoint(bytes calldata checkpointData) internal returns (ICheckpointManager.Checkpoint memory) {
-        (
-            uint256[2] memory signature,
-            bytes memory bitmap,
-            uint256 epochNumber,
-            uint256 blockNumber,
-            bytes32 blockHash,
-            uint256 blockRound,
-            bytes32 currentValidatorSetHash,
-            bytes32 eventRoot
-        ) = abi.decode(checkpointData, (uint256[2], bytes, uint256, uint256, bytes32, uint256, bytes32, bytes32));
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint(epochNumber, blockNumber, eventRoot);
-        _checkpointManager.submit(
-            ICheckpointManager.CheckpointMetadata(blockHash, blockRound, currentValidatorSetHash),
-            checkpoint,
-            signature,
-            new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
-            bitmap
-        );
-
-        return checkpoint;
     }
 
     // slither-disable-next-line unused-state,naming-convention

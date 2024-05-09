@@ -15,12 +15,11 @@ contract SetupContracts is Script {
     using stdJson for string;
 
     struct OutputConfig {
-        address bls;
-        address bn256G2;
         address checkpointManager;
         address feedRegistry;
         address feedRegistryAdapter;
         address feedVerifier;
+        address proxyAdmin;
     }
 
     struct Config {
