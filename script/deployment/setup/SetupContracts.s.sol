@@ -14,14 +14,6 @@ import { IEOFeed } from "../../../src/adapters/interfaces/IEOFeed.sol";
 contract SetupContracts is Script {
     using stdJson for string;
 
-    struct OutputConfig {
-        address checkpointManager;
-        address feedRegistry;
-        address feedRegistryAdapter;
-        address feedVerifier;
-        address proxyAdmin;
-    }
-
     struct Config {
         uint256 childChainId;
         address proxyAdminOwner;
@@ -46,8 +38,6 @@ contract SetupContracts is Script {
         Config memory configData = abi.decode(configRaw, (Config));
 
         string memory outputConfig = EOJsonUtils.getOutputConfig();
-        bytes memory outputConfigRaw = outputConfig.parseRaw(".");
-        OutputConfig memory outputConfigData = abi.decode(outputConfigRaw, (OutputConfig));
 
         uint16[] memory symbols = new uint16[](configData.supportedSymbols.length);
         bool[] memory symbolsBools = new bool[](configData.supportedSymbols.length);
@@ -61,14 +51,14 @@ contract SetupContracts is Script {
         }
         vm.startBroadcast();
 
-        EOFeedRegistry(outputConfigData.feedRegistry).whitelistPublishers(configData.publishers, publishersBools);
-        EOFeedRegistry(outputConfigData.feedRegistry).setSupportedSymbols(symbols, symbolsBools);
+        EOFeedRegistry(outputConfig.readAddress(".feedRegistry")).whitelistPublishers(
+            configData.publishers, publishersBools
+        );
+        EOFeedRegistry(outputConfig.readAddress(".feedRegistry")).setSupportedSymbols(symbols, symbolsBools);
 
         IEOFeed feed;
         for (uint256 i = 0; i < configData.supportedSymbolsData.length; i++) {
-            console.log(EOFeedRegistryAdapter(outputConfigData.feedRegistryAdapter).owner());
-            console.log(configData.supportedSymbolsData[i].symbolId);
-            feed = EOFeedRegistryAdapter(outputConfigData.feedRegistryAdapter).deployEOFeed(
+            feed = EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter")).deployEOFeed(
                 configData.supportedSymbolsData[i].base,
                 configData.supportedSymbolsData[i].quote,
                 uint16(configData.supportedSymbolsData[i].symbolId),
