@@ -23,6 +23,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
 
     error FeedAlreadyExists();
     error BaseQuotePairExists();
+    error SymbolNotSupported();
 
     /**
      * @notice Initialize the contract
@@ -67,6 +68,11 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
         onlyOwner
         returns (IEOFeed)
     {
+        // check if pairSymbol exists in feedRegistry contract
+        if (!_feedRegistry.isSupportedSymbol(pairSymbol)) {
+            revert SymbolNotSupported();
+        }
+
         if (address(_pairSymbolsToFeeds[pairSymbol]) != address(0)) {
             revert FeedAlreadyExists();
         }

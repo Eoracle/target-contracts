@@ -59,4 +59,8 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
     function isWhitelistedPublisher(address) external pure returns (bool) {
         return true;
     }
+
+    function isSupportedSymbol(uint16) external view returns (bool) {
+        return true;
+    }
 }

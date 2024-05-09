@@ -34,4 +34,5 @@ interface IEOFeedRegistry {
     function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory);
 
     function isWhitelistedPublisher(address publisher) external view returns (bool);
+    function isSupportedSymbol(uint16 symbol) external view returns (bool);
 }
