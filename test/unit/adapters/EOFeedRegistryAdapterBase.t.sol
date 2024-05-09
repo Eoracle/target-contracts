@@ -10,6 +10,7 @@ import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryA
 //beacon
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
+import { ICheckpointManager } from "../../../src/interfaces/ICheckpointManager.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
@@ -148,7 +149,17 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     function _updatePriceFeed(uint16 pairSymbol, uint256 rate, uint256 timestamp) internal {
         IEOFeedVerifier.LeafInput memory input;
         input.unhashedLeaf = abi.encode(pairSymbol, rate, timestamp);
-        feedRegistry.updatePriceFeed(input, "");
+        feedRegistry.updatePriceFeed(
+            input,
+            ICheckpointManager.CheckpointMetadata({
+                currentValidatorSetHash: bytes32(0),
+                blockHash: bytes32(0),
+                blockRound: 0
+            }),
+            ICheckpointManager.Checkpoint({ blockNumber: 0, epoch: 0, eventRoot: bytes32(0) }),
+            [uint256(0), uint256(0)],
+            bytes("1")
+        );
     }
 
     function test_GetRoundFeed() public {

@@ -27,11 +27,17 @@ interface IEOFeedVerifier {
     /**
      * @notice Submit a proof and exit (verify) leaf
      * @param input Exit leaf input
-     * @param checkpointData checkpoint data for verifying the exit
+     * @param checkpointMetadata Metadata for the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function submitAndExit(
         LeafInput memory input,
-        bytes calldata checkpointData
+        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
+        ICheckpointManager.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         returns (bytes memory leafData);
@@ -39,11 +45,17 @@ interface IEOFeedVerifier {
     /**
      * @notice Submit checkpoint and verify multiple leaves
      * @param inputs Exit leaves inputs
-     * @param checkpointData checkpoint data for verifying the exit
+     * @param checkpointMetadata Metadata for the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function submitAndBatchExit(
         LeafInput[] memory inputs,
-        bytes calldata checkpointData
+        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
+        ICheckpointManager.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         returns (bytes[] memory);

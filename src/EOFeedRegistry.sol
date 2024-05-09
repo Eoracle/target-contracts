@@ -5,6 +5,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
+import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
 
 contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     mapping(uint16 => PriceFeed) internal _priceFeeds;
@@ -56,36 +57,48 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     /**
      * @notice Update the price feed for a symbol
-     * @param checkpointData Proof data (data + proof) for the price feed
+     * @param checkpointMetadata Metadata for the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput memory input,
-        bytes memory checkpointData
+        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
+        ICheckpointManager.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyWhitelisted
     {
-        bytes memory data = _feedVerifier.submitAndExit(input, checkpointData);
+        bytes memory data = _feedVerifier.submitAndExit(input, checkpointMetadata, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
     }
 
     /**
      * @notice Update the price feeds for multiple symbols
      * @param inputs Array of leafs to prove the price feeds
-     * @param checkpointData Checkpoint data for verifying the price feeds
+     * @param checkpointMetadata Metadata for the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        bytes calldata checkpointData
+        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
+        ICheckpointManager.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyWhitelisted
     {
         require(inputs.length > 0, "MISSING_INPUTS");
-        require(checkpointData.length > 0, "MISSING_CHECKPOINT");
 
-        bytes[] memory data = _feedVerifier.submitAndBatchExit(inputs, checkpointData);
-        for (uint256 i = 0; i < data.length; i++) {
+        bytes[] memory data =
+            _feedVerifier.submitAndBatchExit(inputs, checkpointMetadata, checkpoint, signature, bitmap);
+        for (uint256 i = 0; i < data.length;) {
             _processVerifiedRate(data[i]);
         }
     }
