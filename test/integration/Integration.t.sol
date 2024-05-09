@@ -50,7 +50,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeeds() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeeds(input, checkpointData[0]);
+        feedRegistry.updatePriceFeeds(input, checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
         feed = feedRegistry.getLatestPriceFeed(symbols[1]);
