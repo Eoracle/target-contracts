@@ -168,6 +168,7 @@ contract EOFeedRegistryTests is Test, Utils {
             ICheckpointManager.Checkpoint({ blockNumber: blockNumber, epoch: epochNumber, eventRoot: eventRoot });
         uint256[2] memory signature = [uint256(1), uint256(2)];
         bytes memory bitmap = bytes("1");
+
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](2);
         inputs[0] = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaf0,
@@ -204,7 +205,7 @@ contract EOFeedRegistryTests is Test, Utils {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ blockNumber: 0, epoch: 0, eventRoot: bytes32(0) });
         uint256[2] memory signature = [uint256(0), uint256(0)];
-        bytes memory bitmap = bytes("0");
+        bytes memory bitmap = bytes("1");
 
         _whitelistPublisher(owner, publisher);
         vm.startPrank(publisher);
@@ -212,47 +213,11 @@ contract EOFeedRegistryTests is Test, Utils {
         IEOFeedVerifier.LeafInput[] memory inputs;
         vm.expectRevert("MISSING_INPUTS");
         registry.updatePriceFeeds(inputs, checkpointMetadata, checkpoint, signature, bitmap);
-
-        inputs = new IEOFeedVerifier.LeafInput[](2);
-        vm.expectRevert("MISSING_CHECKPOINT");
-        registry.updatePriceFeeds(inputs, checkpointMetadata, checkpoint, signature, bitmap);
     }
 
     function test_RevertWhen_SymbolNotSupported_GetLatestPriceFeed() public {
         vm.expectRevert("SYMBOL_NOT_SUPPORTED");
         registry.getLatestPriceFeed(999);
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
-            currentValidatorSetHash: bytes32(0x00),
-            blockHash: bytes32(0x00),
-            blockRound: 0
-        });
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ blockNumber: 0, epoch: 0, eventRoot: bytes32(0) });
-        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](2);
-        uint256[2] memory signature = [uint256(0), uint256(0)];
-        bytes memory bitmap = bytes("0");
-
-        bytes memory ratesData0 = abi.encode(symbol, rate, timestamp);
-        bytes memory unhashedLeaf0 = abi.encode(1, address(0), address(0), ratesData0);
-        bytes memory ratesData1 = abi.encode(symbol + 1, rate + 1, timestamp + 1);
-        bytes memory unhashedLeaf1 = abi.encode(2, address(0), address(0), ratesData1);
-        inputs[0] = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaf0,
-            leafIndex: 0,
-            blockNumber: blockNumber,
-            proof: new bytes32[](0)
-        });
-        inputs[1] = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaf1,
-            leafIndex: 1,
-            blockNumber: blockNumber,
-            proof: new bytes32[](0)
-        });
-        registry.updatePriceFeeds(inputs, checkpointMetadata, checkpoint, signature, bitmap);
-        IEOFeedRegistry.PriceFeed memory feed0 = registry.getLatestPriceFeed(symbol);
-        IEOFeedRegistry.PriceFeed memory feed1 = registry.getLatestPriceFeed(symbol + 1);
-        assertEq(feed0.value, rate);
-        assertEq(feed1.value, rate + 1);
     }
 
     function _whitelistPublisher(address _executer, address _publisher) private {

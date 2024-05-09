@@ -74,12 +74,12 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         bytes[] memory unhashedLeaves;
         bytes32[][] memory proves;
         bytes32[] memory hashes;
-        bytes[] memory bitmaps;
+        bytes[] memory _bitmaps;
         uint256[2][] memory aggMessagePoints;
 
         ICheckpointManager.Validator[] memory validatorSetTmp;
 
-        (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, bitmaps, unhashedLeaves, proves,) = abi.decode(
+        (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, _bitmaps, unhashedLeaves, proves,) = abi.decode(
             out,
             (
                 uint256,
@@ -118,6 +118,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
                 currentValidatorSetHash: hashes[2]
             })
         );
+        bitmaps.push(_bitmaps[0]);
     }
 
     function _seedSymbolData() internal override {

@@ -98,7 +98,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
         bytes[] memory data =
             _feedVerifier.submitAndBatchExit(inputs, checkpointMetadata, checkpoint, signature, bitmap);
-        for (uint256 i = 0; i < data.length;) {
+        for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
         }
     }
