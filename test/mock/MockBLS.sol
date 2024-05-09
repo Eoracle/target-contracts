@@ -5,7 +5,7 @@
 // File lib/core-contracts/contracts/interfaces/common/IBLS.sol
 
 // Original license: SPDX_License_Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 interface IBLS {
     function verifySingle(

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Arrays } from "@openzeppelin/contracts/utils/Arrays.sol";
@@ -56,6 +56,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
     )
         external
     {
+        require(currentValidatorSetHash != bytes32(0), "VALIDATOR_SET_NOT_INITIALIZED");
         require(currentValidatorSetHash == checkpointMetadata.currentValidatorSetHash, "INVALID_VALIDATOR_SET_HASH");
         bytes32 newValidatorSetHash;
         if (newValidatorSet.length == 0) {
@@ -82,8 +83,6 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         _verifySignature(bls.hashToPoint(DOMAIN, hash), signature, bitmap);
 
         uint256 prevEpoch = currentEpoch;
-
-        // _verifyCheckpoint(prevEpoch, checkpoint);
 
         checkpoints[checkpoint.epoch] = checkpoint;
 
@@ -203,7 +202,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         // slither-disable-next-line uninitialized-local
         uint256[4] memory aggPubkey;
         uint256 aggVotingPower = 0;
-        for (uint256 i = 0; i < length;) {
+        for (uint256 i = 0; i < length; i++) {
             if (_getValueFromBitmap(bitmap, i)) {
                 if (aggVotingPower == 0) {
                     aggPubkey = currentValidatorSet[i].blsKey;
@@ -223,9 +222,6 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
                 }
                 aggVotingPower += currentValidatorSet[i].votingPower;
             }
-            unchecked {
-                ++i;
-            }
         }
 
         require(aggVotingPower != 0, "BITMAP_IS_EMPTY");
@@ -234,19 +230,6 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         (bool callSuccess, bool result) = bls.verifySingle(signature, aggPubkey, message);
 
         require(callSuccess && result, "SIGNATURE_VERIFICATION_FAILED");
-    }
-
-    /**
-     * @notice Internal function that performs checks on the checkpoint
-     * @param prevId Current checkpoint ID
-     * @param checkpoint The checkpoint to store
-     */
-    function _verifyCheckpoint(uint256 prevId, Checkpoint calldata checkpoint) private view {
-        Checkpoint memory oldCheckpoint = checkpoints[prevId];
-        require(
-            checkpoint.epoch == oldCheckpoint.epoch || checkpoint.epoch == (oldCheckpoint.epoch + 1), "INVALID_EPOCH"
-        );
-        require(checkpoint.blockNumber > oldCheckpoint.blockNumber, "EMPTY_CHECKPOINT");
     }
 
     function _getValueFromBitmap(bytes calldata bitmap, uint256 index) private pure returns (bool) {
