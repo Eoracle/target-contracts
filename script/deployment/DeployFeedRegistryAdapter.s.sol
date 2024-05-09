@@ -16,7 +16,6 @@ contract DeployFeedRegistryAdapter is Script {
     function run() external returns (address feedImplementation, address adapterProxy) {
         vm.startBroadcast();
         feedImplementation = address(new EOFeed());
-        vm.stopBroadcast();
 
         string memory addressString = Strings.toHexString(uint256(uint160(feedImplementation)), 20);
         EOJsonUtils.writeConfig(addressString, ".feedImplementation");
@@ -32,6 +31,7 @@ contract DeployFeedRegistryAdapter is Script {
             EOFeedRegistryAdapterBase.initialize, (feedRegistry, feedImplementation, targetContractsOwner)
         );
         adapterProxy = Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdminOwner, initData);
+        vm.stopBroadcast();
 
         addressString = Strings.toHexString(uint256(uint160(adapterProxy)), 20);
         EOJsonUtils.writeConfig(addressString, ".feedRegistryAdapter");
