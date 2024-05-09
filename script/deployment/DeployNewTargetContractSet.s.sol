@@ -2,8 +2,6 @@
 
 pragma solidity 0.8.25;
 
-import { console } from "forge-std/Test.sol";
-
 import { stdJson } from "forge-std/Script.sol";
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { CheckpointManagerDeployer } from "./base/DeployCheckpointManager.s.sol";
@@ -16,7 +14,6 @@ import { IBLS } from "src/interfaces/IBLS.sol";
 import { ICheckpointManager } from "src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "src/interfaces/IEOFeedVerifier.sol";
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
-import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
 
 // Deployment command: FOUNDRY_PROFILE="deployment" forge script script/deployment/DeployNewTargetContractSet.s.sol
 // --rpc-url $RPC_URL --private-key $PRIVATE_KEY -vvv --slow --verify --broadcast
@@ -70,6 +67,5 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
         EOJsonUtils.writeConfig(addressString, ".feedRegistry");
 
         vm.stopBroadcast();
-        console.log("====", EOFeedRegistry(feedRegistryProxy).owner());
     }
 }
