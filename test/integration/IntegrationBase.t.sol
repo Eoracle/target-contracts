@@ -48,7 +48,6 @@ abstract contract IntegrationBaseTests is Test, Utils {
     ICheckpointManager.CheckpointMetadata[] public checkpointMetas;
     ICheckpointManager.Checkpoint[] public checkpoints;
     uint256[2][] public signatures;
-    bytes[] public bitmaps;
 
     function setUp() public {
         mainDeployer = new DeployNewTargetContractSet();

@@ -14,7 +14,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[0], checkpointData[0]);
+        feedRegistry.updatePriceFeed(input[0], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
     }
@@ -24,7 +24,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed2() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[1], checkpointData[0]);
+        feedRegistry.updatePriceFeed(input[1], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[1]);
         assertEq(feed.value, rates[1]);
     }
