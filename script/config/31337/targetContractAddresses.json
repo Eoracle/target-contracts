@@ -2,6 +2,6 @@
   "checkpointManager": "0xdb8cff278adccf9e9b5da745b44e754fc4ee3c76",
   "feedVerifier": "0x62c20aa1e0272312bc100b4e23b4dc1ed96dd7d1",
   "feedRegistry": "0xd718d5a27a29ff1cd22403426084ba0d479869a0",
-  "feedRegistryAdapter": "0xd21060559c9beb54fc07afd6151adf6cfcddcaeb",
+  "feedRegistryAdapter": "0x8d2c17fad02b7bb64139109c6533b7c2b9cadb81",
   "proxyAdmin": "0x90193c961a926261b756d1e5bb255e67ff9498a1"
 }
