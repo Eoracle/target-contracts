@@ -19,5 +19,3 @@ yarn.lock
 broadcast/*
 broadcast/*/31337/
 
-# output config
-script/config/31337/targetContractAddresses.json

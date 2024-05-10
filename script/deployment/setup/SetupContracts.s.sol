@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.25;
 
-import { Script } from "forge-std/Script.sol";
+import { Script, console } from "forge-std/Script.sol";
 import { stdJson } from "forge-std/Script.sol";
 import { EOJsonUtils } from "../../utils/EOJsonUtils.sol";
 import { EOFeedRegistry } from "../../../src/EOFeedRegistry.sol";
@@ -29,47 +29,80 @@ contract SetupContracts is Script {
         uint256 symbolId;
     }
 
+    uint16[] public symbols;
+    bool[] public symbolsBools;
+    address[] public publishers;
+    bool[] public publishersBools;
+
+    EOFeedRegistry public feedRegistry;
+    EOFeedRegistryAdapter public feedRegistryAdapter;
+
     function run() external {
         string memory config = EOJsonUtils.getConfig();
         bytes memory configRaw = config.parseRaw(".");
         Config memory configData = abi.decode(configRaw, (Config));
 
         string memory outputConfig = EOJsonUtils.getOutputConfig();
+        feedRegistry = EOFeedRegistry(outputConfig.readAddress(".feedRegistry"));
+        feedRegistryAdapter = EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter"));
 
-        uint16[] memory symbols = new uint16[](configData.supportedSymbols.length);
-        bool[] memory symbolsBools = new bool[](configData.supportedSymbols.length);
-        for (uint256 i = 0; i < configData.supportedSymbols.length; i++) {
-            symbols[i] = uint16(configData.supportedSymbols[i]);
-            symbolsBools[i] = true;
-        }
-        bool[] memory publishersBools = new bool[](configData.publishers.length);
-        for (uint256 i = 0; i < configData.publishers.length; i++) {
-            publishersBools[i] = true;
-        }
         vm.startBroadcast();
 
-        EOFeedRegistry(outputConfig.readAddress(".feedRegistry")).whitelistPublishers(
-            configData.publishers, publishersBools
-        );
-        EOFeedRegistry(outputConfig.readAddress(".feedRegistry")).setSupportedSymbols(symbols, symbolsBools);
+        // Set supported symbols in FeedRegistry which are not set yet
+        _updateSupportedSymbols();
 
+        // Set publishers in FeedRegistry which are not set yet
+        _updateWhiteListedPublishers();
+
+        // Deploy feeds which are not deployed yet
         address feed;
         string memory feedAddressesJson;
         for (uint256 i = 0; i < configData.supportedSymbolsData.length; i++) {
-            feed = address(
-                EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter")).deployEOFeed(
-                    configData.supportedSymbolsData[i].base,
-                    configData.supportedSymbolsData[i].quote,
-                    uint16(configData.supportedSymbolsData[i].symbolId),
-                    configData.supportedSymbolsData[i].description,
-                    uint8(configData.supportedSymbolsData[i].decimals),
-                    1
-                )
-            );
+            feed = address(feedRegistryAdapter.getFeedByPairSymbol(uint16(configData.supportedSymbolsData[i].symbolId)));
+            if (feed == address(0)) {
+                feed = address(
+                    feedRegistryAdapter.deployEOFeed(
+                        configData.supportedSymbolsData[i].base,
+                        configData.supportedSymbolsData[i].quote,
+                        uint16(configData.supportedSymbolsData[i].symbolId),
+                        configData.supportedSymbolsData[i].description,
+                        uint8(configData.supportedSymbolsData[i].decimals),
+                        1
+                    )
+                );
+            }
             feedAddressesJson = outputConfig.serialize(configData.supportedSymbolsData[i].description, feed);
         }
+        console.log(feedAddressesJson);
         EOJsonUtils.writeConfig(feedAddressesJson, ".feeds");
 
         vm.stopBroadcast();
+    }
+
+    function _updateSupportedSymbols() internal {
+        uint16 symbolId;
+
+        for (uint256 i = 0; i < configData.supportedSymbols.length; i++) {
+            symbolId = uint16(configData.supportedSymbols[i]);
+            if (!feedRegistry.isSupportedSymbol(symbolId)) {
+                symbols.push(symbolId);
+                symbolsBools.push(true);
+            }
+        }
+        if (symbols.length > 0) {
+            feedRegistry.setSupportedSymbols(symbols, symbolsBools);
+        }
+    }
+
+    function _updateWhiteListedPublishers() internal {
+        for (uint256 i = 0; i < configData.publishers.length; i++) {
+            if (!feedRegistry.isWhitelistedPublisher(configData.publishers[i])) {
+                publishers.push(configData.publishers[i]);
+                publishersBools.push(true);
+            }
+        }
+        if (publishers.length > 0) {
+            feedRegistry.whitelistPublishers(publishers, publishersBools);
+        }
     }
 }
