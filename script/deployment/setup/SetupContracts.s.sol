@@ -36,11 +36,12 @@ contract SetupContracts is Script {
 
     EOFeedRegistry public feedRegistry;
     EOFeedRegistryAdapter public feedRegistryAdapter;
+    Config public configData;
 
     function run() external {
         string memory config = EOJsonUtils.getConfig();
         bytes memory configRaw = config.parseRaw(".");
-        Config memory configData = abi.decode(configRaw, (Config));
+        configData = abi.decode(configRaw, (Config));
 
         string memory outputConfig = EOJsonUtils.getOutputConfig();
         feedRegistry = EOFeedRegistry(outputConfig.readAddress(".feedRegistry"));
