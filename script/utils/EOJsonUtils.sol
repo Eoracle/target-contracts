@@ -18,6 +18,12 @@ library EOJsonUtils {
         VM.writeJson(value, path, key);
     }
 
+    function writeConfig(string memory value) internal {
+        string memory path =
+            string.concat("script/config/", Strings.toString(block.chainid), "/targetContractAddresses.json");
+        VM.writeJson(value, path);
+    }
+
     function getConfig() internal view returns (string memory) {
         string memory path =
             string.concat("script/config/", Strings.toString(block.chainid), "/targetContractSetConfig.json");
