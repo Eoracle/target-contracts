@@ -2,14 +2,11 @@
 
 pragma solidity 0.8.25;
 
-import { console } from "forge-std/Test.sol";
-
 import { Script } from "forge-std/Script.sol";
 import { stdJson } from "forge-std/Script.sol";
 import { EOJsonUtils } from "../../utils/EOJsonUtils.sol";
 import { EOFeedRegistry } from "../../../src/EOFeedRegistry.sol";
 import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapter.sol";
-import { IEOFeed } from "../../../src/adapters/interfaces/IEOFeed.sol";
 
 contract SetupContracts is Script {
     using stdJson for string;
@@ -56,18 +53,23 @@ contract SetupContracts is Script {
         );
         EOFeedRegistry(outputConfig.readAddress(".feedRegistry")).setSupportedSymbols(symbols, symbolsBools);
 
-        IEOFeed feed;
+        address feed;
+        string memory feedAddressesJson;
         for (uint256 i = 0; i < configData.supportedSymbolsData.length; i++) {
-            feed = EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter")).deployEOFeed(
-                configData.supportedSymbolsData[i].base,
-                configData.supportedSymbolsData[i].quote,
-                uint16(configData.supportedSymbolsData[i].symbolId),
-                configData.supportedSymbolsData[i].description,
-                uint8(configData.supportedSymbolsData[i].decimals),
-                1
+            feed = address(
+                EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter")).deployEOFeed(
+                    configData.supportedSymbolsData[i].base,
+                    configData.supportedSymbolsData[i].quote,
+                    uint16(configData.supportedSymbolsData[i].symbolId),
+                    configData.supportedSymbolsData[i].description,
+                    uint8(configData.supportedSymbolsData[i].decimals),
+                    1
+                )
             );
-            console.log("feed", address(feed));
+            feedAddressesJson = outputConfig.serialize(configData.supportedSymbolsData[i].description, feed);
         }
+        EOJsonUtils.writeConfig(feedAddressesJson, ".feeds");
+
         vm.stopBroadcast();
     }
 }
