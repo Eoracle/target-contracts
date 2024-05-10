@@ -9,7 +9,13 @@ import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { MockCheckpointManager } from "../mock/MockCheckpointManager.sol";
-import { OwnableUnauthorizedAccount, CallerIsNotWhitelisted, SymbolNotSupported } from "../../src/interfaces/Errors.sol";
+import {
+    OwnableUnauthorizedAccount,
+    CallerIsNotWhitelisted,
+    SymbolNotSupported,
+    MissingLeafInputs,
+    MissingCheckpoint
+} from "../../src/interfaces/Errors.sol";
 
 contract EOFeedRegistryTests is Test, Utils {
     EOFeedRegistry private registry;
@@ -203,16 +209,16 @@ contract EOFeedRegistryTests is Test, Utils {
         vm.startPrank(publisher);
         bytes memory checkpointData;
         IEOFeedVerifier.LeafInput[] memory inputs;
-        vm.expectRevert("MISSING_INPUTS");
+        vm.expectRevert(MissingLeafInputs.selector);
         registry.updatePriceFeeds(inputs, checkpointData);
 
         inputs = new IEOFeedVerifier.LeafInput[](2);
-        vm.expectRevert("MISSING_CHECKPOINT");
+        vm.expectRevert(MissingCheckpoint.selector);
         registry.updatePriceFeeds(inputs, checkpointData);
     }
 
     function test_RevertWhen_SymbolNotSupported_GetLatestPriceFeed() public {
-        vm.expectRevert("SYMBOL_NOT_SUPPORTED");
+        vm.expectRevert(SymbolNotSupported.selector);
         registry.getLatestPriceFeed(999);
     }
 

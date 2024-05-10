@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 /*//////////////////////////////////////////////////////////////////////////
                                 Common
@@ -21,3 +21,16 @@ error FeedVerifierNotInitialized();
 error ExitAlreadyProcessed();
 error InvalidProof();
 error InvalidAddress();
+
+/*//////////////////////////////////////////////////////////////////////////
+                                TargetCheckpointManager
+//////////////////////////////////////////////////////////////////////////*/
+error ValidatorSetNotInitialized();
+error InvalidValidatorSetHash();
+error NoEventRootForBlockNumber();
+error NoEventRootForEpoch();
+error InvalidEventRoot();
+error VotingPowerIsZero();
+error InvalidBitmap();
+error InsufficientVotingPower();
+error SignatureVerficationFailed();

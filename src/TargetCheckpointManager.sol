@@ -7,6 +7,17 @@ import { Merkle } from "./common/Merkle.sol";
 import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
 import { IBLS } from "./interfaces/IBLS.sol";
 import { IBN256G2 } from "./interfaces/IBN256G2.sol";
+import {
+    ValidatorSetNotInitialized,
+    InvalidValidatorSetHash,
+    NoEventRootForBlockNumber,
+    NoEventRootForEpoch,
+    InvalidEventRoot,
+    VotingPowerIsZero,
+    InvalidBitmap,
+    InsufficientVotingPower,
+    SignatureVerficationFailed
+} from "./interfaces/Errors.sol";
 
 contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
     using Arrays for uint256[];
@@ -56,8 +67,8 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
     )
         external
     {
-        require(currentValidatorSetHash != bytes32(0), "VALIDATOR_SET_NOT_INITIALIZED");
-        require(currentValidatorSetHash == checkpointMetadata.currentValidatorSetHash, "INVALID_VALIDATOR_SET_HASH");
+        if (currentValidatorSetHash == bytes32(0)) revert ValidatorSetNotInitialized();
+        if (currentValidatorSetHash != checkpointMetadata.currentValidatorSetHash) revert InvalidValidatorSetHash();
         bytes32 newValidatorSetHash;
         if (newValidatorSet.length == 0) {
             newValidatorSetHash = checkpointMetadata.currentValidatorSetHash;
@@ -117,7 +128,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         returns (bool)
     {
         bytes32 eventRoot = getEventRootByBlock(blockNumber);
-        require(eventRoot != bytes32(0), "NO_EVENT_ROOT_FOR_BLOCK_NUMBER");
+        if (eventRoot == bytes32(0)) revert NoEventRootForBlockNumber();
         return leaf.checkMembership(leafIndex, eventRoot, proof);
     }
 
@@ -135,7 +146,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         returns (bool)
     {
         bytes32 eventRoot = checkpoints[epoch].eventRoot;
-        require(eventRoot != bytes32(0), "NO_EVENT_ROOT_FOR_EPOCH");
+        if (eventRoot == bytes32(0)) revert NoEventRootForEpoch();
         return leaf.checkMembership(leafIndex, eventRoot, proof);
     }
 
@@ -160,7 +171,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         pure
         returns (bool)
     {
-        require(eventRoot != bytes32(0), "INVALID_EVENT_ROOT");
+        if (eventRoot == bytes32(0)) revert InvalidEventRoot();
         return leaf.checkMembership(leafIndex, eventRoot, proof);
     }
 
@@ -171,7 +182,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
         uint256 totalPower = 0;
         for (uint256 i = 0; i < length; ++i) {
             uint256 votingPower = newValidatorSet[i].votingPower;
-            require(votingPower > 0, "VOTING_POWER_ZERO");
+            if (votingPower == 0) revert VotingPowerIsZero();
             totalPower += votingPower;
             currentValidatorSet[i] = newValidatorSet[i];
         }
@@ -224,12 +235,12 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
             }
         }
 
-        require(aggVotingPower != 0, "BITMAP_IS_EMPTY");
-        require(aggVotingPower > ((2 * totalVotingPower) / 3), "INSUFFICIENT_VOTING_POWER");
+        if (aggVotingPower == 0) revert InvalidBitmap();
+        if (aggVotingPower <= ((2 * totalVotingPower) / 3)) revert InsufficientVotingPower();
 
         (bool callSuccess, bool result) = bls.verifySingle(signature, aggPubkey, message);
 
-        require(callSuccess && result, "SIGNATURE_VERIFICATION_FAILED");
+        if (!callSuccess || !result) revert SignatureVerficationFailed();
     }
 
     function _getValueFromBitmap(bytes calldata bitmap, uint256 index) private pure returns (bool) {
