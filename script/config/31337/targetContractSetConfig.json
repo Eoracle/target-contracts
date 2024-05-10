@@ -4,21 +4,21 @@
   "childChainId": 42420,
   "targetChainId": 31337,
   "publishers": ["0x90F79bf6EB2c4f870365E785982E1f101E93b906", "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65"],
-  "supportedSymbols": [1, 2, 3, 4],
+  "supportedSymbols": [1, 2],
   "supportedSymbolsData": [
     {
-      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBb1",
+      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
       "quote": "0x0000000000000000000000000000000000000348",
       "decimals": 18,
       "description": "BTC/USD",
-      "symbolId": 3
+      "symbolId": 1
     },
     {
-      "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEe1",
+      "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
       "decimals": 18,
       "description": "ETH/USD",
-      "symbolId": 4
+      "symbolId": 2
     }
   ]
 }
