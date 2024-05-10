@@ -1,10 +1,13 @@
 {
-  "bls": "0xa8452ec99ce0c64f20701db7dd3abdb607c00496",
-  "bn256G2": "0x90193c961a926261b756d1e5bb255e67ff9498a1",
-  "checkpointManager": "0xdb8cff278adccf9e9b5da745b44e754fc4ee3c76",
-  "feedRegistry": "0xd718d5a27a29ff1cd22403426084ba0d479869a0",
-  "feedRegistryAdapter": "0xd21060559c9beb54fc07afd6151adf6cfcddcaeb",
-  "feedVerifier": "0x62c20aa1e0272312bc100b4e23b4dc1ed96dd7d1",
-  "feeds": [],
+  "bls": "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+  "bn256G2": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+  "checkpointManager": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+  "feedRegistry": "0xa513e6e4b8f2a923d98304ec87f64353c4d5c853",
+  "feedRegistryAdapter": "0x610178da211fef7d417bc0e6fed39f05609ad788",
+  "feedVerifier": "0x5fc8d32690cc91d4c39d9d3abcbd16989f875707",
+  "feeds": {
+    "BTC/USD": "0xCBd5431cC04031d089c90E7c83288183A6Fe545d",
+    "ETH/USD": "0x40a87c555319e8bD334b209CA3fA22615b9c619e"
+  },
   "proxyAdmin": "0x90193c961a926261b756d1e5bb255e67ff9498a1"
 }
