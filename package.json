@@ -30,9 +30,9 @@
   "scripts": {
     "clean": "rm -rf cache out",
     "build": "forge build",
-    "deploy:local": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle",
-    "deploy:sepolia": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle --rpc-url $SEPOLIA_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
-    "deploy:mainnet": "source .env && forge script script/DeployEoracle.s.sol:DeployEoracle --rpc-url $MAINNET_RPC_URL --verify --broadcast --private-key $PRIVATE_KEY",
+    "deploy": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployNewTargetContractSet.s.sol:DeployNewTargetContractSet --rpc-url $RPC_URL  --broadcast --private-key $PRIVATE_KEY",
+    "deploy:adapters": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployFeedRegistryAdapter.s.sol:DeployFeedRegistryAdapter --rpc-url $RPC_URL  --broadcast --private-key $PRIVATE_KEY",
+    "deploy:setup": "source .env && forge clean && forge script script/deployment/setup/SetupContracts.s.sol:SetupContracts -vvvv --rpc-url $RPC_URL --broadcast --private-key $OWNER_PRIVATE_KEY",
     "lint": "npm run lint:sol && npm run prettier:check",
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
