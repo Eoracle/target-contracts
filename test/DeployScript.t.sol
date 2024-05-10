@@ -68,7 +68,6 @@ contract DeployScriptTest is Test {
         assertEq(EOFeedRegistryAdapter(adapterProxy).owner(), targetContractsOwner);
         assertEq(address(EOFeedRegistryAdapter(adapterProxy).getFeedRegistry()), feedRegistryProxy);
         assertEq(adapterProxy, outputConfig.readAddress(".feedRegistryAdapter"));
-        EOJsonUtils.writeConfig(initialOutputConfig);
     }
 
     // revert the changes to the config made by this test suite
