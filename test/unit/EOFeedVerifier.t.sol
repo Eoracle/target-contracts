@@ -142,7 +142,7 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
         assertEq(feedVerifier.isProcessedExit(id), true);
     }
 
-    function test_SubmitAndExit() public {
+    function test_submitAndVerify() public {
         IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaves[0],
             leafIndex: 0,
@@ -164,24 +164,22 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
 
         (uint256 id,,, bytes memory data) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
         vm.expectEmit(true, true, true, true);
-        emit ExitProcessed(id, true, data);
-        bytes memory leafData = feedVerifier.submitAndExit(input, checkpointMetadata, checkpoint, signature, bitmap);
+        emit LeafVerified(id, data);
+        bytes memory leafData = feedVerifier.submitAndVerify(input, checkpointMetadata, checkpoint, signature, bitmap);
         assertEq(leafData, data);
 
         assertEq(checkpointManager.getEventRootByBlock(blockNumber), hashes[0]);
         assertEq(checkpointManager.checkpointBlockNumbers(0), blockNumber);
 
         assertEq(
-            checkpointManager.getEventMembershipByBlockNumber(
-                blockNumber, leavesArray[0][input.leafIndex], input.leafIndex, input.proof
+            checkpointManager.checkEventMembership(
+                checkpoint.eventRoot, leavesArray[0][input.leafIndex], input.leafIndex, input.proof
             ),
             true
         );
-
-        assertEq(feedVerifier.isProcessedExit(id), true);
     }
 
-    function test_SubmitAndExitRevertsIfDataIsAltered() public {
+    function test_submitAndVerifyRevertsIfDataIsAltered() public {
         IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
             unhashedLeaf: unhashedLeaves[0],
             leafIndex: 0,
@@ -201,10 +199,10 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
         ICheckpointManager.Checkpoint memory checkpoint =
             ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
         vm.expectRevert(InvalidProof.selector);
-        feedVerifier.submitAndExit(input, checkpointMetadata, checkpoint, signature, bitmap);
+        feedVerifier.submitAndVerify(input, checkpointMetadata, checkpoint, signature, bitmap);
     }
 
-    function test_SubmitAndBatchExit() public {
+    function test_submitAndBatchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
         ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
             blockHash: hashes[1],
@@ -225,21 +223,19 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
         // solhint-disable-next-line func-named-parameters
 
         vm.expectEmit(true, true, true, true);
-        emit ExitProcessed(id, true, data);
-        feedVerifier.submitAndBatchExit(inputs, checkpointMetadata, checkpoint, signature, bitmaps[0]);
+        emit LeafVerified(id, data);
+        feedVerifier.submitAndBatchVerify(inputs, checkpointMetadata, checkpoint, signature, bitmaps[0]);
 
         assertEq(checkpointManager.getEventRootByBlock(checkpoint.blockNumber), hashes[0]);
         assertEq(checkpointManager.checkpointBlockNumbers(0), checkpoint.blockNumber);
 
         // using leavesArray[1] because [0] holds only one real leaf and 3 mock hashes
         assertEq(
-            checkpointManager.getEventMembershipByBlockNumber(
-                checkpoint.blockNumber, leavesArray[0][inputs[0].leafIndex], inputs[0].leafIndex, inputs[0].proof
+            checkpointManager.checkEventMembership(
+                checkpoint.eventRoot, leavesArray[0][inputs[0].leafIndex], inputs[0].leafIndex, inputs[0].proof
             ),
             true
         );
-
-        assertEq(feedVerifier.isProcessedExit(id), true);
     }
 }
 

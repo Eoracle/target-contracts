@@ -49,7 +49,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
-    function submitAndExit(
+    function submitAndVerify(
         LeafInput calldata input,
         ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
         ICheckpointManager.Checkpoint calldata checkpoint,
@@ -67,7 +67,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
             bitmap
         );
-        bytes memory data = _exit(input, false);
+        bytes memory data = _verify(input, checkpoint.eventRoot);
         return data;
     }
 
@@ -88,7 +88,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param bitmap Bitmap of the validators who signed the checkpoint
      * @return Array of the leaf data fields of all submitted leaves
      */
-    function submitAndBatchExit(
+    function submitAndBatchVerify(
         LeafInput[] calldata inputs,
         ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
         ICheckpointManager.Checkpoint calldata checkpoint,
@@ -106,7 +106,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
             bitmap
         );
-        return _batchExit(inputs);
+        return _batchVerify(inputs, checkpoint.eventRoot);
     }
 
     /**
@@ -141,6 +141,21 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
+     * @notice Verify a batch of exits leaves
+     * @param inputs Batch exit inputs for multiple event leaves
+     * @param eventRoot the root this event should belong to
+     * @return Array of the leaf data fields of all submitted leaves
+     */
+    function _batchVerify(LeafInput[] calldata inputs, bytes32 eventRoot) internal returns (bytes[] memory) {
+        uint256 length = inputs.length;
+        bytes[] memory returnData = new bytes[](length);
+        for (uint256 i = 0; i < length; i++) {
+            returnData[i] = _verify(inputs[i], eventRoot);
+        }
+        return returnData;
+    }
+
+    /**
      * @notice Process an exit for one event
      * @param input Exit leaf input
      * @param isBatch Boolean value indicating if the exit is part of a batch
@@ -166,6 +181,27 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         _processedExits[id] = true;
 
         emit ExitProcessed(id, true, data);
+
+        return data;
+    }
+
+    /**
+     * @notice Verify for one event
+     * @param input Exit leaf input
+     * @param eventRoot event root the leaf should belong to
+     */
+    function _verify(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory) {
+        // slither-disable-next-line calls-loop
+        if (
+            !_checkpointManager.checkEventMembership(
+                eventRoot, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
+            )
+        ) revert InvalidProof();
+
+        (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
+            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
+
+        emit LeafVerified(id, data);
 
         return data;
     }
