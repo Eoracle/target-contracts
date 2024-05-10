@@ -17,11 +17,12 @@ interface IEOFeedVerifier {
     }
 
     event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
-
+    event LeafVerified(uint256 indexed id, bytes returnData);
     /**
      * @notice Perform an exit (verify) for one event
      * @param input Exit leaf input
      */
+
     function exit(LeafInput calldata input) external;
 
     /**
@@ -32,7 +33,7 @@ interface IEOFeedVerifier {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
-    function submitAndExit(
+    function submitAndVerify(
         LeafInput memory input,
         ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
         ICheckpointManager.Checkpoint calldata checkpoint,
@@ -50,7 +51,7 @@ interface IEOFeedVerifier {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
-    function submitAndBatchExit(
+    function submitAndBatchVerify(
         LeafInput[] memory inputs,
         ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
         ICheckpointManager.Checkpoint calldata checkpoint,
