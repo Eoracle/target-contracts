@@ -25,4 +25,8 @@ library Denominations {
     address public constant RUB = address(643);
     address public constant INR = address(356);
     address public constant BRL = address(986);
+
+    function isETH(address token) internal pure returns (bool) {
+        return token == ETH;
+    }
 }

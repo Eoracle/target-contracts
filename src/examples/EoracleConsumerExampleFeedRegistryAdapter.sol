@@ -2,7 +2,7 @@
 pragma solidity 0.8.25;
 
 import { IEOFeedRegistryAdapter } from "../adapters/interfaces/IEOFeedRegistryAdapter.sol";
-import { Denominations } from "./libs/Denominations.sol";
+import { Denominations } from "../libraries/Denominations.sol";
 
 contract EoracleConsumerExampleFeedRegistryAdapter {
     // solhint-disable-next-line var-name-mixedcase

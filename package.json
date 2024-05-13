@@ -32,6 +32,7 @@
     "build": "forge build",
     "deploy": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployNewTargetContractSet.s.sol:DeployNewTargetContractSet --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY",
     "deploy:adapters": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployFeedRegistryAdapter.s.sol:DeployFeedRegistryAdapter --rpc-url $RPC_URL  --broadcast --private-key $PRIVATE_KEY",
+    "deploy:lib": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployLibDenominations.s.sol:DeployLibDenominations --rpc-url $RPC_URL  --broadcast --private-key $PRIVATE_KEY",
     "deploy:setup": "source .env && forge clean && forge script script/deployment/setup/SetupContracts.s.sol:SetupContracts -vvvv --rpc-url $RPC_URL --broadcast --private-key $OWNER_PRIVATE_KEY",
     "deploy:consumer:feed": "source .env && forge clean && forge script script/deployment/examples/DeployConsumerExampleFeed.s.sol:DeployConsumerExampleFeed -vvvv --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY",
     "lint": "npm run lint:sol && npm run prettier:check",
