@@ -19,7 +19,6 @@ contract EoracleConsumerExampleFeed {
         return _feed;
     }
 
-    //Example for using EOFeedRegistry.getLatestFeeds with a list of symbols.
     function getPrice() external view returns (int256 answer) {
         (, answer,,,) = _feed.latestRoundData();
     }
