@@ -14,14 +14,11 @@ contract DeployConsumerExampleFeed is Script {
 
     function run() external returns (address consumer) {
         vm.startBroadcast();
-
-        string memory outputConfig = EOJsonUtils.getOutputConfig();
-        string memory outputConfigJsonKey = "outputConfigJsonKey";
-        outputConfigJsonKey.serialize(outputConfig);
+        EOJsonUtils.initOutputConfig();
 
         consumer = address(new EoracleConsumerExampleFeed(FEED));
 
-        string memory outputConfigJson = outputConfigJsonKey.serialize("consumerExampleFeed", consumer);
+        string memory outputConfigJson = EOJsonUtils.OUTPUT_CONFIG.serialize("consumerExampleFeed", consumer);
         EOJsonUtils.writeConfig(outputConfigJson);
 
         vm.stopBroadcast();

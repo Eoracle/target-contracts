@@ -3,16 +3,21 @@
 pragma solidity 0.8.25;
 
 import { Script } from "forge-std/Script.sol";
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { stdJson } from "forge-std/Script.sol";
+
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 import { Denominations } from "../../src/libraries/Denominations.sol";
 
 contract DeployLibDenominations is Script {
-    function run() external returns (address feedImplementation, address adapterProxy) {
+    using stdJson for string;
+
+    function run() external returns (address libDenominations) {
         vm.startBroadcast();
+        EOJsonUtils.initOutputConfig();
 
         address libDenominations = _deployLibDenominations(bytes32(block.timestamp));
-        EOJsonUtils.writeConfig(Strings.toHexString(address(libDenominations)), ".libDenominations");
+        string memory outputConfigJson = EOJsonUtils.OUTPUT_CONFIG.serialize("libDenominations", libDenominations);
+        EOJsonUtils.writeConfig(outputConfigJson);
         vm.stopBroadcast();
     }
 

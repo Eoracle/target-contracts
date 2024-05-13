@@ -109,7 +109,6 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param symbol Symbol of the price feed
      * @return Price feed struct
      */
-    // TODO: it is not compatible with CL
     function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
         if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         return _priceFeeds[symbol];
