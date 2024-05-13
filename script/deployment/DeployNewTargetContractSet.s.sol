@@ -3,7 +3,7 @@
 pragma solidity 0.8.25;
 
 import { stdJson } from "forge-std/Script.sol";
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { CheckpointManagerDeployer } from "./base/DeployCheckpointManager.s.sol";
 import { FeedVerifierDeployer } from "./base/DeployFeedVerifier.s.sol";
 import { FeedRegistryDeployer } from "./base/DeployFeedRegistry.s.sol";
@@ -36,35 +36,50 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
         uint256 currentChainId = block.chainid;
         require(targetChainId == currentChainId, "Wrong chain id for this config.");
 
+        uint256 childChainId = config.readUint(".childChainId");
+        require(childChainId == vm.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
+
         vm.startBroadcast();
 
         address proxyAdminOwner = config.readAddress(".proxyAdminOwner");
 
         bn256G2 = address(new BN256G2());
-        string memory addressString = Strings.toHexString(uint256(uint160(bn256G2)), 20);
-        EOJsonUtils.writeConfig(addressString, ".bn256G2");
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(bn256G2), ".bn256G2");
 
         bls = address(new BLS());
-        addressString = Strings.toHexString(uint256(uint160(bls)), 20);
-        EOJsonUtils.writeConfig(addressString, ".bls");
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(bls), ".bls");
 
-        uint256 childChainId = config.readUint(".childChainId");
         address targetContractsOwner = config.readAddress(".targetContractsOwner");
 
+        /*//////////////////////////////////////////////////////////////////////////
+                                        TargetCheckpointManager
+        //////////////////////////////////////////////////////////////////////////*/
         checkpointManagerProxy =
             deployCheckpointManager(proxyAdminOwner, IBLS(bls), IBN256G2(bn256G2), childChainId, targetContractsOwner);
-        addressString = Strings.toHexString(uint256(uint160(checkpointManagerProxy)), 20);
-        EOJsonUtils.writeConfig(addressString, ".checkpointManager");
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(checkpointManagerProxy), ".checkpointManager");
 
+        address implementationAddress = Upgrades.getImplementationAddress(checkpointManagerProxy);
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(implementationAddress), ".checkpointManagerImplementation");
+
+        /*//////////////////////////////////////////////////////////////////////////
+                                        EOFeedVerifier
+        //////////////////////////////////////////////////////////////////////////*/
         feedVerifierProxy =
             deployFeedVerifier(proxyAdminOwner, ICheckpointManager(checkpointManagerProxy), targetContractsOwner);
-        addressString = Strings.toHexString(uint256(uint160(feedVerifierProxy)), 20);
-        EOJsonUtils.writeConfig(addressString, ".feedVerifier");
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(feedVerifierProxy), ".feedVerifier");
 
+        implementationAddress = Upgrades.getImplementationAddress(feedVerifierProxy);
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(implementationAddress), ".feedVerifierImplementation");
+
+        /*//////////////////////////////////////////////////////////////////////////
+                                        EOFeedRegistry
+        //////////////////////////////////////////////////////////////////////////*/
         feedRegistryProxy =
             deployFeedRegistry(proxyAdminOwner, IEOFeedVerifier(feedVerifierProxy), targetContractsOwner);
-        addressString = Strings.toHexString(uint256(uint160(feedRegistryProxy)), 20);
-        EOJsonUtils.writeConfig(addressString, ".feedRegistry");
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(feedRegistryProxy), ".feedRegistry");
+
+        implementationAddress = Upgrades.getImplementationAddress(feedRegistryProxy);
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(implementationAddress), ".feedRegistryImplementation");
 
         vm.stopBroadcast();
     }
