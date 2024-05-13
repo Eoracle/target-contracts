@@ -29,7 +29,6 @@ contract DeployFeedRegistryAdapter is Script {
             EOFeedRegistryAdapterBase.initialize, (feedRegistry, feedImplementation, targetContractsOwner)
         );
         adapterProxy = Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdminOwner, initData);
-        vm.stopBroadcast();
 
         EOJsonUtils.writeConfig(EOJsonUtils.addressToString(adapterProxy), ".feedRegistryAdapter");
         address implementationAddress = Upgrades.getImplementationAddress(adapterProxy);
