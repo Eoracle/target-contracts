@@ -20,12 +20,9 @@ contract DeployConsumerExampleFeed is Script {
         outputConfigJsonKey.serialize(outputConfig);
 
         consumer = address(new EoracleConsumerExampleFeed(FEED));
-        // string memory addressString = Strings.toHexString(uint256(uint160(consumer)), 20);
 
         string memory outputConfigJson = outputConfigJsonKey.serialize("consumerExampleFeed", consumer);
         EOJsonUtils.writeConfig(outputConfigJson);
-
-        // EOJsonUtils.writeConfig(addressString, ".consumerExampleFeed");
 
         vm.stopBroadcast();
     }
