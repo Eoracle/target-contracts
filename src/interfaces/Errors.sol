@@ -2,16 +2,11 @@
 pragma solidity 0.8.25;
 
 /*//////////////////////////////////////////////////////////////////////////
-                                Common
-//////////////////////////////////////////////////////////////////////////*/
-error OwnableUnauthorizedAccount(address);
-
-/*//////////////////////////////////////////////////////////////////////////
                                 EOFeedRegistry
 //////////////////////////////////////////////////////////////////////////*/
-error CallerIsNotWhitelisted();
+error CallerIsNotWhitelisted(address caller);
 error MissingLeafInputs();
-error SymbolNotSupported();
+error SymbolNotSupported(uint16 symbol);
 
 /*//////////////////////////////////////////////////////////////////////////
                                 EOFeedVerifier
@@ -30,6 +25,12 @@ error NoEventRootForBlockNumber();
 error NoEventRootForEpoch();
 error InvalidEventRoot();
 error VotingPowerIsZero();
-error InvalidBitmap();
+error AggVotingPowerIsZero();
 error InsufficientVotingPower();
 error SignatureVerficationFailed();
+
+/*//////////////////////////////////////////////////////////////////////////
+                                EOFeedRegistryAdapter
+//////////////////////////////////////////////////////////////////////////*/
+error FeedAlreadyExists();
+error BaseQuotePairExists();

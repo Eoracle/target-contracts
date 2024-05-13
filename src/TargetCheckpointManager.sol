@@ -14,7 +14,7 @@ import {
     NoEventRootForEpoch,
     InvalidEventRoot,
     VotingPowerIsZero,
-    InvalidBitmap,
+    AggVotingPowerIsZero,
     InsufficientVotingPower,
     SignatureVerficationFailed
 } from "./interfaces/Errors.sol";
@@ -240,7 +240,7 @@ contract TargetCheckpointManager is ICheckpointManager, OwnableUpgradeable {
             }
         }
 
-        if (aggVotingPower == 0) revert InvalidBitmap();
+        if (aggVotingPower == 0) revert AggVotingPowerIsZero();
         if (aggVotingPower <= ((2 * totalVotingPower) / 3)) revert InsufficientVotingPower();
 
         (bool callSuccess, bool result) = bls.verifySingle(signature, aggPubkey, message);

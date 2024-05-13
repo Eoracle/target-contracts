@@ -16,7 +16,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     IEOFeedVerifier internal _feedVerifier;
 
     modifier onlyWhitelisted() {
-        if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted();
+        if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
         _;
     }
 
@@ -111,7 +111,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     // TODO: it is not compatible with CL
     function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
-        if (!_supportedSymbols[symbol]) revert SymbolNotSupported();
+        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         return _priceFeeds[symbol];
     }
 
@@ -156,7 +156,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     function _processVerifiedRate(bytes memory data) internal {
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
-        if (!_supportedSymbols[symbol]) revert SymbolNotSupported();
+        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
     }
 }

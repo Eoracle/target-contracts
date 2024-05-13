@@ -6,6 +6,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { IEOFeed } from "./interfaces/IEOFeed.sol";
 import { IEOFeedRegistryAdapter } from "./interfaces/IEOFeedRegistryAdapter.sol";
 import { EOFeedFactoryBase } from "./factories/EOFeedFactoryBase.sol";
+import { FeedAlreadyExists, BaseQuotePairExists, SymbolNotSupported } from "../interfaces/Errors.sol";
 
 /**
  * @title EOFeedRegistryAdapterBase
@@ -20,10 +21,6 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     event FeedRegistrySet(address indexed feedRegistry);
     event FeedDeployed(uint16 indexed pairSymbol, address indexed feed);
     event PairSymbolAdded(address indexed base, address indexed quote, uint16 indexed pairSymbol);
-
-    error FeedAlreadyExists();
-    error BaseQuotePairExists();
-    error SymbolNotSupported();
 
     /**
      * @notice Initialize the contract
@@ -70,7 +67,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     {
         // check if pairSymbol exists in feedRegistry contract
         if (!_feedRegistry.isSupportedSymbol(pairSymbol)) {
-            revert SymbolNotSupported();
+            revert SymbolNotSupported(pairSymbol);
         }
 
         if (address(_pairSymbolsToFeeds[pairSymbol]) != address(0)) {

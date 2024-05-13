@@ -11,7 +11,7 @@ import {
     NoEventRootForEpoch,
     InvalidEventRoot,
     VotingPowerIsZero,
-    InvalidBitmap,
+    AggVotingPowerIsZero,
     InsufficientVotingPower,
     SignatureVerficationFailed
 } from "../../src/interfaces/Errors.sol";
@@ -122,7 +122,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
             blockRound: 0,
             currentValidatorSetHash: hashes[2]
         });
-        vm.expectRevert(InvalidBitmap.selector);
+        vm.expectRevert(AggVotingPowerIsZero.selector);
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[1], validatorSet, bitmaps[1]);
     }
 
