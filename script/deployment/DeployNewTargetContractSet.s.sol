@@ -30,14 +30,10 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
             address feedRegistryProxy
         )
     {
-        // string memory config = EOJsonUtils.getConfig();
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
-        // uint256 targetChainId = config.readUint(".targetChainId");
-        // uint256 targetChainId = configStructured.targetChainId
         require(configStructured.targetChainId == block.chainid, "Wrong chain id for this config.");
 
-        // uint256 childChainId = config.readUint(".childChainId");
         require(configStructured.childChainId == vm.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
 
         vm.startBroadcast();
