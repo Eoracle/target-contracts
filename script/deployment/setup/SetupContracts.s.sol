@@ -11,24 +11,6 @@ import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapt
 contract SetupContracts is Script {
     using stdJson for string;
 
-    struct Config {
-        uint256 childChainId;
-        address proxyAdminOwner;
-        address[] publishers;
-        uint256[] supportedSymbols;
-        SymbolData[] supportedSymbolsData;
-        uint256 targetChainId;
-        address targetContractsOwner;
-    }
-
-    struct SymbolData {
-        address base;
-        uint256 decimals;
-        string description;
-        address quote;
-        uint256 symbolId;
-    }
-
     uint16[] public symbols;
     bool[] public symbolsBools;
     address[] public publishers;
@@ -38,14 +20,9 @@ contract SetupContracts is Script {
     EOFeedRegistryAdapter public feedRegistryAdapter;
 
     function run() external {
-        Config memory configData;
-        string memory config = EOJsonUtils.getConfig();
-        bytes memory configRaw = config.parseRaw(".");
-        configData = abi.decode(configRaw, (Config));
+        EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
-        string memory outputConfig = EOJsonUtils.getOutputConfig();
-        string memory outputConfigJsonKey = "outputConfigJsonKey";
-        outputConfigJsonKey.serialize(outputConfig);
+        string memory outputConfig = EOJsonUtils.initOutputConfig();
 
         feedRegistry = EOFeedRegistry(outputConfig.readAddress(".feedRegistry"));
         feedRegistryAdapter = EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter"));
@@ -53,39 +30,42 @@ contract SetupContracts is Script {
         vm.startBroadcast();
 
         // Set supported symbols in FeedRegistry which are not set yet
-        _updateSupportedSymbols(configData);
+        _updateSupportedSymbols(configStructured);
 
         // Set publishers in FeedRegistry which are not set yet
-        _updateWhiteListedPublishers(configData);
+        _updateWhiteListedPublishers(configStructured);
 
         // Deploy feeds which are not deployed yet
         address feed;
         string memory feedAddressesJsonKey = "feedsJson";
         string memory feedAddressesJson;
 
-        for (uint256 i = 0; i < configData.supportedSymbolsData.length; i++) {
-            feed = address(feedRegistryAdapter.getFeedByPairSymbol(uint16(configData.supportedSymbolsData[i].symbolId)));
+        for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
+            feed = address(
+                feedRegistryAdapter.getFeedByPairSymbol(uint16(configStructured.supportedSymbolsData[i].symbolId))
+            );
             if (feed == address(0)) {
                 feed = address(
                     feedRegistryAdapter.deployEOFeed(
-                        configData.supportedSymbolsData[i].base,
-                        configData.supportedSymbolsData[i].quote,
-                        uint16(configData.supportedSymbolsData[i].symbolId),
-                        configData.supportedSymbolsData[i].description,
-                        uint8(configData.supportedSymbolsData[i].decimals),
+                        configStructured.supportedSymbolsData[i].base,
+                        configStructured.supportedSymbolsData[i].quote,
+                        uint16(configStructured.supportedSymbolsData[i].symbolId),
+                        configStructured.supportedSymbolsData[i].description,
+                        uint8(configStructured.supportedSymbolsData[i].decimals),
                         1
                     )
                 );
             }
-            feedAddressesJson = feedAddressesJsonKey.serialize(configData.supportedSymbolsData[i].description, feed);
+            feedAddressesJson =
+                feedAddressesJsonKey.serialize(configStructured.supportedSymbolsData[i].description, feed);
         }
-        string memory outputConfigJson = outputConfigJsonKey.serialize("feeds", feedAddressesJson);
+        string memory outputConfigJson = EOJsonUtils.OUTPUT_CONFIG.serialize("feeds", feedAddressesJson);
         EOJsonUtils.writeConfig(outputConfigJson);
 
         vm.stopBroadcast();
     }
 
-    function _updateSupportedSymbols(Config memory _configData) internal {
+    function _updateSupportedSymbols(EOJsonUtils.Config memory _configData) internal {
         uint16 symbolId;
 
         for (uint256 i = 0; i < _configData.supportedSymbols.length; i++) {
@@ -100,7 +80,7 @@ contract SetupContracts is Script {
         }
     }
 
-    function _updateWhiteListedPublishers(Config memory _configData) internal {
+    function _updateWhiteListedPublishers(EOJsonUtils.Config memory _configData) internal {
         for (uint256 i = 0; i < _configData.publishers.length; i++) {
             if (!feedRegistry.isWhitelistedPublisher(_configData.publishers[i])) {
                 publishers.push(_configData.publishers[i]);

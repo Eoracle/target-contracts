@@ -4,6 +4,18 @@ pragma solidity 0.8.25;
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { UninitializedCheckpointManager, InitializedCheckpointManager } from "./CheckpointManagerBase.sol";
 
+import {
+    ValidatorSetNotInitialized,
+    InvalidValidatorSetHash,
+    NoEventRootForBlockNumber,
+    NoEventRootForEpoch,
+    InvalidEventRoot,
+    VotingPowerIsZero,
+    AggVotingPowerIsZero,
+    InsufficientVotingPower,
+    SignatureVerficationFailed
+} from "../../src/interfaces/Errors.sol";
+
 abstract contract FirstSubmittedCheckpoint is InitializedCheckpointManager {
     function setUp() public virtual override {
         super.setUp();
@@ -53,7 +65,7 @@ contract CheckpointManagerSetNewValidatorSetTest is UninitializedCheckpointManag
     function test_RevertWhen_VotingPowerIsZero_SetNewValidatorSet() public {
         checkpointManager.initialize(bls, bn256G2, childChainId, address(this));
         validatorSet[0].votingPower = 0;
-        vm.expectRevert("VOTING_POWER_ZERO");
+        vm.expectRevert(VotingPowerIsZero.selector);
         checkpointManager.setNewValidatorSet(validatorSet);
     }
 
@@ -61,7 +73,7 @@ contract CheckpointManagerSetNewValidatorSetTest is UninitializedCheckpointManag
         ICheckpointManager.Checkpoint memory checkpoint;
         ICheckpointManager.CheckpointMetadata memory checkpointMetadata;
 
-        vm.expectRevert("VALIDATOR_SET_NOT_INITIALIZED");
+        vm.expectRevert(ValidatorSetNotInitialized.selector);
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
     }
 }
@@ -80,7 +92,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
             currentValidatorSetHash: hashes[1] //Invalid Hash
          });
 
-        vm.expectRevert("INVALID_VALIDATOR_SET_HASH");
+        vm.expectRevert(InvalidValidatorSetHash.selector);
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
     }
 
@@ -97,7 +109,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
             currentValidatorSetHash: hashes[2]
         });
 
-        vm.expectRevert("SIGNATURE_VERIFICATION_FAILED");
+        vm.expectRevert(SignatureVerficationFailed.selector);
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
     }
 
@@ -110,7 +122,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
             blockRound: 0,
             currentValidatorSetHash: hashes[2]
         });
-        vm.expectRevert("BITMAP_IS_EMPTY");
+        vm.expectRevert(AggVotingPowerIsZero.selector);
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[1], validatorSet, bitmaps[1]);
     }
 
@@ -124,7 +136,7 @@ contract CheckpointManagerSubmitTest is InitializedCheckpointManager {
             currentValidatorSetHash: hashes[2]
         });
 
-        vm.expectRevert("INSUFFICIENT_VOTING_POWER");
+        vm.expectRevert(InsufficientVotingPower.selector);
         checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[2], validatorSet, bitmaps[2]);
     }
 
@@ -199,7 +211,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmittedCheckpoint {
             );
             checkpointManager.getEventMembershipByEpoch(checkpoint.epoch, checkpoint.eventRoot, leafIndex, proof);
         } else {
-            vm.expectRevert("INSUFFICIENT_VOTING_POWER");
+            vm.expectRevert(InsufficientVotingPower.selector);
             checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[7], validatorSet, bitmaps[7]);
         }
     }
@@ -209,7 +221,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmittedCheckpoint {
         bytes32 leaf = keccak256(abi.encodePacked(block.timestamp));
         uint256 leafIndex = 0;
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
-        vm.expectRevert("NO_EVENT_ROOT_FOR_BLOCK_NUMBER");
+        vm.expectRevert(NoEventRootForBlockNumber.selector);
         checkpointManager.getEventMembershipByBlockNumber(blockNumber, leaf, leafIndex, proof);
     }
 
@@ -218,7 +230,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmittedCheckpoint {
         bytes32 leaf = keccak256(abi.encodePacked(block.timestamp));
         uint256 leafIndex = 0;
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
-        vm.expectRevert("NO_EVENT_ROOT_FOR_EPOCH");
+        vm.expectRevert(NoEventRootForEpoch.selector);
         checkpointManager.getEventMembershipByEpoch(epoch, leaf, leafIndex, proof);
     }
 
@@ -227,7 +239,7 @@ contract CheckpointManagerSubmitSecondTest is FirstSubmittedCheckpoint {
         bytes32 leaf = keccak256(abi.encodePacked(block.timestamp));
         uint256 leafIndex = 0;
         proof.push(keccak256(abi.encodePacked(block.timestamp)));
-        vm.expectRevert("INVALID_EVENT_ROOT");
+        vm.expectRevert(InvalidEventRoot.selector);
         checkpointManager.checkEventMembership(eventRoot, leaf, leafIndex, proof);
     }
 

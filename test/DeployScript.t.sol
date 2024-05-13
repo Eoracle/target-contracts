@@ -24,10 +24,12 @@ contract DeployScriptTest is Test {
     address public feedImplementation;
     address public adapterProxy;
     string public config;
+    string public initialOutputConfig;
     string public outputConfig;
     address public targetContractsOwner;
 
     function setUp() public {
+        initialOutputConfig = EOJsonUtils.getOutputConfig();
         mainDeployer = new DeployNewTargetContractSet();
         adapterDeployer = new DeployFeedRegistryAdapter();
 
@@ -66,5 +68,11 @@ contract DeployScriptTest is Test {
         assertEq(EOFeedRegistryAdapter(adapterProxy).owner(), targetContractsOwner);
         assertEq(address(EOFeedRegistryAdapter(adapterProxy).getFeedRegistry()), feedRegistryProxy);
         assertEq(adapterProxy, outputConfig.readAddress(".feedRegistryAdapter"));
+    }
+
+    // revert the changes to the config made by this test suite
+    // solhint-disable-next-line ordering
+    function test_Cleanup() public {
+        EOJsonUtils.writeConfig(initialOutputConfig);
     }
 }

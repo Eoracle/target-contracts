@@ -6,6 +6,7 @@ import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/I
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
 import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
+import { CallerIsNotWhitelisted, MissingLeafInputs, SymbolNotSupported } from "./interfaces/Errors.sol";
 
 contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     mapping(uint16 => PriceFeed) internal _priceFeeds;
@@ -15,7 +16,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     IEOFeedVerifier internal _feedVerifier;
 
     modifier onlyWhitelisted() {
-        require(_whitelistedPublishers[msg.sender], "Caller is not whitelisted");
+        if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
         _;
     }
 
@@ -72,7 +73,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        bytes memory data = _feedVerifier.submitAndExit(input, checkpointMetadata, checkpoint, signature, bitmap);
+        bytes memory data = _feedVerifier.submitAndVerify(input, checkpointMetadata, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
     }
 
@@ -94,10 +95,10 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        require(inputs.length > 0, "MISSING_INPUTS");
+        if (inputs.length == 0) revert MissingLeafInputs();
 
         bytes[] memory data =
-            _feedVerifier.submitAndBatchExit(inputs, checkpointMetadata, checkpoint, signature, bitmap);
+            _feedVerifier.submitAndBatchVerify(inputs, checkpointMetadata, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
         }
@@ -109,7 +110,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @return Price feed struct
      */
     function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
-        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
+        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         return _priceFeeds[symbol];
     }
 
@@ -154,7 +155,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     function _processVerifiedRate(bytes memory data) internal {
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
-        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
+        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
     }
 }

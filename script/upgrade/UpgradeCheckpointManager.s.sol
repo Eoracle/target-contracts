@@ -11,8 +11,13 @@ contract UpgradeCheckpointManager is Script {
     using stdJson for string;
 
     function run() external {
-        string memory config = EOJsonUtils.getOutputConfig();
+        string memory config = EOJsonUtils.initOutputConfig();
+
         address proxyAddress = config.readAddress(".checkpointManager");
         Upgrades.upgradeProxy(proxyAddress, "TargetCheckpointManagerV2.sol", "");
+        address implementationAddress = Upgrades.getImplementationAddress(proxyAddress);
+        string memory outputConfigJson =
+            EOJsonUtils.OUTPUT_CONFIG.serialize("checkpointManagerImplementation", implementationAddress);
+        EOJsonUtils.writeConfig(outputConfigJson);
     }
 }
