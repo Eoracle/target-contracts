@@ -14,5 +14,7 @@ contract UpgradeCheckpointManager is Script {
         string memory config = EOJsonUtils.getOutputConfig();
         address proxyAddress = config.readAddress(".checkpointManager");
         Upgrades.upgradeProxy(proxyAddress, "TargetCheckpointManagerV2.sol", "");
+        address implementationAddress = Upgrades.getImplementationAddress(proxyAddress);
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(implementationAddress), ".checkpointManagerImplementation");
     }
 }

@@ -1,0 +1,9 @@
+{
+  "bls": "0x05dfb66017504a8471e3c2d17e76db6a42db2883",
+  "bn256G2": "0x3b8e822f30496a5a0081739f7ab047b571b0ae4f",
+  "checkpointManager": "0x6a693c72ec02cdfce2630fad1dd4d444ae2dc02d",
+  "feedVerifier": "0xf06fd32071c866b367055bcf069aa3217b7a2e83",
+  "feedRegistry": "0x982cbaea9ca2cbc1473ead51b753611eac1bd523",
+  "feedRegistryAdapter": "0x8e96af13bb78568474051cc43c02e3c8f5684766",
+  "proxyAdmin": ""
+}

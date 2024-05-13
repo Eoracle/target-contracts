@@ -38,4 +38,8 @@ library EOJsonUtils {
             "script/config/", Strings.toString(block.chainid), "/", Strings.toString(childChainId), "/", fileName
         );
     }
+
+    function addressToString(address _address) internal pure returns (string memory) {
+        return Strings.toHexString(uint256(uint160(_address)), 20);
+    }
 }

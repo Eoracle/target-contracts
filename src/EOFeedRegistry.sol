@@ -72,7 +72,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        bytes memory data = _feedVerifier.submitAndExit(input, checkpointMetadata, checkpoint, signature, bitmap);
+        bytes memory data = _feedVerifier.submitAndVerify(input, checkpointMetadata, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
     }
 
@@ -97,7 +97,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         require(inputs.length > 0, "MISSING_INPUTS");
 
         bytes[] memory data =
-            _feedVerifier.submitAndBatchExit(inputs, checkpointMetadata, checkpoint, signature, bitmap);
+            _feedVerifier.submitAndBatchVerify(inputs, checkpointMetadata, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
         }

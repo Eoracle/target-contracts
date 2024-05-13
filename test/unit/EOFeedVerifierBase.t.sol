@@ -48,6 +48,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     bytes32[][] public leavesArray;
 
     event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
+    event LeafVerified(uint256 indexed id, bytes returnData);
 
     function setUp() public virtual {
         bls = new BLS();

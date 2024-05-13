@@ -1,9 +1,9 @@
 {
-  "bls": "0xc00e920934ce6b78a987e0e1bb2ddd678d778adc",
-  "bn256G2": "0xc2893cbc80c30bd74b0d2b4967843d26f19c1fbb",
-  "checkpointManager": "0xd6993f15219184c4bfc97918b35938ba78673b8a",
-  "feedVerifier": "0x8b480aa03c1be370109450f37ad38cf3a6b7cfe1",
-  "feedRegistry": "0x577e23ad6005072905107f8c933c166fb28c5c02",
-  "feedRegistryAdapter": "",
+  "bls": "0xdb939dca1d8729d47132cf4948c61341047ca9aa",
+  "bn256G2": "0xe1d306815dfbc77e419b8a0c13f035f3f885e6ec",
+  "checkpointManager": "0x1d8ca5381e7bac524194d1b5c0e04029ed2c6bea",
+  "feedVerifier": "0xe67a36ab0d3f1846b94fcab0bebe36e6f4a9e63f",
+  "feedRegistry": "0xf9047e89bb422cc8fb23b8bec51a26c9a15bbbfd",
+  "feedRegistryAdapter": "0xf099658ccc89e6b6facab3f3bb9ec2978c6944b9",
   "proxyAdmin": ""
 }
