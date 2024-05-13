@@ -11,6 +11,7 @@ import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryA
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 import { ICheckpointManager } from "../../../src/interfaces/ICheckpointManager.sol";
+import { FeedAlreadyExists, BaseQuotePairExists } from "../../../src/interfaces/Errors.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
@@ -116,13 +117,13 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
 
     function test_RevertWhen_DeployFeed_ExistingFeed() public {
         _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
-        vm.expectRevert(EOFeedRegistryAdapterBase.FeedAlreadyExists.selector);
+        vm.expectRevert(FeedAlreadyExists.selector);
         _deployEOFeed(_base2Address, _quote2Address, _pairSymbol, _description, _decimals, VERSION);
     }
 
     function test_RevertWhen_DeployFeed_ExistingPair() public {
         _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
-        vm.expectRevert(EOFeedRegistryAdapterBase.BaseQuotePairExists.selector);
+        vm.expectRevert(BaseQuotePairExists.selector);
         _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol2, _description2, _decimals, VERSION);
     }
 

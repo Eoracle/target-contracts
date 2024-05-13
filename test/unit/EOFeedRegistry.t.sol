@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Test } from "forge-std/Test.sol";
 import { Utils } from "../utils/Utils.sol";
 import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
@@ -9,8 +10,7 @@ import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { MockCheckpointManager } from "../mock/MockCheckpointManager.sol";
-
-error OwnableUnauthorizedAccount(address);
+import { CallerIsNotWhitelisted, SymbolNotSupported, MissingLeafInputs } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedRegistryTests is Test, Utils {
     EOFeedRegistry private registry;
@@ -40,7 +40,7 @@ contract EOFeedRegistryTests is Test, Utils {
     }
 
     function test_whitelistPublishersRevertIfNotOwner() public {
-        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, notOwner));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _whitelistPublisher(notOwner, publisher);
     }
 
@@ -60,7 +60,7 @@ contract EOFeedRegistryTests is Test, Utils {
     }
 
     function test_setSupportedSymbolsRevertIfNotOwner() public {
-        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, notOwner));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _setSupportedSymbol(notOwner, symbol);
     }
 
@@ -97,7 +97,7 @@ contract EOFeedRegistryTests is Test, Utils {
             blockNumber: blockNumber,
             proof: new bytes32[](0)
         });
-        vm.expectRevert("Caller is not whitelisted");
+        vm.expectRevert(abi.encodeWithSelector(CallerIsNotWhitelisted.selector, address(this)));
         registry.updatePriceFeed(input, checkpointMetadata, checkpoint, signature, bitmap);
     }
 
@@ -121,7 +121,7 @@ contract EOFeedRegistryTests is Test, Utils {
         });
 
         _whitelistPublisher(owner, publisher);
-        vm.expectRevert("SYMBOL_NOT_SUPPORTED");
+        vm.expectRevert(abi.encodeWithSelector(SymbolNotSupported.selector, symbol));
         vm.prank(publisher);
         registry.updatePriceFeed(input, checkpointMetadata, checkpoint, signature, bitmap);
     }
@@ -211,12 +211,12 @@ contract EOFeedRegistryTests is Test, Utils {
         vm.startPrank(publisher);
 
         IEOFeedVerifier.LeafInput[] memory inputs;
-        vm.expectRevert("MISSING_INPUTS");
+        vm.expectRevert(MissingLeafInputs.selector);
         registry.updatePriceFeeds(inputs, checkpointMetadata, checkpoint, signature, bitmap);
     }
 
     function test_RevertWhen_SymbolNotSupported_GetLatestPriceFeed() public {
-        vm.expectRevert("SYMBOL_NOT_SUPPORTED");
+        vm.expectRevert(abi.encodeWithSelector(SymbolNotSupported.selector, 999));
         registry.getLatestPriceFeed(999);
     }
 

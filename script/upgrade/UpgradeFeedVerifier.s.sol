@@ -14,5 +14,7 @@ contract UpgradeFeedVerifier is Script {
         string memory config = EOJsonUtils.getOutputConfig();
         address proxyAddress = config.readAddress(".feedVerifier");
         Upgrades.upgradeProxy(proxyAddress, "EOFeedVerifierV2.sol", "");
+        address implementationAddress = Upgrades.getImplementationAddress(proxyAddress);
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(implementationAddress), ".feedVerifierImplementation");
     }
 }

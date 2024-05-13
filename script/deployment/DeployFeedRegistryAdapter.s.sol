@@ -5,7 +5,6 @@ pragma solidity 0.8.25;
 import { Script } from "forge-std/Script.sol";
 import { stdJson } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { EOFeed } from "src/adapters/EOFeed.sol";
 import { EOFeedRegistryAdapterBase } from "src/adapters/EOFeedRegistryAdapterBase.sol";
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
@@ -17,8 +16,7 @@ contract DeployFeedRegistryAdapter is Script {
         vm.startBroadcast();
         feedImplementation = address(new EOFeed());
 
-        string memory addressString = Strings.toHexString(uint256(uint160(feedImplementation)), 20);
-        EOJsonUtils.writeConfig(addressString, ".feedImplementation");
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(feedImplementation), ".feedImplementation");
 
         string memory outputConfig = EOJsonUtils.getOutputConfig();
         address feedRegistry = outputConfig.readAddress(".feedRegistry");
@@ -32,9 +30,10 @@ contract DeployFeedRegistryAdapter is Script {
         );
         adapterProxy = Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdminOwner, initData);
 
-        addressString = Strings.toHexString(uint256(uint160(adapterProxy)), 20);
-        EOJsonUtils.writeConfig(addressString, ".feedRegistryAdapter");
-
-        vm.stopBroadcast();
+        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(adapterProxy), ".feedRegistryAdapter");
+        address implementationAddress = Upgrades.getImplementationAddress(adapterProxy);
+        EOJsonUtils.writeConfig(
+            EOJsonUtils.addressToString(implementationAddress), ".feedRegistryAdapterImplementation"
+        );
     }
 }

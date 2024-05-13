@@ -6,6 +6,7 @@ import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 
 import { Merkle } from "./common/Merkle.sol";
+import { FeedVerifierNotInitialized, ExitAlreadyProcessed, InvalidProof, InvalidAddress } from "./interfaces/Errors.sol";
 
 using Merkle for bytes32;
 
@@ -14,8 +15,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     ICheckpointManager internal _checkpointManager;
 
     modifier onlyInitialized() {
-        require(address(_checkpointManager) != address(0), "NOT_INITIALIZED");
-
+        if (address(_checkpointManager) == address(0)) revert FeedVerifierNotInitialized();
         _;
     }
 
@@ -26,10 +26,9 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param owner Owner of the contract
      */
     function initialize(ICheckpointManager newCheckpointManager, address owner) external initializer {
-        require(
-            address(newCheckpointManager) != address(0) && address(newCheckpointManager).code.length != 0,
-            "INVALID_ADDRESS"
-        );
+        if (address(newCheckpointManager) == address(0) || address(newCheckpointManager).code.length == 0) {
+            revert InvalidAddress();
+        }
         _checkpointManager = newCheckpointManager;
         __Ownable_init(owner);
     }
@@ -169,16 +168,15 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
                 return new bytes(0x00);
             }
         } else {
-            require(!_processedExits[id], "EXIT_ALREADY_PROCESSED");
+            if (_processedExits[id]) revert ExitAlreadyProcessed();
         }
 
         // slither-disable-next-line calls-loop
-        require(
-            _checkpointManager.getEventMembershipByBlockNumber(
+        if (
+            !_checkpointManager.getEventMembershipByBlockNumber(
                 input.blockNumber, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
-            ),
-            "INVALID_PROOF"
-        );
+            )
+        ) revert InvalidProof();
 
         _processedExits[id] = true;
 
@@ -194,12 +192,11 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function _verify(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory) {
         // slither-disable-next-line calls-loop
-        require(
-            _checkpointManager.checkEventMembership(
+        if (
+            !_checkpointManager.checkEventMembership(
                 eventRoot, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
-            ),
-            "INVALID_PROOF"
-        );
+            )
+        ) revert InvalidProof();
 
         (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
             abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
