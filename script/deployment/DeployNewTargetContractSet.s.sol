@@ -37,7 +37,7 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
         require(targetChainId == currentChainId, "Wrong chain id for this config.");
 
         uint256 childChainId = config.readUint(".childChainId");
-        require(childChainId == VM.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
+        require(childChainId == vm.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
 
         vm.startBroadcast();
 
@@ -49,7 +49,6 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
         bls = address(new BLS());
         EOJsonUtils.writeConfig(EOJsonUtils.addressToString(bls), ".bls");
 
-        uint256 childChainId = config.readUint(".childChainId");
         address targetContractsOwner = config.readAddress(".targetContractsOwner");
 
         /*//////////////////////////////////////////////////////////////////////////
