@@ -13,21 +13,30 @@ library EOJsonUtils {
     Vm internal constant VM = Vm(VM_ADDRESS);
 
     function writeConfig(string memory value, string memory key) internal {
-        string memory path =
-            string.concat("script/config/", Strings.toString(block.chainid), "/targetContractAddresses.json");
+        string memory path = getFilePath("targetContractAddresses.json");
         VM.writeJson(value, path, key);
     }
 
+    function writeConfig(string memory config) internal {
+        string memory path = getFilePath("targetContractAddresses.json");
+        VM.writeJson(config, path);
+    }
+
     function getConfig() internal view returns (string memory) {
-        string memory path =
-            string.concat("script/config/", Strings.toString(block.chainid), "/targetContractSetConfig.json");
+        string memory path = getFilePath("targetContractSetConfig.json");
         return VM.readFile(path);
     }
 
     function getOutputConfig() internal view returns (string memory) {
-        string memory path =
-            string.concat("script/config/", Strings.toString(block.chainid), "/targetContractAddresses.json");
+        string memory path = getFilePath("targetContractAddresses.json");
         return VM.readFile(path);
+    }
+
+    function getFilePath(string memory fileName) internal view returns (string memory) {
+        uint256 childChainId = VM.envUint("CHILD_CHAIN_ID");
+        return string.concat(
+            "script/config/", Strings.toString(block.chainid), "/", Strings.toString(childChainId), "/", fileName
+        );
     }
 
     function addressToString(address _address) internal pure returns (string memory) {
