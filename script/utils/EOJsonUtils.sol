@@ -29,4 +29,8 @@ library EOJsonUtils {
             string.concat("script/config/", Strings.toString(block.chainid), "/targetContractAddresses.json");
         return VM.readFile(path);
     }
+
+    function addressToString(address _address) internal pure returns (string memory) {
+        return Strings.toHexString(uint256(uint160(_address)), 20);
+    }
 }
