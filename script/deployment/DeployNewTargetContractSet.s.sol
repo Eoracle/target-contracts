@@ -36,6 +36,9 @@ contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDe
         uint256 currentChainId = block.chainid;
         require(targetChainId == currentChainId, "Wrong chain id for this config.");
 
+        uint256 childChainId = config.readUint(".childChainId");
+        require(childChainId == VM.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
+
         vm.startBroadcast();
 
         address proxyAdminOwner = config.readAddress(".proxyAdminOwner");
