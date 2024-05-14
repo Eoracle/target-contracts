@@ -236,28 +236,53 @@ contract BN256G2 is IBN256G2 {
 
     /**
      * @notice Calculates the modular inverse of a over n
+     * @dev The same as the modular exponentiation with the exponent n-2.
+     *         zkEvm doesn't have precompiled contract for gas efficient modexp calculation,
+     *         so temporarily it is implemented in solidity,
+     *         should be replaced with precompiled as soon as it is available.
      * @param a The operand to calculate the inverse of
      * @param n The modulus
      * @return result Inv(a)modn
-     *
      */
     function _modInv(uint256 a, uint256 n) internal view returns (uint256 result) {
-        bool success;
-        // prettier-ignore
-        // slither-disable-next-line assembly
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            let freemem := mload(0x40)
-            mstore(freemem, 0x20)
-            mstore(add(freemem, 0x20), 0x20)
-            mstore(add(freemem, 0x40), 0x20)
-            mstore(add(freemem, 0x60), a)
-            mstore(add(freemem, 0x80), sub(n, 2))
-            mstore(add(freemem, 0xA0), n)
-            success := staticcall(sub(gas(), 2000), 5, freemem, 0xC0, freemem, 0x20)
-            result := mload(freemem)
+        // "a" - base
+        // "n - 2" - exponent value
+        // "n" - modulus
+        result = _expmod(a, n - 2, n);
+
+        // bool success;
+        // // prettier-ignore
+        // // slither-disable-next-line assembly
+        // // solhint-disable-next-line no-inline-assembly
+        // assembly {
+        //     let freemem := mload(0x40)
+        //     mstore(freemem, 0x20)
+        //     mstore(add(freemem, 0x20), 0x20)
+        //     mstore(add(freemem, 0x40), 0x20)
+        //     mstore(add(freemem, 0x60), a)
+        //     mstore(add(freemem, 0x80), sub(n, 2))
+        //     mstore(add(freemem, 0xA0), n)
+        //     success := staticcall(sub(gas(), 2000), 5, freemem, 0xC0, freemem, 0x20)
+        //     result := mload(freemem)
+        // }
+        // require(success, "error with modular inverse");
+    }
+
+    function _expmod(uint256 base, uint256 e, uint256 m) internal pure returns (uint256 o) {
+        if (m == 0) return 0;
+        if (e == 0) return 1;
+
+        uint256 result = 1;
+        base %= m;
+
+        while (e > 0) {
+            if (e % 2 == 1) {
+                result = mulmod(result, base, m); // Use mulmod to prevent overflow
+            }
+            base = mulmod(base, base, m); // Use mulmod to prevent overflow
+            e /= 2;
         }
-        require(success, "error with modular inverse");
+        return result;
     }
 
     /**
