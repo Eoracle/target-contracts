@@ -245,15 +245,11 @@ contract BN256G2 is IBN256G2 {
      * @return result Inv(a)modn
      */
     function _modInv(uint256 a, uint256 n) internal view returns (uint256 result) {
-        // "a" - base
-        // "n - 2" - exponent value
-        // "n" - modulus
-
+        // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
         uint256 base = a;
         uint256 e = n - 2;
         uint256 m = n;
 
-        // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
         if (m == 0) return 0;
         if (e == 0) return 1;
 
