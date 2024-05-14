@@ -242,9 +242,9 @@ contract BN256G2 is IBN256G2 {
      *         should be replaced with precompiled as soon as it is available.
      * @param a The operand to calculate the inverse of
      * @param n The modulus
-     * @return result Inv(a)modn
+     * @return Inv(a)modn
      */
-    function _modInv(uint256 a, uint256 n) internal view returns (uint256 result) {
+    function _modInv(uint256 a, uint256 n) internal view returns (uint256) {
         // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
         uint256 base = a;
         uint256 e = n - 2;
