@@ -2,7 +2,6 @@
 pragma solidity 0.8.25;
 
 import { IEOFeedVerifier } from "./IEOFeedVerifier.sol";
-import { ICheckpointManager } from "./ICheckpointManager.sol";
 
 interface IEOFeedRegistry {
     struct PriceFeed {
@@ -12,8 +11,7 @@ interface IEOFeedRegistry {
 
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput calldata input,
-        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
-        ICheckpointManager.Checkpoint calldata checkpoint,
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
         uint256[2] calldata signature,
         bytes calldata bitmap
     )
@@ -21,8 +19,7 @@ interface IEOFeedRegistry {
 
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
-        ICheckpointManager.Checkpoint calldata checkpoint,
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
         uint256[2] calldata signature,
         bytes calldata bitmap
     )

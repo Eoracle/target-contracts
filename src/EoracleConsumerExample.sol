@@ -3,7 +3,6 @@ pragma solidity 0.8.25;
 
 import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
-import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
 
 contract EoracleConsumer {
     // solhint-disable-next-line var-name-mixedcase
@@ -14,20 +13,19 @@ contract EoracleConsumer {
     //Example for calling an EOFeedRegistry.updateFeeds (with a single symbol) and then using the results
     function updateAndGetPriceFeed(
         bytes calldata rateData,
-        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
-        ICheckpointManager.Checkpoint calldata checkpoint,
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
         uint256[2] calldata signature,
         bytes calldata bitmap
     )
         external
     {
-        (uint256 blockNumber, uint256 leafIndex, bytes memory unhashedLeaf, bytes32[] memory proof) =
+        (, uint256 leafIndex, bytes memory unhashedLeaf, bytes32[] memory proof) =
             abi.decode(rateData, (uint256, uint256, bytes, bytes32[]));
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput(blockNumber, leafIndex, unhashedLeaf, proof);
+        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput(leafIndex, unhashedLeaf, proof);
 
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(unhashedLeaf, (uint16, uint256, uint256));
 
-        EOFeedRegistry.updatePriceFeed(input, checkpointMetadata, checkpoint, signature, bitmap);
+        EOFeedRegistry.updatePriceFeed(input, checkpoint, signature, bitmap);
         IEOFeedRegistry.PriceFeed memory priceFeed = EOFeedRegistry.getLatestPriceFeed(symbol);
         require(priceFeed.timestamp == timestamp, "INVALID_TIMESTAMP");
         require(priceFeed.value == rate, "INVALID_RATE");
