@@ -246,21 +246,19 @@ contract BN256G2 is IBN256G2 {
      */
     function _modInv(uint256 a, uint256 n) internal view returns (uint256) {
         // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
-        uint256 base = a;
         uint256 e = n - 2;
-        uint256 m = n;
 
-        if (m == 0) return 0;
+        if (n == 0) return 0;
         if (e == 0) return 1;
 
         uint256 result = 1;
-        base %= m;
+        a %= n;
 
         while (e > 0) {
             if (e % 2 == 1) {
-                result = mulmod(result, base, m); // Use mulmod to prevent overflow
+                result = mulmod(result, a, n); // Use mulmod to prevent overflow
             }
-            base = mulmod(base, base, m); // Use mulmod to prevent overflow
+            a = mulmod(a, a, n); // Use mulmod to prevent overflow
             e /= 2;
         }
         return result;
