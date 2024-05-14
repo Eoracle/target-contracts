@@ -236,9 +236,9 @@ contract BN256G2 is IBN256G2 {
 
     /**
      * @notice Calculates the modular inverse of a over n
-     * @dev The same as the modular exponentiation with the exponent n-2.
-     *         zkEvm doesn't have precompiled contract for gas efficient modexp calculation,
-     *         so temporarily it is implemented in solidity,
+     *  @dev The same as the modular exponentiation with the exponent n-2.
+     *         For EVM chains that don't support the Modexp precompile.
+     *         Temporarily implemented in solidity,
      *         should be replaced with precompiled as soon as it is available.
      * @param a The operand to calculate the inverse of
      * @param n The modulus
