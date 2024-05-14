@@ -248,27 +248,12 @@ contract BN256G2 is IBN256G2 {
         // "a" - base
         // "n - 2" - exponent value
         // "n" - modulus
-        result = _expmod(a, n - 2, n);
 
-        // bool success;
-        // // prettier-ignore
-        // // slither-disable-next-line assembly
-        // // solhint-disable-next-line no-inline-assembly
-        // assembly {
-        //     let freemem := mload(0x40)
-        //     mstore(freemem, 0x20)
-        //     mstore(add(freemem, 0x20), 0x20)
-        //     mstore(add(freemem, 0x40), 0x20)
-        //     mstore(add(freemem, 0x60), a)
-        //     mstore(add(freemem, 0x80), sub(n, 2))
-        //     mstore(add(freemem, 0xA0), n)
-        //     success := staticcall(sub(gas(), 2000), 5, freemem, 0xC0, freemem, 0x20)
-        //     result := mload(freemem)
-        // }
-        // require(success, "error with modular inverse");
-    }
+        uint256 base = a;
+        uint256 e = n - 2;
+        uint256 m = n;
 
-    function _expmod(uint256 base, uint256 e, uint256 m) internal pure returns (uint256 o) {
+        // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
         if (m == 0) return 0;
         if (e == 0) return 1;
 
