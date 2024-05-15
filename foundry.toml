@@ -10,10 +10,12 @@
   optimizer = true
   optimizer_runs = 10_000
   out = "out"
+  extra_output = ["storageLayout"]
   script = "script"
   solc = "0.8.25"
   src = "src"
   test = "test/unit"
+  build_info = true
   libs = ["lib"]
   fs_permissions = [{ access = "read-write", path = "./" }]
   ffi = true
