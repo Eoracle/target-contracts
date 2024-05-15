@@ -14,7 +14,7 @@ contract DeployFeeds is Script {
     EOFeedRegistry public feedRegistry;
     EOFeedRegistryAdapter public feedRegistryAdapter;
 
-    error SymbolNotSupported(uint16 symbolId);
+    error SymbolIsNotSupported(uint16 symbolId);
 
     function run() external {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
@@ -32,10 +32,10 @@ contract DeployFeeds is Script {
         string memory feedAddressesJson;
         uint16 symbolId;
 
-        // revert if at least one symbol is not supported
+        // revert if at least one symbol is not supported.
         for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
             if (!feedRegistry.isSupportedSymbol(symbolId)) {
-                revert SymbolNotSupported(symbolId);
+                revert SymbolIsNotSupported(symbolId);
             }
         }
 
