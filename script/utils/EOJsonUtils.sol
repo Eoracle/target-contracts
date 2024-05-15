@@ -8,9 +8,34 @@ import { Vm } from "forge-std/Vm.sol";
 library EOJsonUtils {
     using stdJson for string;
 
+    struct Config {
+        uint256 childChainId;
+        address proxyAdminOwner;
+        address[] publishers;
+        uint256[] supportedSymbols;
+        SymbolData[] supportedSymbolsData;
+        uint256 targetChainId;
+        address targetContractsOwner;
+    }
+
+    struct SymbolData {
+        address base;
+        uint256 decimals;
+        string description;
+        address quote;
+        uint256 symbolId;
+    }
+
     // Cheat code address, 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D.
     address internal constant VM_ADDRESS = address(uint160(uint256(keccak256("hevm cheat code"))));
+    string internal constant OUTPUT_CONFIG = "outputConfigJsonKey";
     Vm internal constant VM = Vm(VM_ADDRESS);
+
+    function initOutputConfig() internal returns (string memory) {
+        string memory outputConfig = getOutputConfig();
+        OUTPUT_CONFIG.serialize(outputConfig);
+        return outputConfig;
+    }
 
     function writeConfig(string memory value, string memory key) internal {
         string memory path = getFilePath("targetContractAddresses.json");
@@ -25,6 +50,12 @@ library EOJsonUtils {
     function getConfig() internal view returns (string memory) {
         string memory path = getFilePath("targetContractSetConfig.json");
         return VM.readFile(path);
+    }
+
+    function getParsedConfig() internal view returns (Config memory) {
+        string memory config = getConfig();
+        bytes memory configRaw = config.parseRaw(".");
+        return abi.decode(configRaw, (Config));
     }
 
     function getOutputConfig() internal view returns (string memory) {

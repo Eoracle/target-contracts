@@ -22,46 +22,49 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedRegistryDeploye
         external
         returns (address bls, address bn256G2, address feedVerifierProxy, address feedRegistryProxy)
     {
-        string memory config = EOJsonUtils.getConfig();
+        EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
-        uint256 targetChainId = config.readUint(".targetChainId");
-        uint256 currentChainId = block.chainid;
-        require(targetChainId == currentChainId, "Wrong chain id for this config.");
+        require(configStructured.targetChainId == block.chainid, "Wrong chain id for this config.");
 
-        uint256 childChainId = config.readUint(".childChainId");
-        require(childChainId == vm.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
+        require(configStructured.childChainId == vm.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
 
         vm.startBroadcast();
 
-        address proxyAdminOwner = config.readAddress(".proxyAdminOwner");
+        EOJsonUtils.initOutputConfig();
 
         bn256G2 = address(new BN256G2());
-        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(bn256G2), ".bn256G2");
+        EOJsonUtils.OUTPUT_CONFIG.serialize("bn256G2", bn256G2);
 
         bls = address(new BLS());
-        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(bls), ".bls");
-
-        address targetContractsOwner = config.readAddress(".targetContractsOwner");
+        EOJsonUtils.OUTPUT_CONFIG.serialize("bls", bls);
 
         /*//////////////////////////////////////////////////////////////////////////
                                         EOFeedVerifier
         //////////////////////////////////////////////////////////////////////////*/
-        feedVerifierProxy =
-            deployFeedVerifier(proxyAdminOwner, targetContractsOwner, IBLS(bls), IBN256G2(bn256G2), childChainId);
-        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(feedVerifierProxy), ".feedVerifier");
+        feedVerifierProxy = deployFeedVerifier(
+            configStructured.proxyAdminOwner,
+            configStructured.targetContractsOwner,
+            IBLS(bls),
+            IBN256G2(bn256G2),
+            configStructured.childChainId
+        );
+        EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifier", feedVerifierProxy);
 
         address implementationAddress = Upgrades.getImplementationAddress(feedVerifierProxy);
-        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(implementationAddress), ".feedVerifierImplementation");
+        EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifierImplementation", implementationAddress);
 
         /*//////////////////////////////////////////////////////////////////////////
                                         EOFeedRegistry
         //////////////////////////////////////////////////////////////////////////*/
-        feedRegistryProxy =
-            deployFeedRegistry(proxyAdminOwner, IEOFeedVerifier(feedVerifierProxy), targetContractsOwner);
-        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(feedRegistryProxy), ".feedRegistry");
+        feedRegistryProxy = deployFeedRegistry(
+            configStructured.proxyAdminOwner, IEOFeedVerifier(feedVerifierProxy), configStructured.targetContractsOwner
+        );
+        EOJsonUtils.OUTPUT_CONFIG.serialize("feedRegistry", feedRegistryProxy);
 
         implementationAddress = Upgrades.getImplementationAddress(feedRegistryProxy);
-        EOJsonUtils.writeConfig(EOJsonUtils.addressToString(implementationAddress), ".feedRegistryImplementation");
+        string memory outputConfigJson =
+            EOJsonUtils.OUTPUT_CONFIG.serialize("feedRegistryImplementation", implementationAddress);
+        EOJsonUtils.writeConfig(outputConfigJson);
 
         vm.stopBroadcast();
     }

@@ -11,7 +11,7 @@ import { IBN256G2 } from "../interfaces/IBN256G2.sol";
  * @dev Adaptation of https://github.com/musalbas/solidity-BN256G2 to 0.6.0 and then 0.8.19
  */
 // slither-disable-next-line missing-inheritance
-contract BN256G2 is IBN256G2 {
+contract BN256G2v1 is IBN256G2 {
     uint256 internal constant FIELD_MODULUS = 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47;
     uint256 internal constant TWISTBX = 0x2b149d40ceb8aaae81be18991be06ac3b5b4c5e559dbefa33267e6dc24a138e5;
     uint256 internal constant TWISTBY = 0x9713b03af0fed4cd2cafadeed8fdf4a74fa084e52d1852e4a2bd0685c315d2;
@@ -236,32 +236,28 @@ contract BN256G2 is IBN256G2 {
 
     /**
      * @notice Calculates the modular inverse of a over n
-     *  @dev The same as the modular exponentiation with the exponent n-2.
-     *         For EVM chains that don't support the Modexp precompile.
-     *         Temporarily implemented in solidity,
-     *         should be replaced with precompiled as soon as it is available.
      * @param a The operand to calculate the inverse of
      * @param n The modulus
-     * @return Inv(a)modn
+     * @return result Inv(a)modn
+     *
      */
-    function _modInv(uint256 a, uint256 n) internal view returns (uint256) {
-        // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
-        uint256 e = n - 2;
-
-        if (n == 0) return 0;
-        if (e == 0) return 1;
-
-        uint256 result = 1;
-        a %= n;
-
-        while (e > 0) {
-            if (e % 2 == 1) {
-                result = mulmod(result, a, n); // Use mulmod to prevent overflow
-            }
-            a = mulmod(a, a, n); // Use mulmod to prevent overflow
-            e /= 2;
+    function _modInv(uint256 a, uint256 n) internal view returns (uint256 result) {
+        bool success;
+        // prettier-ignore
+        // slither-disable-next-line assembly
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            let freemem := mload(0x40)
+            mstore(freemem, 0x20)
+            mstore(add(freemem, 0x20), 0x20)
+            mstore(add(freemem, 0x40), 0x20)
+            mstore(add(freemem, 0x60), a)
+            mstore(add(freemem, 0x80), sub(n, 2))
+            mstore(add(freemem, 0xA0), n)
+            success := staticcall(sub(gas(), 2000), 5, freemem, 0xC0, freemem, 0x20)
+            result := mload(freemem)
         }
-        return result;
+        require(success, "error with modular inverse");
     }
 
     /**

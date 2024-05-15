@@ -11,14 +11,14 @@ contract UpgradeFeedRegistryAdapter is Script {
     using stdJson for string;
 
     function run() external {
-        string memory config = EOJsonUtils.getOutputConfig();
+        string memory config = EOJsonUtils.initOutputConfig();
         address proxyAddress = config.readAddress(".feedRegistryAdapter");
         vm.startBroadcast();
         Upgrades.upgradeProxy(proxyAddress, "EOFeedRegistryAdapterV2.sol", "");
         vm.stopBroadcast();
         address implementationAddress = Upgrades.getImplementationAddress(proxyAddress);
-        EOJsonUtils.writeConfig(
-            EOJsonUtils.addressToString(implementationAddress), ".feedRegistryAdapterImplementation"
-        );
+        string memory outputConfigJson =
+            EOJsonUtils.OUTPUT_CONFIG.serialize("feedRegistryAdapterImplementation", implementationAddress);
+        EOJsonUtils.writeConfig(outputConfigJson);
     }
 }
