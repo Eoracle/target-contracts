@@ -10,7 +10,6 @@ import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryA
 //beacon
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
-import { ICheckpointManager } from "../../../src/interfaces/ICheckpointManager.sol";
 import { FeedAlreadyExists, BaseQuotePairExists } from "../../../src/interfaces/Errors.sol";
 
 // solhint-disable ordering
@@ -152,12 +151,13 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         input.unhashedLeaf = abi.encode(pairSymbol, rate, timestamp);
         feedRegistry.updatePriceFeed(
             input,
-            ICheckpointManager.CheckpointMetadata({
-                currentValidatorSetHash: bytes32(0),
+            IEOFeedVerifier.Checkpoint({
+                blockNumber: 0,
+                epoch: 0,
+                eventRoot: bytes32(0),
                 blockHash: bytes32(0),
                 blockRound: 0
             }),
-            ICheckpointManager.Checkpoint({ blockNumber: 0, epoch: 0, eventRoot: bytes32(0) }),
             [uint256(0), uint256(0)],
             bytes("1")
         );

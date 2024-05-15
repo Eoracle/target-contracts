@@ -9,6 +9,8 @@ interface IEOFeedRegistry {
         uint256 timestamp;
     }
 
+    event RateUpdated(uint16 symbol, uint256 rate, uint256 timestamp);
+
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput calldata input,
         IEOFeedVerifier.Checkpoint calldata checkpoint,

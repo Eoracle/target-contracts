@@ -163,5 +163,6 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
         if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
+        emit RateUpdated(symbol, rate, timestamp);
     }
 }

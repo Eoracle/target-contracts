@@ -39,31 +39,21 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Initialize the contract with the checkpoint manager address
-     * @dev The checkpoint manager contract must be deployed first
      * @param owner Owner of the contract
-     * @param newBls Address of the BLS library contract
-     * @param newBn256G2 Address of the Bn256G2 library contract
-     * @param newChildChainId Chain ID of the child chain
+     * @param _bls Address of the BLS library contract
+     * @param _bn256G2 Address of the Bn256G2 library contract
+     * @param _childChainId Chain ID of the child chain
      */
-    function initialize(
-        address owner,
-        IBLS newBls,
-        IBN256G2 newBn256G2,
-        uint256 newChildChainId
-    )
-        external
-        initializer
-    {
+    function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _childChainId) external initializer {
         if (
-            address(newBls) == address(0) || address(newBls).code.length == 0 || address(newBn256G2) == address(0)
-                || address(newBn256G2).code.length == 0
+            address(_bls) == address(0) || address(_bls).code.length == 0 || address(_bn256G2) == address(0)
+                || address(_bn256G2).code.length == 0
         ) {
             revert InvalidAddress();
         }
-        childChainId = newChildChainId;
-        bls = newBls;
-        bn256G2 = newBn256G2;
+        childChainId = _childChainId;
+        bls = _bls;
+        bn256G2 = _bn256G2;
         __Ownable_init(owner);
     }
 
@@ -148,6 +138,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @notice Verify for one event
      * @param input Exit leaf input
      * @param eventRoot event root the leaf should belong to
+     * @return The leaf data field
      */
     function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory) {
         bytes32 leaf = keccak256(input.unhashedLeaf);
@@ -230,6 +221,13 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         if (!callSuccess || !result) revert SignatureVerficationFailed();
     }
 
+    /**
+     * @dev Extracts a boolean value from a specific index in a bitmap.
+     * @param bitmap The bytes array containing the bitmap.
+     * @param index The bit position from which to retrieve the value.
+     * @return bool The boolean value of the bit at the specified index in the bitmap.
+     *              Returns 'true' if the bit is set (1), and 'false' if the bit is not set (0).
+     */
     function _getValueFromBitmap(bytes calldata bitmap, uint256 index) private pure returns (bool) {
         uint256 byteNumber = index / 8;
         uint8 bitNumber = uint8(index % 8);
