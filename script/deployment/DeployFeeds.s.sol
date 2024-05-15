@@ -31,15 +31,16 @@ contract DeployFeeds is Script {
         string memory feedAddressesJsonKey = "feedsJson";
         string memory feedAddressesJson;
         uint16 symbolId;
+        uint256 symbolLength = configStructured.supportedSymbolsData.length;
 
         // revert if at least one symbol is not supported.
-        for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
+        for (uint256 i = 0; i < symbolLength; i++) {
             if (!feedRegistry.isSupportedSymbol(symbolId)) {
                 revert SymbolIsNotSupported(symbolId);
             }
         }
 
-        for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
+        for (uint256 i = 0; i < symbolLength; i++) {
             symbolId = uint16(configStructured.supportedSymbolsData[i].symbolId);
             feed = address(feedRegistryAdapter.getFeedByPairSymbol(symbolId));
             if (feed == address(0)) {
