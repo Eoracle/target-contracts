@@ -89,31 +89,21 @@ contract EOFeed is IEOFeed, Initializable {
     }
 
     /**
-     * @notice Get the latest round
-     * @return uint256 The round, round is not used, 0 is returned
-     */
-    function latestRound() external view returns (uint256) {
-        return 0;
-    }
-
-    /**
      * @notice Get the price for the round (round is not used, the lasest price is returned)
-     * @param roundId The round id
+     * @param
      * @return int256 The price
      */
-    // solhint-disable-next-line no-unused-vars
-    function getAnswer(uint256 roundId) external view returns (int256) {
+    function getAnswer(uint256) external view returns (int256) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
         return int256(priceData.value);
     }
 
     /**
      * @notice Get the timestamp for the round (round is not used, the lasest timestamp is returned)
-     * @param roundId The round id
+     * @param
      * @return uint256 The timestamp
      */
-    // solhint-disable-next-line no-unused-vars
-    function getTimestamp(uint256 roundId) external view returns (uint256) {
+    function getTimestamp(uint256) external view returns (uint256) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
         return priceData.timestamp;
     }
@@ -148,5 +138,13 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function version() external view returns (uint256) {
         return _version;
+    }
+
+    /**
+     * @notice Get the latest round
+     * @return uint256 The round, round is not used, 0 is returned
+     */
+    function latestRound() external pure returns (uint256) {
+        return 0;
     }
 }
