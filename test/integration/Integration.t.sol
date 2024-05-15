@@ -14,6 +14,15 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         feedRegistry.updatePriceFeed(input[0], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
+        assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[0]).latestAnswer(), int256(rates[0]));
+    }
+
+    function test_updatePriceFeed1() public {
+        vm.prank(publisher);
+        feedRegistry.updatePriceFeed(input[1], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
+        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[1]);
+        assertEq(feed.value, rates[1]);
+        assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[1]).latestAnswer(), int256(rates[1]));
     }
 
     /**
@@ -25,6 +34,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
             feedRegistry.updatePriceFeed(input[i], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
             IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[i]);
             assertEq(feed.value, rates[i]);
+            assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[i]).latestAnswer(), int256(rates[i]));
         }
     }
 
@@ -38,6 +48,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
             feedRegistry.updatePriceFeed(input[i], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
             IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[i]);
             assertEq(feed.value, rates[i]);
+            assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[i]).latestAnswer(), int256(rates[i]));
         }
     }
 
@@ -51,6 +62,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         for (uint256 i = 0; i < symbols.length; i++) {
             feed = feedRegistry.getLatestPriceFeed(symbols[i]);
             assertEq(feed.value, rates[i]);
+            assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[i]).latestAnswer(), int256(rates[i]));
         }
     }
 

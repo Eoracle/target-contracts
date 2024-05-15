@@ -6,6 +6,7 @@ import { stdJson } from "forge-std/Script.sol";
 import { Utils } from "../utils/Utils.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
+import { EOFeedRegistryAdapter } from "../../src/adapters/EOFeedRegistryAdapter.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 
@@ -13,6 +14,7 @@ import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
 import { DeployNewTargetContractSet } from "../../script/deployment/DeployNewTargetContractSet.s.sol";
 import { EOJsonUtils } from "../../script/utils/EOJsonUtils.sol";
 import { DeployFeedRegistryAdapter } from "../../script/deployment/DeployFeedRegistryAdapter.s.sol";
+import { DeployFeeds } from "../../script/deployment/DeployFeeds.s.sol";
 import { SetupCoreContracts } from "../../script/deployment/setup/SetupCoreContracts.s.sol";
 // solhint-disable max-states-count
 import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
@@ -21,16 +23,17 @@ abstract contract IntegrationBaseTests is Test, Utils {
     using stdJson for string;
 
     EOFeedRegistry public feedRegistry;
+    EOFeedRegistryAdapter public feedRegistryAdapter;
     EOFeedVerifier public feedVerifier;
     TargetCheckpointManager public checkpointManager;
 
     DeployNewTargetContractSet public mainDeployer;
     DeployFeedRegistryAdapter public adapterDeployer;
     SetupCoreContracts public coreContractsSetup;
+    DeployFeeds public feedsDeployer;
 
     address public publisher;
     address public owner;
-    address public feedImplementation;
     address public adapterProxy;
 
     uint16[] public symbols;
@@ -65,6 +68,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
         mainDeployer = new DeployNewTargetContractSet();
         adapterDeployer = new DeployFeedRegistryAdapter();
         coreContractsSetup = new SetupCoreContracts();
+        feedsDeployer = new DeployFeeds();
 
         address checkpointManagerAddr;
         address feedVerifierAddr;
@@ -72,11 +76,14 @@ abstract contract IntegrationBaseTests is Test, Utils {
 
         (,, checkpointManagerAddr, feedVerifierAddr, feedRegistryAddr) = mainDeployer.run();
         coreContractsSetup.run(owner);
-        (feedImplementation, adapterProxy) = adapterDeployer.run();
+        address feedRegistryAdapterAddress;
+        (, feedRegistryAdapterAddress) = adapterDeployer.run();
+        feedsDeployer.run(owner);
 
         checkpointManager = TargetCheckpointManager(checkpointManagerAddr);
         feedVerifier = EOFeedVerifier(feedVerifierAddr);
         feedRegistry = EOFeedRegistry(feedRegistryAddr);
+        feedRegistryAdapter = EOFeedRegistryAdapter(feedRegistryAdapterAddress);
 
         _seedSymbolData(configStructured);
         _generatePayload(symbolData);

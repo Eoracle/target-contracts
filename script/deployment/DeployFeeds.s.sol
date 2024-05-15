@@ -17,6 +17,10 @@ contract DeployFeeds is Script {
     error SymbolIsNotSupported(uint16 symbolId);
 
     function run() external {
+        run(vm.addr(vm.envUint("PRIVATE_KEY")));
+    }
+
+    function run(address broadcastFrom) public {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
         string memory outputConfig = EOJsonUtils.initOutputConfig();
@@ -24,7 +28,7 @@ contract DeployFeeds is Script {
         feedRegistry = EOFeedRegistry(outputConfig.readAddress(".feedRegistry"));
         feedRegistryAdapter = EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter"));
 
-        vm.startBroadcast();
+        vm.startBroadcast(broadcastFrom);
 
         // Deploy feeds which are not deployed yet
         address feed;
@@ -35,6 +39,7 @@ contract DeployFeeds is Script {
 
         // revert if at least one symbol is not supported.
         for (uint256 i = 0; i < symbolLength; i++) {
+            symbolId = uint16(configStructured.supportedSymbolsData[i].symbolId);
             if (!feedRegistry.isSupportedSymbol(symbolId)) {
                 revert SymbolIsNotSupported(symbolId);
             }
