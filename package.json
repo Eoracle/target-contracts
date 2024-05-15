@@ -53,7 +53,7 @@
     "test": "forge test --force --ffi",
     "test:coverage": "forge coverage --force --ffi",
     "test:coverage:report": "forge coverage --force --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
-    "pre-commit": "FOUNDRY_PROFILE='snapshot' forge snapshot --force && git add .gas-snapshot && npx lint-staged",
+    "pre-commit": "npx lint-staged && git diff --name-only -- '*.sol' && FOUNDRY_PROFILE='snapshot' forge snapshot --force && git add .gas-snapshot",
     "pre-push": "git diff HEAD --ignore-submodules --quiet && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge test --ffi --force --watch-delay 500ms",
     "prepare": "husky install"
   },
