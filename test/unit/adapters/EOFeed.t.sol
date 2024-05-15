@@ -51,26 +51,24 @@ contract EOFeedTest is Test {
         assertEq(answeredInRound, 0);
     }
 
-    function test_GetRoundData2() public {
-        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
-        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.getRoundData(2);
-        assertEq(roundId, 0);
-        assertEq(answer, int256(RATE2));
-        assertEq(startedAt, block.timestamp);
-        assertEq(updatedAt, block.timestamp);
-        assertEq(answeredInRound, 0);
+    function test_LatestAnswer() public view {
+        assertEq(feed.latestAnswer(), int256(RATE1));
     }
 
-    function test_LatestRoundData2() public {
-        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
-        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.latestRoundData();
-        assertEq(roundId, 0);
-        assertEq(answer, int256(RATE2));
-        assertEq(startedAt, block.timestamp);
-        assertEq(updatedAt, block.timestamp);
-        assertEq(answeredInRound, 0);
+    function test_LatestTimestamp() public view {
+        assertEq(feed.latestTimestamp(), _lastTimestamp);
+    }
+
+    function test_LatestRound() public view {
+        assertEq(feed.latestRound(), 0);
+    }
+
+    function test_GetAnswer() public view {
+        assertEq(feed.getAnswer(1), int256(RATE1));
+    }
+
+    function test_GetTimestamp() public view {
+        assertEq(feed.getTimestamp(1), _lastTimestamp);
     }
 
     function test_Decimals() public view {
@@ -83,6 +81,30 @@ contract EOFeedTest is Test {
 
     function test_Version() public view {
         assertEq(feed.version(), _version);
+    }
+
+    function test_UpdatePrice() public {
+        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feed.getRoundData(2);
+        assertEq(roundId, 0);
+        assertEq(answer, int256(RATE2));
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, 0);
+
+        (roundId, answer, startedAt, updatedAt, answeredInRound) = feed.latestRoundData();
+        assertEq(roundId, 0);
+        assertEq(answer, int256(RATE2));
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, 0);
+
+        assertEq(feed.latestAnswer(), int256(RATE2));
+        assertEq(feed.latestTimestamp(), block.timestamp);
+        assertEq(feed.latestRound(), 0);
+        assertEq(feed.getAnswer(2), int256(RATE2));
+        assertEq(feed.getTimestamp(2), block.timestamp);
     }
 
     function testFuzz_GetRoundData(uint256 rate, uint256 timestamp) public {
