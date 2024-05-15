@@ -32,7 +32,7 @@ contract DeployFeeds is Script {
         string memory feedAddressesJson;
         uint16 symbolId;
 
-        // revertif at least one symbol is not supported
+        // revert if at least one symbol is not supported
         for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
             if (!feedRegistry.isSupportedSymbol(symbolId)) {
                 revert SymbolNotSupported(symbolId);
