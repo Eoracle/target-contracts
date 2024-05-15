@@ -18,13 +18,17 @@ contract SetupCoreContracts is Script {
     EOFeedRegistry public feedRegistry;
 
     function run() external {
+        run(vm.addr(vm.envUint("PRIVATE_KEY")));
+    }
+
+    function run(address broadcastFrom) public {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
         string memory outputConfig = EOJsonUtils.initOutputConfig();
 
         feedRegistry = EOFeedRegistry(outputConfig.readAddress(".feedRegistry"));
 
-        vm.startBroadcast();
+        vm.startBroadcast(broadcastFrom);
 
         // Set supported symbols in FeedRegistry which are not set yet
         _updateSupportedSymbols(configStructured);

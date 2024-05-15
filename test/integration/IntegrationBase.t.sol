@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { Test, console } from "forge-std/Test.sol";
+import { Test } from "forge-std/Test.sol";
 import { stdJson } from "forge-std/Script.sol";
 import { Utils } from "../utils/Utils.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
@@ -71,13 +71,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
         address feedRegistryAddr;
 
         (,, checkpointManagerAddr, feedVerifierAddr, feedRegistryAddr) = mainDeployer.run();
-        // vm.prank(owner);
-        uint256 prKey = vm.envOr({ name: "PRIVATE_KEY", defaultValue: uint256(0) });
-        address _broadcaster = vm.addr(prKey);
-        console.logAddress(_broadcaster);
-        console.logAddress(EOFeedRegistry(feedRegistryAddr).owner());
-
-        coreContractsSetup.run();
+        coreContractsSetup.run(owner);
         (feedImplementation, adapterProxy) = adapterDeployer.run();
 
         checkpointManager = TargetCheckpointManager(checkpointManagerAddr);
