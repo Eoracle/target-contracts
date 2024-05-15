@@ -14,6 +14,8 @@ contract DeployFeeds is Script {
     EOFeedRegistry public feedRegistry;
     EOFeedRegistryAdapter public feedRegistryAdapter;
 
+    error SymbolNotSupported(uint16 symbolId);
+
     function run() external {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
@@ -30,22 +32,27 @@ contract DeployFeeds is Script {
         string memory feedAddressesJson;
         uint16 symbolId;
 
+        // revertif at least one symbol is not supported
+        for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
+            if (!feedRegistry.isSupportedSymbol(symbolId)) {
+                revert SymbolNotSupported(symbolId);
+            }
+        }
+
         for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
             symbolId = uint16(configStructured.supportedSymbolsData[i].symbolId);
             feed = address(feedRegistryAdapter.getFeedByPairSymbol(symbolId));
             if (feed == address(0)) {
-                if (feedRegistry.isSupportedSymbol(symbolId)) {
-                    feed = address(
-                        feedRegistryAdapter.deployEOFeed(
-                            configStructured.supportedSymbolsData[i].base,
-                            configStructured.supportedSymbolsData[i].quote,
-                            symbolId,
-                            configStructured.supportedSymbolsData[i].description,
-                            uint8(configStructured.supportedSymbolsData[i].decimals),
-                            1
-                        )
-                    );
-                }
+                feed = address(
+                    feedRegistryAdapter.deployEOFeed(
+                        configStructured.supportedSymbolsData[i].base,
+                        configStructured.supportedSymbolsData[i].quote,
+                        symbolId,
+                        configStructured.supportedSymbolsData[i].description,
+                        uint8(configStructured.supportedSymbolsData[i].decimals),
+                        1
+                    )
+                );
             }
             feedAddressesJson =
                 feedAddressesJsonKey.serialize(configStructured.supportedSymbolsData[i].description, feed);
