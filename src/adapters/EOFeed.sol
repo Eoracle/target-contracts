@@ -54,7 +54,7 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function getRoundData(uint80) external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
-        return (0, int256(priceData.value), 0, priceData.timestamp, 0);
+        return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
     }
 
     /**
@@ -67,7 +67,7 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
-        return (0, int256(priceData.value), 0, priceData.timestamp, 0);
+        return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
     }
 
     /**

@@ -36,7 +36,7 @@ contract EOFeedTest is Test {
             feed.getRoundData(1);
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE1));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, _lastTimestamp);
         assertEq(updatedAt, _lastTimestamp);
         assertEq(answeredInRound, 0);
     }
@@ -46,7 +46,7 @@ contract EOFeedTest is Test {
             feed.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE1));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, _lastTimestamp);
         assertEq(updatedAt, _lastTimestamp);
         assertEq(answeredInRound, 0);
     }
@@ -57,7 +57,7 @@ contract EOFeedTest is Test {
             feed.getRoundData(2);
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE2));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, block.timestamp);
         assertEq(updatedAt, block.timestamp);
         assertEq(answeredInRound, 0);
     }
@@ -68,7 +68,7 @@ contract EOFeedTest is Test {
             feed.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE2));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, block.timestamp);
         assertEq(updatedAt, block.timestamp);
         assertEq(answeredInRound, 0);
     }
@@ -91,7 +91,7 @@ contract EOFeedTest is Test {
             feed.getRoundData(3);
         assertEq(roundId, 0);
         assertEq(answer, int256(rate));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, timestamp);
         assertEq(updatedAt, timestamp);
         assertEq(answeredInRound, 0);
     }
@@ -102,7 +102,7 @@ contract EOFeedTest is Test {
             feed.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(rate));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, timestamp);
         assertEq(updatedAt, timestamp);
         assertEq(answeredInRound, 0);
     }

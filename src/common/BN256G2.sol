@@ -53,7 +53,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt2yy
     )
         external
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         if (pt1xx == 0 && pt1xy == 0 && pt1yx == 0 && pt1yy == 0) {
@@ -92,7 +92,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1yy
     )
         external
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         uint256 pt1zx = 1;
@@ -207,7 +207,7 @@ contract BN256G2 is IBN256G2 {
      * @return Inv([xx, xy])
      */
     // solhint-disable-next-line ordering
-    function _fq2inv(uint256 x, uint256 y) internal view returns (uint256, uint256) {
+    function _fq2inv(uint256 x, uint256 y) internal pure returns (uint256, uint256) {
         uint256 inv =
             _modInv(addmod(mulmod(y, y, FIELD_MODULUS), mulmod(x, x, FIELD_MODULUS), FIELD_MODULUS), FIELD_MODULUS);
         return (mulmod(x, inv, FIELD_MODULUS), FIELD_MODULUS - mulmod(y, inv, FIELD_MODULUS));
@@ -244,7 +244,7 @@ contract BN256G2 is IBN256G2 {
      * @param n The modulus
      * @return Inv(a)modn
      */
-    function _modInv(uint256 a, uint256 n) internal view returns (uint256) {
+    function _modInv(uint256 a, uint256 n) internal pure returns (uint256) {
         // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
         uint256 e = n - 2;
 
@@ -287,7 +287,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1zy
     )
         internal
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         uint256 invzx;

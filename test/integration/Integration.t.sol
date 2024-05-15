@@ -4,14 +4,11 @@ pragma solidity 0.8.25;
 import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
-
 import { IntegrationBaseTests } from "./IntegrationBase.t.sol";
+import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
 
 // solhint-disable max-states-count
 contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests {
-    /**
-     * @notice update first symbol
-     */
     function test_updatePriceFeed() public {
         vm.prank(publisher);
         feedRegistry.updatePriceFeed(input[0], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
@@ -20,29 +17,28 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
     }
 
     /**
-     * @notice update second symbol
-     */
-    function test_updatePriceFeed2() public {
-        vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[1], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
-        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[1]);
-        assertEq(feed.value, rates[1]);
-    }
-
-    /**
      * @notice update first symbol and then second symbol
      */
     function test_updatePriceFeed_SeparateCalls() public {
-        test_updatePriceFeed();
-        test_updatePriceFeed2();
+        for (uint256 i = 0; i < symbols.length; i++) {
+            vm.prank(publisher);
+            feedRegistry.updatePriceFeed(input[i], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
+            IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[i]);
+            assertEq(feed.value, rates[i]);
+        }
     }
 
     /**
      * @notice update first symbol and then second symbol
      */
     function test_updatePriceFeed_SeparateCallsReverse() public {
-        test_updatePriceFeed2();
-        test_updatePriceFeed();
+        for (uint256 i = symbols.length; i > 0;) {
+            i--;
+            vm.prank(publisher);
+            feedRegistry.updatePriceFeed(input[i], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
+            IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[i]);
+            assertEq(feed.value, rates[i]);
+        }
     }
 
     /**
@@ -51,10 +47,11 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
     function test_updatePriceFeeds() public {
         vm.prank(publisher);
         feedRegistry.updatePriceFeeds(input, checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
-        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
-        assertEq(feed.value, rates[0]);
-        feed = feedRegistry.getLatestPriceFeed(symbols[1]);
-        assertEq(feed.value, rates[1]);
+        IEOFeedRegistry.PriceFeed memory feed;
+        for (uint256 i = 0; i < symbols.length; i++) {
+            feed = feedRegistry.getLatestPriceFeed(symbols[i]);
+            assertEq(feed.value, rates[i]);
+        }
     }
 
     function _generatePayload(bytes[] memory _symbolData) internal override {
@@ -121,11 +118,11 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         bitmaps.push(_bitmaps[0]);
     }
 
-    function _seedSymbolData() internal override {
-        symbols = [1, 2];
-        rates = [100, 101];
-        timestamps = [9_999_999_999, 9_999_999_999];
-        for (uint256 i = 0; i < symbols.length; i++) {
+    function _seedSymbolData(EOJsonUtils.Config memory configStructured) internal override {
+        for (uint256 i = 0; i < configStructured.supportedSymbols.length; i++) {
+            symbols.push(uint16(configStructured.supportedSymbols[i]));
+            rates.push(100 + configStructured.supportedSymbols[i]);
+            timestamps.push(9_999_999_999);
             symbolData.push(abi.encode(symbols[i], rates[i], timestamps[i]));
         }
     }

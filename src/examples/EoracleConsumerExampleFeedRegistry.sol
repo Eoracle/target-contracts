@@ -20,6 +20,11 @@ contract EoracleConsumerExampleFeedRegistry {
     }
 
     //Example for using EOFeedRegistry.getLatestPriceFeeds with a list of symbols.
+    function getPrice(uint16 symbol) external view returns (IEOFeedRegistry.PriceFeed memory) {
+        return _feedRegistry.getLatestPriceFeed(symbol);
+    }
+
+    //Example for using EOFeedRegistry.getLatestPriceFeeds with a list of symbols.
     function getPrices(uint16[] calldata symbols) external view returns (IEOFeedRegistry.PriceFeed[] memory) {
         return _feedRegistry.getLatestPriceFeeds(symbols);
     }
