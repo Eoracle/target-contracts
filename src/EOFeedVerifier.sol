@@ -107,7 +107,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         returns (bytes[] memory)
     {
         _verifySignature(checkpoint, signature, bitmap);
-        return _batchVerify(inputs, checkpoint.eventRoot);
+        return _verifyLeaves(inputs, checkpoint.eventRoot);
     }
 
     /**
@@ -129,27 +129,13 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         totalVotingPower = totalPower;
     }
 
-    function checkEventMembership(
-        bytes32 eventRoot,
-        bytes32 leaf,
-        uint256 leafIndex,
-        bytes32[] calldata proof
-    )
-        public
-        pure
-        returns (bool)
-    {
-        if (eventRoot == bytes32(0)) revert InvalidEventRoot();
-        return leaf.checkMembership(leafIndex, eventRoot, proof);
-    }
-
     /**
      * @notice Verify a batch of exits leaves
      * @param inputs Batch exit inputs for multiple event leaves
      * @param eventRoot the root this event should belong to
      * @return Array of the leaf data fields of all submitted leaves
      */
-    function _batchVerify(LeafInput[] calldata inputs, bytes32 eventRoot) internal returns (bytes[] memory) {
+    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal returns (bytes[] memory) {
         uint256 length = inputs.length;
         bytes[] memory returnData = new bytes[](length);
         for (uint256 i = 0; i < length; i++) {
@@ -164,7 +150,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param eventRoot event root the leaf should belong to
      */
     function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory) {
-        if (!checkEventMembership(eventRoot, keccak256(input.unhashedLeaf), input.leafIndex, input.proof)) {
+        bytes32 leaf = keccak256(input.unhashedLeaf);
+        if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
             revert InvalidProof();
         }
 
@@ -190,6 +177,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         internal
         view
     {
+        if (checkpoint.eventRoot == bytes32(0)) revert InvalidEventRoot();
         bytes memory hash = abi.encode(
             keccak256(
                 // solhint-disable-next-line func-named-parameters

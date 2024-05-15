@@ -77,7 +77,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        if (checkpoint.blockNumber <= _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
+        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
         bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
         _lastProcessedBlockNumber = checkpoint.blockNumber;
@@ -100,7 +100,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         onlyWhitelisted
     {
         if (inputs.length == 0) revert MissingLeafInputs();
-        if (checkpoint.blockNumber <= _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
+        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
 
         bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {

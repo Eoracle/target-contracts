@@ -27,7 +27,6 @@ interface IEOFeedVerifier {
         uint256 votingPower;
     }
 
-    event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
     event LeafVerified(uint256 indexed id, bytes returnData);
 
     /**
@@ -67,14 +66,4 @@ interface IEOFeedVerifier {
      * @param newValidatorSet The new validator set to store
      */
     function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
-
-    function checkEventMembership(
-        bytes32, /* eventRoot */
-        bytes32, /* leaf */
-        uint256, /* leafIndex */
-        bytes32[] calldata /* proof */
-    )
-        external
-        pure
-        returns (bool);
 }
