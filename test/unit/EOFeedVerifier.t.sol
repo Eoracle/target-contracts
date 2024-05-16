@@ -1,222 +1,83 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
-import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
+import { IBLS } from "../../src/interfaces/IBLS.sol";
 import { UninitializedFeedVerifier, InitializedFeedVerifier } from "./EOFeedVerifierBase.t.sol";
-import {
-    FeedVerifierNotInitialized,
-    ExitAlreadyProcessed,
-    InvalidProof,
-    InvalidAddress
-} from "../../src/interfaces/Errors.sol";
-
-abstract contract CheckpointSubmitted is InitializedFeedVerifier {
-    function setUp() public virtual override {
-        super.setUp();
-
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
-
-        ICheckpointManager.Checkpoint memory checkpoint2 =
-            ICheckpointManager.Checkpoint({ epoch: 2, blockNumber: 2, eventRoot: hashes[3] });
-
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
-            blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
-        });
-
-        checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
-        checkpointManager.submit(checkpointMetadata, checkpoint2, aggMessagePoints[1], validatorSet, bitmaps[0]);
-
-        assertEq(checkpointManager.getEventRootByBlock(checkpoint.blockNumber), checkpoint.eventRoot);
-        assertEq(checkpointManager.checkpointBlockNumbers(0), checkpoint.blockNumber);
-
-        uint256 leafIndex = 1;
-        assertEq(
-            checkpointManager.getEventMembershipByBlockNumber(
-                checkpoint2.blockNumber, leavesArray[1][leafIndex], leafIndex, proves[2]
-            ),
-            true
-        );
-    }
-}
-
-abstract contract EOFeedVerifierExited is CheckpointSubmitted {
-    function setUp() public virtual override {
-        super.setUp();
-        uint256 blockNumber = 1;
-        uint256 leafIndex = 0;
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: leafIndex,
-            blockNumber: blockNumber,
-            proof: proves[0]
-        });
-        feedVerifier.exit(input);
-    }
-}
+import { InvalidProof, InvalidAddress, VotingPowerIsZero } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
     function test_RevertWhen_Initialize_InvalidAddress() public {
-        TargetCheckpointManager checkpointManagerNull;
+        IBLS blsNull;
         vm.expectRevert(InvalidAddress.selector);
-        feedVerifier.initialize(checkpointManagerNull, address(this));
+        feedVerifier.initialize(address(this), blsNull, bn256G2, childChainId);
     }
 
     function test_Initialize() public {
-        feedVerifier.initialize(checkpointManager, address(this));
-        assertEq(
-            keccak256(abi.encode(feedVerifier.getCheckpointManager())),
-            keccak256(abi.encode(address(checkpointManager)))
-        );
+        feedVerifier.initialize(address(this), bls, bn256G2, childChainId);
+        assertEq(address(feedVerifier.bls()), address(bls));
+        assertEq(address(feedVerifier.bn256G2()), address(bn256G2));
+        assertEq(feedVerifier.childChainId(), childChainId);
         assertEq(feedVerifier.owner(), address(this));
     }
 }
 
-contract EOFeedVerifierExitFailedBeforeInitialized is UninitializedFeedVerifier {
-    function test_RevertWhen_Exit_Uninitialized() public {
-        uint256 blockNumber = 0;
-        uint256 leafIndex = 0;
-        bytes memory unhashedLeaf = abi.encodePacked(block.timestamp);
-        proof.push(keccak256(abi.encodePacked(block.timestamp)));
-
-        vm.expectRevert(FeedVerifierNotInitialized.selector);
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaf,
-            leafIndex: leafIndex,
-            blockNumber: blockNumber,
-            proof: proof
-        });
-        feedVerifier.exit(input);
-    }
-
-    function test_RevertWhen_BatchExit_Uninitialized() public {
-        uint256 blockNumber = 0;
-        uint256 leafIndex = 0;
-        bytes memory unhashedLeaf = abi.encodePacked(block.timestamp);
-        proof.push(keccak256(abi.encodePacked(block.timestamp)));
-
-        vm.expectRevert(FeedVerifierNotInitialized.selector);
-        leafInputs.push(IEOFeedVerifier.LeafInput(blockNumber, leafIndex, unhashedLeaf, proof));
-        feedVerifier.batchExit(leafInputs);
-    }
-}
-
-contract EOFeedVerifierExit is InitializedFeedVerifier {
-    function test_Exit() public {
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
-
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
-            blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
-        });
-
-        checkpointManager.submit(checkpointMetadata, checkpoint, aggMessagePoints[0], validatorSet, bitmaps[0]);
-
-        assertEq(checkpointManager.getEventRootByBlock(checkpoint.blockNumber), checkpoint.eventRoot);
-        assertEq(checkpointManager.checkpointBlockNumbers(0), checkpoint.blockNumber);
-
-        uint256 leafIndex = 0;
-        assertEq(
-            checkpointManager.getEventMembershipByBlockNumber(
-                checkpoint.blockNumber, leavesArray[0][leafIndex], leafIndex, proves[0]
-            ),
-            true
-        );
-
-        uint256 id = 0;
-        assertEq(feedVerifier.isProcessedExit(id), false);
-
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: leafIndex,
-            blockNumber: checkpoint.blockNumber,
-            proof: proves[0]
-        });
-        feedVerifier.exit(input);
-        assertEq(feedVerifier.isProcessedExit(id), true);
-    }
-
-    function test_submitAndVerify() public {
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: 0,
-            blockNumber: 1,
-            proof: proves[0]
-        });
+contract EOFeedVerifierTest is InitializedFeedVerifier {
+    function test_verify() public {
+        IEOFeedVerifier.LeafInput memory input =
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
 
         bytes32 eventRoot = hashes[0];
         uint256 blockNumber = 1;
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: blockNumber,
+            eventRoot: eventRoot,
             blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
+            blockRound: 0
         });
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: blockNumber, eventRoot: eventRoot });
         uint256[2] memory signature = aggMessagePoints[0];
         bytes memory bitmap = bitmaps[0];
 
         (uint256 id,,, bytes memory data) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
         vm.expectEmit(true, true, true, true);
         emit LeafVerified(id, data);
-        bytes memory leafData = feedVerifier.submitAndVerify(input, checkpointMetadata, checkpoint, signature, bitmap);
+        bytes memory leafData = feedVerifier.verify(input, checkpoint, signature, bitmap);
         assertEq(leafData, data);
-
-        assertEq(checkpointManager.getEventRootByBlock(blockNumber), hashes[0]);
-        assertEq(checkpointManager.checkpointBlockNumbers(0), blockNumber);
-
-        assertEq(
-            checkpointManager.checkEventMembership(
-                checkpoint.eventRoot, leavesArray[0][input.leafIndex], input.leafIndex, input.proof
-            ),
-            true
-        );
     }
 
-    function test_submitAndVerifyRevertsIfDataIsAltered() public {
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: 0,
-            blockNumber: 1,
-            proof: proves[0]
-        });
+    function test_RevertIf_DataIsAltered_Verify() public {
+        IEOFeedVerifier.LeafInput memory input =
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
 
         //alter one byte in the leaf unhashed data
         input.unhashedLeaf[0] = input.unhashedLeaf[0] == bytes1(0x10) ? bytes1(0x20) : bytes1(0x10);
         uint256[2] memory signature = aggMessagePoints[0];
         bytes memory bitmap = bitmaps[0];
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: 1,
+            eventRoot: hashes[0],
             blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
+            blockRound: 0
         });
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
         vm.expectRevert(InvalidProof.selector);
-        feedVerifier.submitAndVerify(input, checkpointMetadata, checkpoint, signature, bitmap);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
     }
 
-    function test_submitAndBatchVerify() public {
+    function test_batchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: 1,
+            eventRoot: hashes[0],
             blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
+            blockRound: 0
         });
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint({ epoch: 1, blockNumber: 1, eventRoot: hashes[0] });
-        inputs[0] = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: 0,
-            blockNumber: checkpoint.blockNumber,
-            proof: proves[0]
-        });
+        inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
         (uint256 id,,, bytes memory data) = abi.decode(inputs[0].unhashedLeaf, (uint256, address, address, bytes));
 
         uint256[2] memory signature = aggMessagePoints[0];
@@ -224,118 +85,27 @@ contract EOFeedVerifierExit is InitializedFeedVerifier {
 
         vm.expectEmit(true, true, true, true);
         emit LeafVerified(id, data);
-        feedVerifier.submitAndBatchVerify(inputs, checkpointMetadata, checkpoint, signature, bitmaps[0]);
-
-        assertEq(checkpointManager.getEventRootByBlock(checkpoint.blockNumber), hashes[0]);
-        assertEq(checkpointManager.checkpointBlockNumbers(0), checkpoint.blockNumber);
-
-        // using leavesArray[1] because [0] holds only one real leaf and 3 mock hashes
-        assertEq(
-            checkpointManager.checkEventMembership(
-                checkpoint.eventRoot, leavesArray[0][inputs[0].leafIndex], inputs[0].leafIndex, inputs[0].proof
-            ),
-            true
-        );
-    }
-}
-
-contract EOFeedVerifierExitFailedAfterInitialized is CheckpointSubmitted {
-    function test_RevertWhen_Exit_InvalidProof() public {
-        uint256 blockNumber = 1;
-        uint256 leafIndex = 0;
-        proof.push(keccak256(abi.encodePacked(block.timestamp)));
-
-        vm.expectRevert(InvalidProof.selector);
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: leafIndex,
-            blockNumber: blockNumber,
-            proof: proof
-        });
-        feedVerifier.exit(input);
-    }
-}
-
-contract EOFeedVerifierExitFailedAfterSubmitted is EOFeedVerifierExited {
-    function test_RevertWhen_Exit_AlreadyProcessed() public {
-        uint256 blockNumber = 0;
-        uint256 leafIndex = 0;
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: leafIndex,
-            blockNumber: blockNumber,
-            proof: proves[0]
-        });
-        vm.expectRevert(ExitAlreadyProcessed.selector);
-        feedVerifier.exit(input);
-    }
-}
-
-contract EOFeedVerifierBatchExit is EOFeedVerifierExited {
-    function test_BatchExit() public {
-        ICheckpointManager.Checkpoint memory checkpoint1 =
-            ICheckpointManager.Checkpoint({ epoch: 2, blockNumber: 2, eventRoot: hashes[3] });
-
-        ICheckpointManager.Checkpoint memory checkpoint2 =
-            ICheckpointManager.Checkpoint({ epoch: 3, blockNumber: 3, eventRoot: hashes[3] });
-
-        ICheckpointManager.CheckpointMetadata memory checkpointMetadata = ICheckpointManager.CheckpointMetadata({
-            blockHash: hashes[1],
-            blockRound: 0,
-            currentValidatorSetHash: hashes[2]
-        });
-
-        checkpointManager.submit(checkpointMetadata, checkpoint1, aggMessagePoints[1], validatorSet, bitmaps[1]);
-
-        checkpointManager.submit(checkpointMetadata, checkpoint2, aggMessagePoints[2], validatorSet, bitmaps[1]);
-
-        uint256 leafIndex1 = 0;
-        uint256 leafIndex2 = 1;
-        assertEq(
-            checkpointManager.getEventMembershipByBlockNumber(
-                checkpoint1.blockNumber, leavesArray[1][leafIndex1], leafIndex1, proves[1]
-            ),
-            true
-        );
-
-        assertEq(
-            checkpointManager.getEventMembershipByBlockNumber(
-                checkpoint2.blockNumber, leavesArray[1][leafIndex2], leafIndex2, proves[2]
-            ),
-            true
-        );
-
-        leafInputs.push(IEOFeedVerifier.LeafInput(checkpoint1.blockNumber, leafIndex1, unhashedLeaves[1], proves[1]));
-
-        uint256 id = 1;
-        assertEq(feedVerifier.isProcessedExit(id), false);
-        assertEq(feedVerifier.isProcessedExit(id + 1), false);
-
-        feedVerifier.batchExit(leafInputs);
-
-        assertEq(feedVerifier.isProcessedExit(id), true);
-        assertEq(feedVerifier.isProcessedExit(id + 1), false);
-
-        leafInputs.push(IEOFeedVerifier.LeafInput(checkpoint2.blockNumber, leafIndex2, unhashedLeaves[2], proves[2]));
-
-        feedVerifier.batchExit(leafInputs);
-
-        assertEq(feedVerifier.isProcessedExit(id), true);
-        assertEq(feedVerifier.isProcessedExit(id + 1), true);
+        feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
     }
 
-    function test_BatchExit_AlreadyProcessed() public {
-        uint256 blockNumber = 0;
-        uint256 leafIndex = 0;
-        IEOFeedVerifier.LeafInput memory input = IEOFeedVerifier.LeafInput({
-            unhashedLeaf: unhashedLeaves[0],
-            leafIndex: leafIndex,
-            blockNumber: blockNumber,
-            proof: proves[0]
-        });
-        leafInputs.push(input);
-        feedVerifier.batchExit(leafInputs);
-        (uint256 id,,,) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
-        assertEq(feedVerifier.isProcessedExit(id), true);
+    function test_SetNewValidatorSet() public {
+        feedVerifier.setNewValidatorSet(validatorSet);
+        uint256 totalPower = 0;
+        bytes32 validatorSetHash = keccak256(abi.encode(validatorSet));
+        assertEq(feedVerifier.currentValidatorSetLength(), validatorSetSize);
+        assertEq(feedVerifier.currentValidatorSetHash(), validatorSetHash);
+        for (uint256 i = 0; i < validatorSetSize; i++) {
+            (address _address, uint256 votingPower) = feedVerifier.currentValidatorSet(i);
+            assertEq(_address, validatorSet[i]._address);
+            assertEq(votingPower, validatorSet[i].votingPower);
+            totalPower += votingPower;
+        }
+        assertEq(feedVerifier.totalVotingPower(), totalPower);
+    }
+
+    function test_RevertWhen_VotingPowerIsZero_SetNewValidatorSet() public {
+        validatorSet[0].votingPower = 0;
+        vm.expectRevert(VotingPowerIsZero.selector);
+        feedVerifier.setNewValidatorSet(validatorSet);
     }
 }

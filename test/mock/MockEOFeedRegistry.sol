@@ -3,7 +3,6 @@ pragma solidity 0.8.25;
 
 import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
@@ -14,8 +13,7 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
 
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput calldata input,
-        ICheckpointManager.CheckpointMetadata calldata,
-        ICheckpointManager.Checkpoint calldata,
+        IEOFeedVerifier.Checkpoint calldata,
         uint256[2] calldata,
         bytes calldata
     )
@@ -28,8 +26,7 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
 
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        ICheckpointManager.CheckpointMetadata calldata,
-        ICheckpointManager.Checkpoint calldata,
+        IEOFeedVerifier.Checkpoint calldata,
         uint256[2] calldata,
         bytes calldata
     )

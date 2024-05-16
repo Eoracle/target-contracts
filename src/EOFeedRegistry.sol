@@ -5,8 +5,12 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
-import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
-import { CallerIsNotWhitelisted, MissingLeafInputs, SymbolNotSupported } from "./interfaces/Errors.sol";
+import {
+    CallerIsNotWhitelisted,
+    MissingLeafInputs,
+    SymbolNotSupported,
+    BlockNumberAlreadyProcessed
+} from "./interfaces/Errors.sol";
 
 contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     mapping(uint16 => PriceFeed) internal _priceFeeds;
@@ -14,6 +18,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     mapping(uint16 => bool) internal _supportedSymbols;
     // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
+    uint256 internal _lastProcessedBlockNumber;
 
     modifier onlyWhitelisted() {
         if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
@@ -58,37 +63,36 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     /**
      * @notice Update the price feed for a symbol
-     * @param checkpointMetadata Metadata for the checkpoint
+     * @param input A leaf to prove the price feeds
      * @param checkpoint Checkpoint data
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput memory input,
-        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
-        ICheckpointManager.Checkpoint calldata checkpoint,
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
         uint256[2] calldata signature,
         bytes calldata bitmap
     )
         external
         onlyWhitelisted
     {
-        bytes memory data = _feedVerifier.submitAndVerify(input, checkpointMetadata, checkpoint, signature, bitmap);
+        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
+        bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
+        _lastProcessedBlockNumber = checkpoint.blockNumber;
     }
 
     /**
      * @notice Update the price feeds for multiple symbols
      * @param inputs Array of leafs to prove the price feeds
-     * @param checkpointMetadata Metadata for the checkpoint
      * @param checkpoint Checkpoint data
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        ICheckpointManager.CheckpointMetadata calldata checkpointMetadata,
-        ICheckpointManager.Checkpoint calldata checkpoint,
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
         uint256[2] calldata signature,
         bytes calldata bitmap
     )
@@ -96,12 +100,13 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         onlyWhitelisted
     {
         if (inputs.length == 0) revert MissingLeafInputs();
+        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
 
-        bytes[] memory data =
-            _feedVerifier.submitAndBatchVerify(inputs, checkpointMetadata, checkpoint, signature, bitmap);
+        bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
         }
+        _lastProcessedBlockNumber = checkpoint.blockNumber;
     }
 
     /**
@@ -157,5 +162,6 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
         if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
+        emit RateUpdated(symbol, rate, timestamp);
     }
 }
