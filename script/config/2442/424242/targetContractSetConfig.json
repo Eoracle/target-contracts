@@ -1,4 +1,5 @@
 {
+  "usePrecompiledModexp": false,
   "proxyAdminOwner": "0x1352B1855D489Cf15C4607f2fE4f227B671D1874",
   "targetContractsOwner": "0x1352B1855D489Cf15C4607f2fE4f227B671D1874",
   "childChainId": 424242,

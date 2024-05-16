@@ -5,6 +5,7 @@ import { Test } from "forge-std/Test.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
+import { IBN256G2 } from "../../src/interfaces/IBN256G2.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { DeployFeedVerifier } from "../../script/deployment/base/DeployFeedVerifier.s.sol";
 import { Utils } from "../utils/Utils.sol";
@@ -24,7 +25,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
 
     EOFeedVerifier public feedVerifier;
     BLS public bls;
-    BN256G2 public bn256G2;
+    IBN256G2 public bn256G2;
     DeployFeedVerifier public deployer;
 
     uint256 public childChainId = 1;
@@ -49,7 +50,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
 
     function setUp() public virtual {
         bls = new BLS();
-        bn256G2 = new BN256G2();
+        _setBN256G2();
         feedVerifier = new EOFeedVerifier();
         deployer = new DeployFeedVerifier();
 
@@ -75,6 +76,10 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
         for (uint256 i = 0; i < validatorSetSize; i++) {
             validatorSet.push(validatorSetTmp[i]);
         }
+    }
+
+    function _setBN256G2() internal virtual {
+        bn256G2 = new BN256G2();
     }
 }
 

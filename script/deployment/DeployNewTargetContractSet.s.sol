@@ -6,7 +6,8 @@ import { stdJson } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { FeedVerifierDeployer } from "./base/DeployFeedVerifier.s.sol";
 import { FeedRegistryDeployer } from "./base/DeployFeedRegistry.s.sol";
-import { BN256G2 } from "src/common/BN256G2.sol";
+import { BN256G2 } from "../../src/common/BN256G2.sol";
+import { BN256G2v1 } from "../../src/common/BN256G2v1.sol";
 import { BLS } from "src/common/BLS.sol";
 import { IBN256G2 } from "src/interfaces/IBN256G2.sol";
 import { IBLS } from "src/interfaces/IBLS.sol";
@@ -32,7 +33,11 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedRegistryDeploye
 
         EOJsonUtils.initOutputConfig();
 
-        bn256G2 = address(new BN256G2());
+        if (configStructured.usePrecompiledModexp) {
+            bn256G2 = address(new BN256G2v1());
+        } else {
+            bn256G2 = address(new BN256G2());
+        }
         EOJsonUtils.OUTPUT_CONFIG.serialize("bn256G2", bn256G2);
 
         bls = address(new BLS());
