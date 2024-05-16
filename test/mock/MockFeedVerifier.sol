@@ -6,6 +6,13 @@ import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 contract MockFeedVerifier is IEOFeedVerifier {
     Validator[] public validatorSet;
 
+    function setNewValidatorSet(Validator[] calldata newValidatorSet) external {
+        delete validatorSet;
+        for (uint256 i = 0; i < newValidatorSet.length; i++) {
+            validatorSet.push(newValidatorSet[i]);
+        }
+    }
+
     function verify(
         LeafInput memory input,
         Checkpoint calldata,
@@ -13,6 +20,7 @@ contract MockFeedVerifier is IEOFeedVerifier {
         bytes calldata
     )
         external
+        pure
         returns (bytes memory leafData)
     {
         (,,, bytes memory data) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
@@ -26,6 +34,7 @@ contract MockFeedVerifier is IEOFeedVerifier {
         bytes calldata
     )
         external
+        pure
         returns (bytes[] memory leafData)
     {
         uint256 length = inputs.length;
@@ -35,12 +44,5 @@ contract MockFeedVerifier is IEOFeedVerifier {
             returnData[i] = data;
         }
         return returnData;
-    }
-
-    function setNewValidatorSet(Validator[] calldata newValidatorSet) external {
-        delete validatorSet;
-        for (uint256 i = 0; i < newValidatorSet.length; i++) {
-            validatorSet.push(newValidatorSet[i]);
-        }
     }
 }
