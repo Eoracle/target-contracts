@@ -12,14 +12,14 @@ abstract contract FeedVerifierDeployer is Script {
     function deployFeedVerifier(
         address proxyAdmin,
         address owner,
-        IBLS newBls,
-        IBN256G2 newBn256G2,
+        IBLS bls,
+        IBN256G2 bn256G2,
         uint256 childChainId
     )
         internal
         returns (address proxyAddr)
     {
-        bytes memory initData = abi.encodeCall(EOFeedVerifier.initialize, (owner, newBls, newBn256G2, childChainId));
+        bytes memory initData = abi.encodeCall(EOFeedVerifier.initialize, (owner, bls, bn256G2, childChainId));
 
         proxyAddr = Upgrades.deployTransparentProxy("EOFeedVerifier.sol", proxyAdmin, initData);
     }
@@ -29,13 +29,13 @@ contract DeployFeedVerifier is FeedVerifierDeployer {
     function run(
         address proxyAdmin,
         address owner,
-        IBLS newBls,
-        IBN256G2 newBn256G2,
+        IBLS bls,
+        IBN256G2 bn256G2,
         uint256 childChainId
     )
         external
         returns (address proxyAddr)
     {
-        return deployFeedVerifier(proxyAdmin, owner, newBls, newBn256G2, childChainId);
+        return deployFeedVerifier(proxyAdmin, owner, bls, bn256G2, childChainId);
     }
 }

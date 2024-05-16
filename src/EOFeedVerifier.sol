@@ -2,9 +2,7 @@
 pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { Arrays } from "@openzeppelin/contracts/utils/Arrays.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
-
 import { Merkle } from "./common/Merkle.sol";
 import {
     FeedVerifierNotInitialized,
@@ -20,7 +18,6 @@ import { IBLS } from "./interfaces/IBLS.sol";
 import { IBN256G2 } from "./interfaces/IBN256G2.sol";
 
 using Merkle for bytes32;
-using Arrays for uint256[];
 
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
