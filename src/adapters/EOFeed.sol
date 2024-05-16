@@ -54,7 +54,7 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function getRoundData(uint80) external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
-        return (0, int256(priceData.value), 0, priceData.timestamp, 0);
+        return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
     }
 
     /**
@@ -67,7 +67,45 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
-        return (0, int256(priceData.value), 0, priceData.timestamp, 0);
+        return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
+    }
+
+    /**
+     * @notice Get the latest price
+     * @return int256 The price
+     */
+    function latestAnswer() external view returns (int256) {
+        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        return int256(priceData.value);
+    }
+
+    /**
+     * @notice Get the latest timestamp
+     * @return uint256 The timestamp
+     */
+    function latestTimestamp() external view returns (uint256) {
+        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        return priceData.timestamp;
+    }
+
+    /**
+     * @notice Get the price for the round (round is not used, the lasest price is returned)
+     * @param
+     * @return int256 The price
+     */
+    function getAnswer(uint256) external view returns (int256) {
+        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        return int256(priceData.value);
+    }
+
+    /**
+     * @notice Get the timestamp for the round (round is not used, the lasest timestamp is returned)
+     * @param
+     * @return uint256 The timestamp
+     */
+    function getTimestamp(uint256) external view returns (uint256) {
+        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        return priceData.timestamp;
     }
 
     /**
@@ -100,5 +138,13 @@ contract EOFeed is IEOFeed, Initializable {
      */
     function version() external view returns (uint256) {
         return _version;
+    }
+
+    /**
+     * @notice Get the latest round
+     * @return uint256 The round, round is not used, 0 is returned
+     */
+    function latestRound() external pure returns (uint256) {
+        return 0;
     }
 }

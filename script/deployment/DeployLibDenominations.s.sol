@@ -15,7 +15,7 @@ contract DeployLibDenominations is Script {
         vm.startBroadcast();
         EOJsonUtils.initOutputConfig();
 
-        address libDenominations = _deployLibDenominations(bytes32(block.timestamp));
+        libDenominations = _deployLibDenominations(bytes32(block.timestamp));
         string memory outputConfigJson = EOJsonUtils.OUTPUT_CONFIG.serialize("libDenominations", libDenominations);
         EOJsonUtils.writeConfig(outputConfigJson);
         vm.stopBroadcast();

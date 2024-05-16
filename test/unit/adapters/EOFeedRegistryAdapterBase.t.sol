@@ -10,7 +10,7 @@ import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryA
 //beacon
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
-import { FeedAlreadyExists, BaseQuotePairExists } from "../../../src/interfaces/Errors.sol";
+import { FeedAlreadyExists, BaseQuotePairExists, SymbolNotSupported } from "../../../src/interfaces/Errors.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
@@ -126,12 +126,57 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol2, _description2, _decimals, VERSION);
     }
 
+    function test_RevertWhen_DeployFeed_NotSupportedSymbol() public {
+        uint16 symbol = MockEOFeedRegistry(address(feedRegistry)).NOT_SUPPORTED_SYMBOL();
+        vm.expectRevert(abi.encodeWithSelector(SymbolNotSupported.selector, symbol));
+        _deployEOFeed(_baseAddress, _quoteAddress, symbol, _description, _decimals, VERSION);
+    }
+
     function test_RevertWhen_DeployFeed_NotOwner() public {
         vm.expectRevert(
             abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(_notOwner))
         );
         vm.prank(_notOwner);
         _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+    }
+
+    function test_Decimals() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        assertEq(feedRegistryAdapter.decimals(_baseAddress, _quoteAddress), _decimals);
+    }
+
+    function test_Description() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        assertEq(feedRegistryAdapter.description(_baseAddress, _quoteAddress), _description);
+    }
+
+    function test_Version() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        assertEq(feedRegistryAdapter.version(_baseAddress, _quoteAddress), VERSION);
+    }
+
+    function test_LatestRoundData() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feedRegistryAdapter.latestRoundData(_baseAddress, _quoteAddress);
+        assertEq(roundId, 0);
+        assertEq(answer, int256(RATE1));
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, 0);
+    }
+
+    function test_GetRoundData() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feedRegistryAdapter.getRoundData(_baseAddress, _quoteAddress, 1);
+        assertEq(roundId, 0);
+        assertEq(answer, int256(RATE1));
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, 0);
     }
 
     function test_LatestAnswer() public {
@@ -144,6 +189,35 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
         _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
         assertEq(feedRegistryAdapter.latestTimestamp(_baseAddress, _quoteAddress), block.timestamp);
+    }
+
+    function test_LatestRound() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
+        assertEq(feedRegistryAdapter.latestRound(_baseAddress, _quoteAddress), 0);
+    }
+
+    function test_GetAnswer() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
+        assertEq(feedRegistryAdapter.getAnswer(_baseAddress, _quoteAddress, 1), int256(RATE1));
+    }
+
+    function test_GetTimestamp() public {
+        _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
+        assertEq(feedRegistryAdapter.getTimestamp(_baseAddress, _quoteAddress, 1), block.timestamp);
+    }
+
+    function test_IsFeedEnabled() public {
+        IEOFeed feed = _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        assertTrue(feedRegistryAdapter.isFeedEnabled(address(feed)));
+    }
+
+    function test_GetRoundFeed() public {
+        // solhint-disable-next-line func-named-parameters
+        IEOFeed feed = _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
+        assertEq(address(feedRegistryAdapter.getRoundFeed(_baseAddress, _quoteAddress, 1)), address(feed));
     }
 
     function _updatePriceFeed(uint16 pairSymbol, uint256 rate, uint256 timestamp) internal {
@@ -161,12 +235,6 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
             [uint256(0), uint256(0)],
             bytes("1")
         );
-    }
-
-    function test_GetRoundFeed() public {
-        // solhint-disable-next-line func-named-parameters
-        IEOFeed feed = _deployEOFeed(_baseAddress, _quoteAddress, _pairSymbol, _description, _decimals, VERSION);
-        assertEq(address(feedRegistryAdapter.getRoundFeed(_baseAddress, _quoteAddress, 1)), address(feed));
     }
 
     function _deployEOFeed(

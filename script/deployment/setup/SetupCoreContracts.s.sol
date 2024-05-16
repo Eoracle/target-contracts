@@ -6,9 +6,8 @@ import { Script } from "forge-std/Script.sol";
 import { stdJson } from "forge-std/Script.sol";
 import { EOJsonUtils } from "../../utils/EOJsonUtils.sol";
 import { EOFeedRegistry } from "../../../src/EOFeedRegistry.sol";
-import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapter.sol";
 
-contract SetupContracts is Script {
+contract SetupCoreContracts is Script {
     using stdJson for string;
 
     uint16[] public symbols;
@@ -17,50 +16,25 @@ contract SetupContracts is Script {
     bool[] public publishersBools;
 
     EOFeedRegistry public feedRegistry;
-    EOFeedRegistryAdapter public feedRegistryAdapter;
 
     function run() external {
+        run(vm.addr(vm.envUint("PRIVATE_KEY")));
+    }
+
+    function run(address broadcastFrom) public {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
         string memory outputConfig = EOJsonUtils.initOutputConfig();
 
         feedRegistry = EOFeedRegistry(outputConfig.readAddress(".feedRegistry"));
-        feedRegistryAdapter = EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter"));
 
-        vm.startBroadcast();
+        vm.startBroadcast(broadcastFrom);
 
         // Set supported symbols in FeedRegistry which are not set yet
         _updateSupportedSymbols(configStructured);
 
         // Set publishers in FeedRegistry which are not set yet
         _updateWhiteListedPublishers(configStructured);
-
-        // Deploy feeds which are not deployed yet
-        address feed;
-        string memory feedAddressesJsonKey = "feedsJson";
-        string memory feedAddressesJson;
-
-        for (uint256 i = 0; i < configStructured.supportedSymbolsData.length; i++) {
-            feed = address(
-                feedRegistryAdapter.getFeedByPairSymbol(uint16(configStructured.supportedSymbolsData[i].symbolId))
-            );
-            if (feed == address(0)) {
-                feed = address(
-                    feedRegistryAdapter.deployEOFeed(
-                        configStructured.supportedSymbolsData[i].base,
-                        configStructured.supportedSymbolsData[i].quote,
-                        uint16(configStructured.supportedSymbolsData[i].symbolId),
-                        configStructured.supportedSymbolsData[i].description,
-                        uint8(configStructured.supportedSymbolsData[i].decimals),
-                        1
-                    )
-                );
-            }
-            feedAddressesJson =
-                feedAddressesJsonKey.serialize(configStructured.supportedSymbolsData[i].description, feed);
-        }
-        string memory outputConfigJson = EOJsonUtils.OUTPUT_CONFIG.serialize("feeds", feedAddressesJson);
-        EOJsonUtils.writeConfig(outputConfigJson);
 
         vm.stopBroadcast();
     }

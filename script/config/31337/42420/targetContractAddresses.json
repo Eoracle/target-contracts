@@ -1,19 +1,17 @@
 {
-  "bls": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-  "bn256G2": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-  "checkpointManager": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-  "checkpointManagerImplementation": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-  "consumerExampleFeed": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
-  "feedImplementation": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
-  "feedRegistry": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
-  "feedRegistryAdapter": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
-  "feedRegistryAdapterImplementation": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
-  "feedRegistryImplementation": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
-  "feedVerifier": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
-  "feedVerifierImplementation": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+  "bls": "0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496",
+  "bn256G2": "0x90193C961A926261B756D1E5bb255e67ff9498A1",
+  "checkpointManager": "0xDB8cFf278adCCF9E9b5da745B44E754fC4EE3C76",
+  "checkpointManagerImplementation": "0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3",
+  "feedImplementation": "0x4f559F30f5eB88D635FDe1548C4267DB8FaB0351",
+  "feedRegistry": "0xD718d5A27a29FF1cD22403426084bA0d479869a0",
+  "feedRegistryAdapter": "0xd21060559c9beb54fC07aFd6151aDf6cFCDDCAeB",
+  "feedRegistryAdapterImplementation": "0x416C42991d05b31E9A6dC209e91AD22b79D87Ae6",
+  "feedRegistryImplementation": "0xDEb1E9a6Be7Baf84208BB6E10aC9F9bbE1D70809",
+  "feedVerifier": "0x62c20Aa1e0272312BC100b4e23B4DC1Ed96dD7D1",
+  "feedVerifierImplementation": "0x50EEf481cae4250d252Ae577A09bF514f224C6C4",
   "feeds": {
-    "BTC/USD": "0xCBd5431cC04031d089c90E7c83288183A6Fe545d",
-    "ETH/USD": "0x40a87c555319e8bD334b209CA3fA22615b9c619e"
-  },
-  "libDenominations": "0x81bB0F364251621840E9eD2bD599aD6E104EA02B"
+    "BTC/USD": "0xd2891d9AcC7b914E1B51c574BAe872B2a2AADAdf",
+    "ETH/USD": "0xF0A14f262a3fAb505B4c44af6D544B2a51Dc4564"
+  }
 }

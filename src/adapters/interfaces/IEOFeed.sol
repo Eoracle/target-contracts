@@ -17,6 +17,7 @@ interface IEOFeed {
         uint256 version
     )
         external;
+
     function getPairSymbol() external view returns (uint16);
     function decimals() external view returns (uint8);
     function description() external view returns (string memory);
@@ -34,4 +35,15 @@ interface IEOFeed {
         external
         view
         returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
+
+    // v2 interface
+    function latestAnswer() external view returns (int256);
+
+    function latestTimestamp() external view returns (uint256);
+
+    function latestRound() external view returns (uint256);
+
+    function getAnswer(uint256 roundId) external view returns (int256);
+
+    function getTimestamp(uint256 roundId) external view returns (uint256);
 }

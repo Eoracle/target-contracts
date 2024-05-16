@@ -107,39 +107,6 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
         return _pairSymbolsToFeeds[symbol];
     }
 
-    // implement IEOFeedRegistryAdapter
-    /**
-     * @notice Get the latest price for a given base/quote pair
-     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
-     * @param base The base asset address
-     * @param quote The quote asset address
-     * @return int256 The latest price
-     */
-    function latestAnswer(address base, address quote) external view override returns (int256) {
-        return int256(_feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]).value);
-    }
-
-    /**
-     * @notice Get the latest timestamp for a given base/quote pair
-     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
-     * @param base The base asset address
-     * @param quote The quote asset address
-     * @return uint256 The latest timestamp
-     */
-    function latestTimestamp(address base, address quote) external view returns (uint256) {
-        return _feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]).timestamp;
-    }
-
-    /**
-     * @notice Get the feed for a given base/quote pair
-     * @param base The base asset address
-     * @param quote The quote asset address
-     * @return IEOFeed The feed
-     */
-    function getFeed(address base, address quote) external view override returns (IEOFeed) {
-        return _getFeed(base, quote);
-    }
-
     /**
      * @notice Get the decimals for a given base/quote pair
      * @dev Calls the decimals function from the feed itself
@@ -174,6 +141,114 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     }
 
     /**
+     * @notice Get the latest round data for a given base/quote pair
+     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
+     * @param base The base asset address
+     * @param quote The quote asset address
+     * @return roundId The roundId
+     * @return answer The answer
+     * @return startedAt The startedAt
+     * @return updatedAt The updatedAt
+     * @return answeredInRound The answeredInRound
+     */
+    function latestRoundData(
+        address base,
+        address quote
+    )
+        external
+        view
+        returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)
+    {
+        IEOFeedRegistry.PriceFeed memory feedData =
+            _feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]);
+        return (0, int256(feedData.value), feedData.timestamp, feedData.timestamp, 0);
+    }
+
+    /**
+     * @notice Get the round data for a given base/quote pair
+     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
+     *      currently the roundId is not used and 0 is returned
+     * @param base The base asset address
+     * @param quote The quote asset address
+     * @return roundId The roundId
+     * @return answer The answer
+     * @return startedAt The startedAt
+     * @return updatedAt The updatedAt
+     * @return answeredInRound The answeredInRound
+     */
+    function getRoundData(
+        address base,
+        address quote,
+        uint80
+    )
+        external
+        view
+        returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound)
+    {
+        IEOFeedRegistry.PriceFeed memory feedData =
+            _feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]);
+        return (0, int256(feedData.value), feedData.timestamp, feedData.timestamp, 0);
+    }
+
+    /**
+     * @notice Get the latest price for a given base/quote pair
+     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
+     * @param base The base asset address
+     * @param quote The quote asset address
+     * @return int256 The latest price
+     */
+    function latestAnswer(address base, address quote) external view override returns (int256) {
+        return int256(_feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]).value);
+    }
+
+    /**
+     * @notice Get the latest timestamp for a given base/quote pair
+     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
+     * @param base The base asset address
+     * @param quote The quote asset address
+     * @return uint256 The latest timestamp
+     */
+    function latestTimestamp(address base, address quote) external view returns (uint256) {
+        return _feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]).timestamp;
+    }
+
+    /**
+     * @notice Get the answer for a given base/quote pair and round
+     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
+     *      currently the roundId is not used and latest answer is returned
+     * @param base The base asset address
+     * @param quote The quote asset address
+     * @param
+     * @return int256 The answer
+     */
+    function getAnswer(address base, address quote, uint256) external view returns (int256) {
+        return int256(_feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]).value);
+    }
+
+    /**
+     * @notice Get the timestamp for a given base/quote pair and round
+     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
+     *      currently the roundId is not used and latest timestamp is returned
+     * @param base The base asset address
+     * @param quote The quote asset address
+     * @param
+     * @return uint256 The timestamp
+     */
+    function getTimestamp(address base, address quote, uint256) external view returns (uint256) {
+        return _feedRegistry.getLatestPriceFeed(_tokenAddressesToPairSymbols[base][quote]).timestamp;
+    }
+
+    /**
+     * @notice Get the feed for a given base/quote pair
+     * @param base The base asset address
+     * @param quote The quote asset address
+     * @return IEOFeed The feed
+     */
+    function getFeed(address base, address quote) external view override returns (IEOFeed) {
+        return _getFeed(base, quote);
+    }
+
+    /**
      * @notice Check if a feed is enabled in the storage of adapter
      * @param feed The feed address
      * @return bool True if the feed is enabled
@@ -191,6 +266,18 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      */
     function getRoundFeed(address base, address quote, uint80) external view returns (IEOFeed) {
         return _getFeed(base, quote);
+    }
+
+    /**
+     * @notice Get the latest round for a given base/quote pair
+     * @dev Calls the getLatestPriceFeed function from the feed registry, not from Feed itself
+     *      currently the roundId is not used and 0 is returned
+     * @param
+     * @param
+     * @return uint256 The latest round
+     */
+    function latestRound(address, address) external pure returns (uint256) {
+        return 0;
     }
 
     /**

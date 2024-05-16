@@ -34,5 +34,6 @@ contract DeployFeedRegistryAdapter is Script {
         string memory outputConfigJson =
             EOJsonUtils.OUTPUT_CONFIG.serialize("feedRegistryAdapterImplementation", implementationAddress);
         EOJsonUtils.writeConfig(outputConfigJson);
+        vm.stopBroadcast();
     }
 }

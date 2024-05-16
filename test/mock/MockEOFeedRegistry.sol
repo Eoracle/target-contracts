@@ -8,6 +8,7 @@ import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 // solhint-disable no-empty-blocks
 
 contract MockEOFeedRegistry is IEOFeedRegistry {
+    uint16 public constant NOT_SUPPORTED_SYMBOL = 1000;
     mapping(uint16 => PriceFeed) public priceFeeds;
 
     function updatePriceFeed(
@@ -57,7 +58,7 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
         return true;
     }
 
-    function isSupportedSymbol(uint16) external view returns (bool) {
-        return true;
+    function isSupportedSymbol(uint16 symbolId) external pure returns (bool) {
+        return symbolId != NOT_SUPPORTED_SYMBOL;
     }
 }
