@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
+import {
+    CallerIsNotWhitelisted,
+    MissingLeafInputs,
+    SymbolNotSupported,
+    BlockNumberAlreadyProcessed
+} from "./interfaces/Errors.sol";
 
 contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     mapping(uint16 => PriceFeed) internal _priceFeeds;
@@ -12,9 +18,10 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     mapping(uint16 => bool) internal _supportedSymbols;
     // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
+    uint256 internal _lastProcessedBlockNumber;
 
     modifier onlyWhitelisted() {
-        require(_whitelistedPublishers[msg.sender], "Caller is not whitelisted");
+        if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
         _;
     }
 
@@ -35,12 +42,9 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param isSupported Array of booleans indicating whether the symbol is supported
      */
     function setSupportedSymbols(uint16[] calldata symbols, bool[] calldata isSupported) external onlyOwner {
-        for (uint256 i = 0; i < symbols.length;) {
+        for (uint256 i = 0; i < symbols.length; i++) {
             // TODO: check if it not already the needed value
             _supportedSymbols[symbols[i]] = isSupported[i];
-            unchecked {
-                ++i;
-            }
         }
     }
 
@@ -51,52 +55,58 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     // TODO: it's better to use add/remove logic for whitelisted publishers
     function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external onlyOwner {
-        for (uint256 i = 0; i < publishers.length;) {
+        for (uint256 i = 0; i < publishers.length; i++) {
             // TODO: check if it not already the needed value
             _whitelistedPublishers[publishers[i]] = isWhitelisted[i];
-            unchecked {
-                ++i;
-            }
         }
     }
 
     /**
      * @notice Update the price feed for a symbol
-     * @param checkpointData Proof data (data + proof) for the price feed
+     * @param input A leaf to prove the price feeds
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput memory input,
-        bytes memory checkpointData
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyWhitelisted
     {
-        bytes memory data = _feedVerifier.submitAndExit(input, checkpointData);
+        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
+        bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
+        _lastProcessedBlockNumber = checkpoint.blockNumber;
     }
 
     /**
      * @notice Update the price feeds for multiple symbols
      * @param inputs Array of leafs to prove the price feeds
-     * @param checkpointData Checkpoint data for verifying the price feeds
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        bytes calldata checkpointData
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyWhitelisted
     {
-        require(inputs.length > 0, "MISSING_INPUTS");
-        require(checkpointData.length > 0, "MISSING_CHECKPOINT");
+        if (inputs.length == 0) revert MissingLeafInputs();
+        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
 
-        bytes[] memory data = _feedVerifier.submitAndBatchExit(inputs, checkpointData);
-        for (uint256 i = 0; i < data.length;) {
+        bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
+        for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
-            unchecked {
-                ++i;
-            }
         }
+        _lastProcessedBlockNumber = checkpoint.blockNumber;
     }
 
     /**
@@ -104,9 +114,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param symbol Symbol of the price feed
      * @return Price feed struct
      */
-    // TODO: it is not compatible with CL
     function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
-        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
+        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         return _priceFeeds[symbol];
     }
 
@@ -117,11 +126,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      */
     function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory) {
         PriceFeed[] memory retVal = new PriceFeed[](symbols.length);
-        for (uint256 i = 0; i < symbols.length;) {
+        for (uint256 i = 0; i < symbols.length; i++) {
             retVal[i] = this.getLatestPriceFeed(symbols[i]);
-            unchecked {
-                ++i;
-            }
         }
         return retVal;
     }
@@ -154,7 +160,8 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
 
     function _processVerifiedRate(bytes memory data) internal {
         (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
-        require(_supportedSymbols[symbol], "SYMBOL_NOT_SUPPORTED");
+        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
+        emit RateUpdated(symbol, rate, timestamp);
     }
 }

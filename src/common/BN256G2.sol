@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { IBN256G2 } from "../interfaces/IBN256G2.sol";
 // solhint-disable func-named-parameters
@@ -53,7 +53,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt2yy
     )
         external
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         if (pt1xx == 0 && pt1xy == 0 && pt1yx == 0 && pt1yy == 0) {
@@ -92,7 +92,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1yy
     )
         external
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         uint256 pt1zx = 1;
@@ -207,7 +207,7 @@ contract BN256G2 is IBN256G2 {
      * @return Inv([xx, xy])
      */
     // solhint-disable-next-line ordering
-    function _fq2inv(uint256 x, uint256 y) internal view returns (uint256, uint256) {
+    function _fq2inv(uint256 x, uint256 y) internal pure returns (uint256, uint256) {
         uint256 inv =
             _modInv(addmod(mulmod(y, y, FIELD_MODULUS), mulmod(x, x, FIELD_MODULUS), FIELD_MODULUS), FIELD_MODULUS);
         return (mulmod(x, inv, FIELD_MODULUS), FIELD_MODULUS - mulmod(y, inv, FIELD_MODULUS));
@@ -236,28 +236,32 @@ contract BN256G2 is IBN256G2 {
 
     /**
      * @notice Calculates the modular inverse of a over n
+     *  @dev The same as the modular exponentiation with the exponent n-2.
+     *         For EVM chains that don't support the Modexp precompile.
+     *         Temporarily implemented in solidity,
+     *         should be replaced with precompiled as soon as it is available.
      * @param a The operand to calculate the inverse of
      * @param n The modulus
-     * @return result Inv(a)modn
-     *
+     * @return Inv(a)modn
      */
-    function _modInv(uint256 a, uint256 n) internal view returns (uint256 result) {
-        bool success;
-        // prettier-ignore
-        // slither-disable-next-line assembly
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            let freemem := mload(0x40)
-            mstore(freemem, 0x20)
-            mstore(add(freemem, 0x20), 0x20)
-            mstore(add(freemem, 0x40), 0x20)
-            mstore(add(freemem, 0x60), a)
-            mstore(add(freemem, 0x80), sub(n, 2))
-            mstore(add(freemem, 0xA0), n)
-            success := staticcall(sub(gas(), 2000), 5, freemem, 0xC0, freemem, 0x20)
-            result := mload(freemem)
+    function _modInv(uint256 a, uint256 n) internal pure returns (uint256) {
+        // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
+        uint256 e = n - 2;
+
+        if (n == 0) return 0;
+        if (e == 0) return 1;
+
+        uint256 result = 1;
+        a %= n;
+
+        while (e > 0) {
+            if (e % 2 == 1) {
+                result = mulmod(result, a, n); // Use mulmod to prevent overflow
+            }
+            a = mulmod(a, a, n); // Use mulmod to prevent overflow
+            e /= 2;
         }
-        require(success, "error with modular inverse");
+        return result;
     }
 
     /**
@@ -283,7 +287,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1zy
     )
         internal
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         uint256 invzx;

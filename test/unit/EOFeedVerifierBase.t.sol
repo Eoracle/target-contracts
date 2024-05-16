@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { Test } from "forge-std/Test.sol";
-import { TargetCheckpointManager } from "../../src/TargetCheckpointManager.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
-import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { DeployFeedVerifier } from "../../script/deployment/base/DeployFeedVerifier.s.sol";
 import { Utils } from "../utils/Utils.sol";
@@ -25,14 +23,13 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     }
 
     EOFeedVerifier public feedVerifier;
-    TargetCheckpointManager public checkpointManager;
     BLS public bls;
     BN256G2 public bn256G2;
     DeployFeedVerifier public deployer;
 
     uint256 public childChainId = 1;
     uint256 public validatorSetSize;
-    ICheckpointManager.Validator[] public validatorSet;
+    IEOFeedVerifier.Validator[] public validatorSet;
     IEOFeedVerifier.LeafInput[] public leafInputs;
 
     address public admin;
@@ -48,6 +45,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     bytes32[][] public leavesArray;
 
     event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
+    event LeafVerified(uint256 indexed id, bytes returnData);
 
     function setUp() public virtual {
         bls = new BLS();
@@ -66,37 +64,25 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
         cmd[3] = vm.toString(abi.encode(DOMAIN));
         bytes memory out = vm.ffi(cmd);
 
-        ICheckpointManager.Validator[] memory validatorSetTmp;
+        IEOFeedVerifier.Validator[] memory validatorSetTmp;
 
         (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, bitmaps, unhashedLeaves, proves, leavesArray) =
         abi.decode(
             out,
-            (
-                uint256,
-                ICheckpointManager.Validator[],
-                uint256[2][],
-                bytes32[],
-                bytes[],
-                bytes[],
-                bytes32[][],
-                bytes32[][]
-            )
+            (uint256, IEOFeedVerifier.Validator[], uint256[2][], bytes32[], bytes[], bytes[], bytes32[][], bytes32[][])
         );
 
         for (uint256 i = 0; i < validatorSetSize; i++) {
             validatorSet.push(validatorSetTmp[i]);
         }
-
-        checkpointManager = new TargetCheckpointManager();
-        checkpointManager.initialize(bls, bn256G2, childChainId, address(this));
-        checkpointManager.setNewValidatorSet(validatorSet);
     }
 }
 
 abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
     function setUp() public virtual override {
         super.setUp();
-        address proxyAddress = deployer.run(admin, checkpointManager, address(this));
+        address proxyAddress = deployer.run(admin, address(this), bls, bn256G2, childChainId);
         feedVerifier = EOFeedVerifier(proxyAddress);
+        feedVerifier.setNewValidatorSet(validatorSet);
     }
 }

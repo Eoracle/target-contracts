@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { Script } from "forge-std/Script.sol";
 import { stdJson } from "forge-std/Script.sol";
@@ -11,8 +11,15 @@ contract UpgradeFeedVerifier is Script {
     using stdJson for string;
 
     function run() external {
-        string memory config = EOJsonUtils.getOutputConfig();
+        string memory config = EOJsonUtils.initOutputConfig();
         address proxyAddress = config.readAddress(".feedVerifier");
+        vm.startBroadcast();
         Upgrades.upgradeProxy(proxyAddress, "EOFeedVerifierV2.sol", "");
+        vm.stopBroadcast();
+        address implementationAddress = Upgrades.getImplementationAddress(proxyAddress);
+
+        string memory outputConfigJson =
+            EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifierImplementation", implementationAddress);
+        EOJsonUtils.writeConfig(outputConfigJson);
     }
 }

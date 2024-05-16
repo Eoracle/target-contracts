@@ -1,177 +1,240 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { ICheckpointManager } from "./interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
-
 import { Merkle } from "./common/Merkle.sol";
+import {
+    FeedVerifierNotInitialized,
+    InvalidProof,
+    InvalidAddress,
+    InvalidEventRoot,
+    VotingPowerIsZero,
+    AggVotingPowerIsZero,
+    InsufficientVotingPower,
+    SignatureVerficationFailed
+} from "./interfaces/Errors.sol";
+import { IBLS } from "./interfaces/IBLS.sol";
+import { IBN256G2 } from "./interfaces/IBN256G2.sol";
 
 using Merkle for bytes32;
 
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
-    mapping(uint256 => bool) internal _processedExits;
-    ICheckpointManager internal _checkpointManager;
+    bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
+
+    uint256 public childChainId;
+    IBLS public bls;
+    IBN256G2 public bn256G2;
+    uint256 public currentValidatorSetLength;
+    uint256 public totalVotingPower;
+    mapping(uint256 => Validator) public currentValidatorSet;
+    bytes32 public currentValidatorSetHash;
 
     modifier onlyInitialized() {
-        require(address(_checkpointManager) != address(0), "NOT_INITIALIZED");
-
+        if (_getInitializedVersion() == 0) revert FeedVerifierNotInitialized();
         _;
     }
 
     /**
-     * @notice Initialize the contract with the checkpoint manager address
-     * @dev The checkpoint manager contract must be deployed first
-     * @param newCheckpointManager Address of the checkpoint manager contract
      * @param owner Owner of the contract
+     * @param _bls Address of the BLS library contract
+     * @param _bn256G2 Address of the Bn256G2 library contract
+     * @param _childChainId Chain ID of the child chain
      */
-    function initialize(ICheckpointManager newCheckpointManager, address owner) external initializer {
-        require(
-            address(newCheckpointManager) != address(0) && address(newCheckpointManager).code.length != 0,
-            "INVALID_ADDRESS"
-        );
-        _checkpointManager = newCheckpointManager;
+    function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _childChainId) external initializer {
+        if (
+            address(_bls) == address(0) || address(_bls).code.length == 0 || address(_bn256G2) == address(0)
+                || address(_bn256G2).code.length == 0
+        ) {
+            revert InvalidAddress();
+        }
+        childChainId = _childChainId;
+        bls = _bls;
+        bn256G2 = _bn256G2;
         __Ownable_init(owner);
     }
 
     /**
      * @inheritdoc IEOFeedVerifier
-     * @dev This function is used to process an exit for one event
-     * @param input Exit leaf input
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
-    function exit(LeafInput calldata input) external onlyInitialized {
-        _exit(input, false);
-    }
-
-    /**
-     * @inheritdoc IEOFeedVerifier
-     */
-    function submitAndExit(
+    function verify(
         LeafInput calldata input,
-        bytes calldata checkpointData
+        Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyInitialized
         returns (bytes memory)
     {
-        _submitCheckpoint(checkpointData);
-        bytes memory data = _exit(input, false);
+        _verifySignature(checkpoint, signature, bitmap);
+        bytes memory data = _verifyLeaf(input, checkpoint.eventRoot);
         return data;
     }
 
     /**
-     * @notice Perform a batch exit for multiple events
+     * @notice Verifies multiple leaves
      * @param inputs Batch exit inputs for multiple event leaves
-     */
-    function batchExit(LeafInput[] calldata inputs) external onlyInitialized {
-        _batchExit(inputs);
-    }
-
-    /**
-     * @notice Perform a batch exit for multiple events + submit checkpoint for them
-     * @param inputs Batch exit inputs for multiple event leaves
-     * @param checkpointData Checkpoint data for verifying the batch exits
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      * @return Array of the leaf data fields of all submitted leaves
      */
-    function submitAndBatchExit(
+    function batchVerify(
         LeafInput[] calldata inputs,
-        bytes calldata checkpointData
+        Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         onlyInitialized
         returns (bytes[] memory)
     {
-        _submitCheckpoint(checkpointData);
-        return _batchExit(inputs);
+        _verifySignature(checkpoint, signature, bitmap);
+        return _verifyLeaves(inputs, checkpoint.eventRoot);
     }
 
     /**
-     * @notice Check if an exit has been processed
-     * @param id ID of the exit
-     * @return Boolean value indicating if the exit has been processed
+     * @inheritdoc IEOFeedVerifier
+     * @notice Function to set a new validator set for the CheckpointManager
+     * @param newValidatorSet The new validator set to store
      */
-    function isProcessedExit(uint256 id) external view returns (bool) {
-        return _processedExits[id];
+    function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner {
+        uint256 length = newValidatorSet.length;
+        currentValidatorSetLength = length;
+        currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
+        uint256 totalPower = 0;
+        for (uint256 i = 0; i < length; i++) {
+            uint256 votingPower = newValidatorSet[i].votingPower;
+            if (votingPower == 0) revert VotingPowerIsZero();
+            totalPower += votingPower;
+            currentValidatorSet[i] = newValidatorSet[i];
+        }
+        totalVotingPower = totalPower;
     }
 
     /**
-     * @notice Get the address of the checkpoint manager contract
-     * @return Address of the checkpoint manager contract
-     */
-    function getCheckpointManager() external view returns (ICheckpointManager) {
-        return _checkpointManager;
-    }
-
-    /**
-     * @notice Process a batch of exits
+     * @notice Verify a batch of exits leaves
      * @param inputs Batch exit inputs for multiple event leaves
+     * @param eventRoot the root this event should belong to
      * @return Array of the leaf data fields of all submitted leaves
      */
-    function _batchExit(LeafInput[] calldata inputs) internal returns (bytes[] memory) {
+    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal returns (bytes[] memory) {
         uint256 length = inputs.length;
         bytes[] memory returnData = new bytes[](length);
-        for (uint256 i = 0; i < length;) {
-            returnData[i] = _exit(inputs[i], true);
-            unchecked {
-                ++i;
-            }
+        for (uint256 i = 0; i < length; i++) {
+            returnData[i] = _verifyLeaf(inputs[i], eventRoot);
         }
         return returnData;
     }
 
     /**
-     * @notice Process an exit for one event
+     * @notice Verify for one event
      * @param input Exit leaf input
-     * @param isBatch Boolean value indicating if the exit is part of a batch
+     * @param eventRoot event root the leaf should belong to
+     * @return The leaf data field
      */
-    function _exit(LeafInput calldata input, bool isBatch) internal returns (bytes memory) {
-        (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
-            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
-        if (isBatch) {
-            if (_processedExits[id]) {
-                return new bytes(0x00);
-            }
-        } else {
-            require(!_processedExits[id], "EXIT_ALREADY_PROCESSED");
+    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory) {
+        bytes32 leaf = keccak256(input.unhashedLeaf);
+        if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
+            revert InvalidProof();
         }
 
-        // slither-disable-next-line calls-loop
-        require(
-            _checkpointManager.getEventMembershipByBlockNumber(
-                input.blockNumber, keccak256(input.unhashedLeaf), input.leafIndex, input.proof
-            ),
-            "INVALID_PROOF"
-        );
+        (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
+            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
 
-        _processedExits[id] = true;
-
-        emit ExitProcessed(id, true, data);
+        emit LeafVerified(id, data);
 
         return data;
     }
 
-    function _submitCheckpoint(bytes calldata checkpointData) internal returns (ICheckpointManager.Checkpoint memory) {
-        (
-            uint256[2] memory signature,
-            bytes memory bitmap,
-            uint256 epochNumber,
-            uint256 blockNumber,
-            bytes32 blockHash,
-            uint256 blockRound,
-            bytes32 currentValidatorSetHash,
-            bytes32 eventRoot
-        ) = abi.decode(checkpointData, (uint256[2], bytes, uint256, uint256, bytes32, uint256, bytes32, bytes32));
-        ICheckpointManager.Checkpoint memory checkpoint =
-            ICheckpointManager.Checkpoint(epochNumber, blockNumber, eventRoot);
-        _checkpointManager.submit(
-            ICheckpointManager.CheckpointMetadata(blockHash, blockRound, currentValidatorSetHash),
-            checkpoint,
-            signature,
-            new ICheckpointManager.Validator[](0), // TODO : add new validator set to the provider and pass it to here.
-            bitmap
+    /**
+     * @notice Verify the signature of the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
+     */
+    function _verifySignature(
+        Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
+    )
+        internal
+        view
+    {
+        if (checkpoint.eventRoot == bytes32(0)) revert InvalidEventRoot();
+        bytes memory hash = abi.encode(
+            keccak256(
+                // solhint-disable-next-line func-named-parameters
+                abi.encode(
+                    childChainId,
+                    checkpoint.blockNumber,
+                    checkpoint.blockHash,
+                    checkpoint.blockRound,
+                    checkpoint.epoch,
+                    checkpoint.eventRoot,
+                    currentValidatorSetHash,
+                    currentValidatorSetHash
+                )
+            )
         );
 
-        return checkpoint;
+        uint256[2] memory message = bls.hashToPoint(DOMAIN, hash);
+
+        uint256 length = currentValidatorSetLength;
+        // slither-disable-next-line uninitialized-local
+        uint256[4] memory aggPubkey;
+        uint256 aggVotingPower = 0;
+        for (uint256 i = 0; i < length; i++) {
+            if (_getValueFromBitmap(bitmap, i)) {
+                if (aggVotingPower == 0) {
+                    aggPubkey = currentValidatorSet[i].blsKey;
+                } else {
+                    uint256[4] memory blsKey = currentValidatorSet[i].blsKey;
+                    // slither-disable-next-line calls-loop
+                    (aggPubkey[0], aggPubkey[1], aggPubkey[2], aggPubkey[3]) = bn256G2.ecTwistAdd({
+                        pt1xx: aggPubkey[0],
+                        pt1xy: aggPubkey[1],
+                        pt1yx: aggPubkey[2],
+                        pt1yy: aggPubkey[3],
+                        pt2xx: blsKey[0],
+                        pt2xy: blsKey[1],
+                        pt2yx: blsKey[2],
+                        pt2yy: blsKey[3]
+                    });
+                }
+                aggVotingPower += currentValidatorSet[i].votingPower;
+            }
+        }
+
+        if (aggVotingPower == 0) revert AggVotingPowerIsZero();
+        if (aggVotingPower <= ((2 * totalVotingPower) / 3)) revert InsufficientVotingPower();
+
+        (bool callSuccess, bool result) = bls.verifySingle(signature, aggPubkey, message);
+
+        if (!callSuccess || !result) revert SignatureVerficationFailed();
+    }
+
+    /**
+     * @dev Extracts a boolean value from a specific index in a bitmap.
+     * @param bitmap The bytes array containing the bitmap.
+     * @param index The bit position from which to retrieve the value.
+     * @return bool The boolean value of the bit at the specified index in the bitmap.
+     *              Returns 'true' if the bit is set (1), and 'false' if the bit is not set (0).
+     */
+    function _getValueFromBitmap(bytes calldata bitmap, uint256 index) private pure returns (bool) {
+        uint256 byteNumber = index / 8;
+        uint8 bitNumber = uint8(index % 8);
+
+        if (byteNumber >= bitmap.length) {
+            return false;
+        }
+
+        // Get the value of the bit at the given 'index' in a byte.
+        return uint8(bitmap[byteNumber]) & (1 << bitNumber) > 0;
     }
 
     // slither-disable-next-line unused-state,naming-convention

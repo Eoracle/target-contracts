@@ -8,7 +8,7 @@ const input = process.argv[2];
 let domain: any;
 
 let validatorSecretKeys: any[] = [];
-const validatorSetSize = Math.floor(Math.random() * (5 - 1) + 8); // Randomly pick 8 - 12
+const validatorSetSize = 12;
 let aggMessagePoints: mcl.MessagePoint[] = [];
 let accounts: any[] = [
   "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -56,8 +56,8 @@ async function generateMsg() {
   currentValidatorSetHash = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   generateSignature0();
@@ -86,7 +86,7 @@ async function generateMsg() {
       [eventRoot, blockHash, currentValidatorSetHash],
       bitmaps,
       aggVotingPowers,
-    ]
+    ],
   );
 
   console.log(output);
@@ -111,8 +111,8 @@ function generateSignature0() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -127,8 +127,8 @@ function generateSignature0() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -179,8 +179,8 @@ function generateSignature1() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -195,8 +195,8 @@ function generateSignature1() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -247,8 +247,8 @@ function generateSignature2() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -263,8 +263,8 @@ function generateSignature2() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -315,8 +315,8 @@ function generateSignature3() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -331,8 +331,8 @@ function generateSignature3() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -383,8 +383,8 @@ function generateSignature4() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -399,8 +399,8 @@ function generateSignature4() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -451,8 +451,8 @@ function generateSignature5() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -467,8 +467,8 @@ function generateSignature5() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -519,8 +519,8 @@ function generateSignature6() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -535,8 +535,8 @@ function generateSignature6() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -587,8 +587,8 @@ function generateSignature7() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -603,8 +603,8 @@ function generateSignature7() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -660,8 +660,8 @@ function generateSignature8() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -676,8 +676,8 @@ function generateSignature8() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];

@@ -9,7 +9,7 @@ const input = process.argv[2];
 let domain: any;
 
 let validatorSecretKeys: any[] = [];
-const validatorSetSize = Math.floor(Math.random() * (5 - 1) + 8); // Randomly pick 8 - 12
+const validatorSetSize = 12;
 let aggMessagePoints: mcl.MessagePoint[] = [];
 let accounts: any[] = [
   "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -58,8 +58,8 @@ async function generateMsg() {
   currentValidatorSetHash = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
   generateSignature0();
   generateSignature1();
@@ -84,7 +84,7 @@ async function generateMsg() {
       unhashedLeaves,
       proves,
       leavesArray,
-    ]
+    ],
   );
 
   console.log(output);
@@ -97,7 +97,7 @@ function generateSignature0() {
   const data = ethers.utils.hexlify(ethers.utils.randomBytes(32));
   const unhashedLeaf = ethers.utils.defaultAbiCoder.encode(
     ["uint", "address", "address", "bytes"],
-    [id, sender, receiver, data]
+    [id, sender, receiver, data],
   );
 
   const leaves = [
@@ -125,8 +125,8 @@ function generateSignature0() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message = ethers.utils.keccak256(
@@ -141,8 +141,8 @@ function generateSignature0() {
         checkpoint.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures: mcl.Signature[] = [];
@@ -186,12 +186,12 @@ function generateSignature1() {
   const data = ethers.utils.hexlify(ethers.utils.randomBytes(32));
   const unhashedLeaf1 = ethers.utils.defaultAbiCoder.encode(
     ["uint", "address", "address", "bytes"],
-    [id, sender, receiver, data]
+    [id, sender, receiver, data],
   );
 
   const unhashedLeaf2 = ethers.utils.defaultAbiCoder.encode(
     ["uint", "address", "address", "bytes"],
-    [id + 1, sender, receiver, data]
+    [id + 1, sender, receiver, data],
   );
 
   const leaves = [
@@ -225,8 +225,8 @@ function generateSignature1() {
   const messageOfValidatorSet = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(
       ["tuple(address _address, uint256[4] blsKey, uint256 votingPower)[]"],
-      [validatorSet]
-    )
+      [validatorSet],
+    ),
   );
 
   const message1 = ethers.utils.keccak256(
@@ -241,8 +241,8 @@ function generateSignature1() {
         checkpoint1.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures1: mcl.Signature[] = [];
@@ -281,8 +281,8 @@ function generateSignature1() {
         checkpoint2.eventRoot,
         checkpointMetadata.currentValidatorSetHash,
         messageOfValidatorSet,
-      ]
-    )
+      ],
+    ),
   );
 
   const signatures2: mcl.Signature[] = [];

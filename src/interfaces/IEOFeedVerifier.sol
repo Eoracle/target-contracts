@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
-
-import { ICheckpointManager } from "./ICheckpointManager.sol";
+pragma solidity 0.8.25;
 
 /**
  * @title EOFeedManager
@@ -10,49 +8,62 @@ import { ICheckpointManager } from "./ICheckpointManager.sol";
  */
 interface IEOFeedVerifier {
     struct LeafInput {
-        uint256 blockNumber;
         uint256 leafIndex;
         bytes unhashedLeaf;
         bytes32[] proof;
     }
 
-    event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
+    struct Checkpoint {
+        uint256 epoch;
+        uint256 blockNumber;
+        bytes32 eventRoot;
+        bytes32 blockHash;
+        uint256 blockRound;
+    }
+
+    struct Validator {
+        address _address;
+        uint256[4] blsKey;
+        uint256 votingPower;
+    }
+
+    event LeafVerified(uint256 indexed id, bytes returnData);
 
     /**
-     * @notice Perform an exit (verify) for one event
+     * @notice Verifies leaf
      * @param input Exit leaf input
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
-    function exit(LeafInput calldata input) external;
-
-    /**
-     * @notice Submit a proof and exit (verify) leaf
-     * @param input Exit leaf input
-     * @param checkpointData checkpoint data for verifying the exit
-     */
-    function submitAndExit(
+    function verify(
         LeafInput memory input,
-        bytes calldata checkpointData
+        Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         returns (bytes memory leafData);
 
     /**
-     * @notice Submit checkpoint and verify multiple leaves
+     * @notice Verifies multiple leaves
      * @param inputs Exit leaves inputs
-     * @param checkpointData checkpoint data for verifying the exit
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
-    function submitAndBatchExit(
+    function batchVerify(
         LeafInput[] memory inputs,
-        bytes calldata checkpointData
+        Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
     )
         external
         returns (bytes[] memory);
 
     /**
-     * @notice Perform a batch exit for multiple events
-     * @param inputs Batch exit inputs for multiple event leaves
+     * @notice Function to set a new validator set for the CheckpointManager
+     * @param newValidatorSet The new validator set to store
      */
-    function batchExit(LeafInput[] calldata inputs) external;
-
-    function getCheckpointManager() external view returns (ICheckpointManager);
+    function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
 }

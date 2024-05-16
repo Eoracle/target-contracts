@@ -1,70 +1,70 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
 import { stdJson } from "forge-std/Script.sol";
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { CheckpointManagerDeployer } from "./base/DeployCheckpointManager.s.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { FeedVerifierDeployer } from "./base/DeployFeedVerifier.s.sol";
 import { FeedRegistryDeployer } from "./base/DeployFeedRegistry.s.sol";
 import { BN256G2 } from "src/common/BN256G2.sol";
 import { BLS } from "src/common/BLS.sol";
 import { IBN256G2 } from "src/interfaces/IBN256G2.sol";
 import { IBLS } from "src/interfaces/IBLS.sol";
-import { ICheckpointManager } from "src/interfaces/ICheckpointManager.sol";
 import { IEOFeedVerifier } from "src/interfaces/IEOFeedVerifier.sol";
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 
 // Deployment command: FOUNDRY_PROFILE="deployment" forge script script/deployment/DeployNewTargetContractSet.s.sol
 // --rpc-url $RPC_URL --private-key $PRIVATE_KEY -vvv --slow --verify --broadcast
-contract DeployNewTargetContractSet is CheckpointManagerDeployer, FeedVerifierDeployer, FeedRegistryDeployer {
+contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedRegistryDeployer {
     using stdJson for string;
 
     function run()
         external
-        returns (
-            address bls,
-            address bn256G2,
-            address checkpointManagerProxy,
-            address feedVerifierProxy,
-            address feedRegistryProxy
-        )
+        returns (address bls, address bn256G2, address feedVerifierProxy, address feedRegistryProxy)
     {
-        string memory config = EOJsonUtils.getConfig();
+        EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
-        uint256 targetChainId = config.readUint(".targetChainId");
-        uint256 currentChainId = block.chainid;
-        require(targetChainId == currentChainId, "Wrong chain id for this config.");
+        require(configStructured.targetChainId == block.chainid, "Wrong chain id for this config.");
+
+        require(configStructured.childChainId == vm.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
 
         vm.startBroadcast();
 
-        address proxyAdminOwner = config.readAddress(".proxyAdminOwner");
+        EOJsonUtils.initOutputConfig();
 
         bn256G2 = address(new BN256G2());
-        string memory addressString = Strings.toHexString(uint256(uint160(bn256G2)), 20);
-        EOJsonUtils.writeConfig(addressString, ".bn256G2");
+        EOJsonUtils.OUTPUT_CONFIG.serialize("bn256G2", bn256G2);
 
         bls = address(new BLS());
-        addressString = Strings.toHexString(uint256(uint160(bls)), 20);
-        EOJsonUtils.writeConfig(addressString, ".bls");
+        EOJsonUtils.OUTPUT_CONFIG.serialize("bls", bls);
 
-        uint256 childChainId = config.readUint(".childChainId");
-        address targetContractsOwner = config.readAddress(".targetContractsOwner");
+        /*//////////////////////////////////////////////////////////////////////////
+                                        EOFeedVerifier
+        //////////////////////////////////////////////////////////////////////////*/
+        feedVerifierProxy = deployFeedVerifier(
+            configStructured.proxyAdminOwner,
+            configStructured.targetContractsOwner,
+            IBLS(bls),
+            IBN256G2(bn256G2),
+            configStructured.childChainId
+        );
+        EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifier", feedVerifierProxy);
 
-        checkpointManagerProxy =
-            deployCheckpointManager(proxyAdminOwner, IBLS(bls), IBN256G2(bn256G2), childChainId, targetContractsOwner);
-        addressString = Strings.toHexString(uint256(uint160(checkpointManagerProxy)), 20);
-        EOJsonUtils.writeConfig(addressString, ".checkpointManager");
+        address implementationAddress = Upgrades.getImplementationAddress(feedVerifierProxy);
+        EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifierImplementation", implementationAddress);
 
-        feedVerifierProxy =
-            deployFeedVerifier(proxyAdminOwner, ICheckpointManager(checkpointManagerProxy), targetContractsOwner);
-        addressString = Strings.toHexString(uint256(uint160(feedVerifierProxy)), 20);
-        EOJsonUtils.writeConfig(addressString, ".feedVerifier");
+        /*//////////////////////////////////////////////////////////////////////////
+                                        EOFeedRegistry
+        //////////////////////////////////////////////////////////////////////////*/
+        feedRegistryProxy = deployFeedRegistry(
+            configStructured.proxyAdminOwner, IEOFeedVerifier(feedVerifierProxy), configStructured.targetContractsOwner
+        );
+        EOJsonUtils.OUTPUT_CONFIG.serialize("feedRegistry", feedRegistryProxy);
 
-        feedRegistryProxy =
-            deployFeedRegistry(proxyAdminOwner, IEOFeedVerifier(feedVerifierProxy), targetContractsOwner);
-        addressString = Strings.toHexString(uint256(uint160(feedRegistryProxy)), 20);
-        EOJsonUtils.writeConfig(addressString, ".feedRegistry");
+        implementationAddress = Upgrades.getImplementationAddress(feedRegistryProxy);
+        string memory outputConfigJson =
+            EOJsonUtils.OUTPUT_CONFIG.serialize("feedRegistryImplementation", implementationAddress);
+        EOJsonUtils.writeConfig(outputConfigJson);
 
         vm.stopBroadcast();
     }

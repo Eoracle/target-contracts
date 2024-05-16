@@ -11,7 +11,7 @@
   optimizer_runs = 10_000
   out = "out"
   script = "script"
-  solc = "0.8.20"
+  solc = "0.8.25"
   src = "src"
   test = "test/unit"
   libs = ["lib"]
@@ -24,7 +24,12 @@
   build_info = true
   extra_output = ["storageLayout"]
   fuzz = { runs = 10_000 }
-  verbosity = 4
+
+[profile.snapshot]
+  test = "test/unit"
+  build_info = true
+  extra_output = ["storageLayout"]
+  fuzz = { runs = 10_000 }
   
 [fmt]
   bracket_spacing = true
@@ -39,7 +44,7 @@
 [etherscan]
   mainnet = { key = "${ETHERSCAN_API_KEY}" }
   sepolia = { key = "${ETHERSCAN_API_KEY}" }
-
+  
 [rpc_endpoints]
   mainnet = "${MAINNET_RPC_URL}"
   sepolia = "${SEPOLIA_RPC_URL}"

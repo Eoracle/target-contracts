@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.25;
 
 import { Test } from "forge-std/Test.sol";
 import { EOFeed } from "../../../src/adapters/EOFeed.sol";
@@ -35,7 +35,7 @@ contract EOFeedTest is Test {
             feed.getRoundData(1);
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE1));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, _lastTimestamp);
         assertEq(updatedAt, _lastTimestamp);
         assertEq(answeredInRound, 0);
     }
@@ -45,31 +45,29 @@ contract EOFeedTest is Test {
             feed.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE1));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, _lastTimestamp);
         assertEq(updatedAt, _lastTimestamp);
         assertEq(answeredInRound, 0);
     }
 
-    function test_GetRoundData2() public {
-        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
-        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.getRoundData(2);
-        assertEq(roundId, 0);
-        assertEq(answer, int256(RATE2));
-        assertEq(startedAt, 0);
-        assertEq(updatedAt, block.timestamp);
-        assertEq(answeredInRound, 0);
+    function test_LatestAnswer() public view {
+        assertEq(feed.latestAnswer(), int256(RATE1));
     }
 
-    function test_LatestRoundData2() public {
-        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
-        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.latestRoundData();
-        assertEq(roundId, 0);
-        assertEq(answer, int256(RATE2));
-        assertEq(startedAt, 0);
-        assertEq(updatedAt, block.timestamp);
-        assertEq(answeredInRound, 0);
+    function test_LatestTimestamp() public view {
+        assertEq(feed.latestTimestamp(), _lastTimestamp);
+    }
+
+    function test_LatestRound() public view {
+        assertEq(feed.latestRound(), 0);
+    }
+
+    function test_GetAnswer() public view {
+        assertEq(feed.getAnswer(1), int256(RATE1));
+    }
+
+    function test_GetTimestamp() public view {
+        assertEq(feed.getTimestamp(1), _lastTimestamp);
     }
 
     function test_Decimals() public view {
@@ -84,13 +82,37 @@ contract EOFeedTest is Test {
         assertEq(feed.version(), _version);
     }
 
+    function test_UpdatePrice() public {
+        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feed.getRoundData(2);
+        assertEq(roundId, 0);
+        assertEq(answer, int256(RATE2));
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, 0);
+
+        (roundId, answer, startedAt, updatedAt, answeredInRound) = feed.latestRoundData();
+        assertEq(roundId, 0);
+        assertEq(answer, int256(RATE2));
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, 0);
+
+        assertEq(feed.latestAnswer(), int256(RATE2));
+        assertEq(feed.latestTimestamp(), block.timestamp);
+        assertEq(feed.latestRound(), 0);
+        assertEq(feed.getAnswer(2), int256(RATE2));
+        assertEq(feed.getTimestamp(2), block.timestamp);
+    }
+
     function testFuzz_GetRoundData(uint256 rate, uint256 timestamp) public {
         _updatePriceFeed(_pairSymbol, rate, timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             feed.getRoundData(3);
         assertEq(roundId, 0);
         assertEq(answer, int256(rate));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, timestamp);
         assertEq(updatedAt, timestamp);
         assertEq(answeredInRound, 0);
     }
@@ -101,7 +123,7 @@ contract EOFeedTest is Test {
             feed.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(rate));
-        assertEq(startedAt, 0);
+        assertEq(startedAt, timestamp);
         assertEq(updatedAt, timestamp);
         assertEq(answeredInRound, 0);
     }
@@ -109,6 +131,17 @@ contract EOFeedTest is Test {
     function _updatePriceFeed(uint16 pairSymbol, uint256 rate, uint256 timestamp) internal {
         IEOFeedVerifier.LeafInput memory input;
         input.unhashedLeaf = abi.encode(pairSymbol, rate, timestamp);
-        feedRegistry.updatePriceFeed(input, "");
+        feedRegistry.updatePriceFeed(
+            input,
+            IEOFeedVerifier.Checkpoint({
+                blockNumber: 0,
+                epoch: 0,
+                eventRoot: bytes32(0),
+                blockHash: bytes32(0),
+                blockRound: 0
+            }),
+            [uint256(0), uint256(0)],
+            bytes("0")
+        );
     }
 }
