@@ -7,22 +7,15 @@ pragma solidity 0.8.25;
 error CallerIsNotWhitelisted(address caller);
 error MissingLeafInputs();
 error SymbolNotSupported(uint16 symbol);
+error BlockNumberAlreadyProcessed();
 
 /*//////////////////////////////////////////////////////////////////////////
                                 EOFeedVerifier
 //////////////////////////////////////////////////////////////////////////*/
 error FeedVerifierNotInitialized();
-error ExitAlreadyProcessed();
 error InvalidProof();
 error InvalidAddress();
-
-/*//////////////////////////////////////////////////////////////////////////
-                                TargetCheckpointManager
-//////////////////////////////////////////////////////////////////////////*/
-error ValidatorSetNotInitialized();
 error InvalidValidatorSetHash();
-error NoEventRootForBlockNumber();
-error NoEventRootForEpoch();
 error InvalidEventRoot();
 error VotingPowerIsZero();
 error AggVotingPowerIsZero();

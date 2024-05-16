@@ -5,18 +5,21 @@ pragma solidity 0.8.25;
 import { Script } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { EOFeedVerifier } from "src/EOFeedVerifier.sol";
-import { ICheckpointManager } from "src/interfaces/ICheckpointManager.sol";
+import { IBLS } from "src/interfaces/IBLS.sol";
+import { IBN256G2 } from "src/interfaces/IBN256G2.sol";
 
 abstract contract FeedVerifierDeployer is Script {
     function deployFeedVerifier(
         address proxyAdmin,
-        ICheckpointManager checkpointManager,
-        address owner
+        address owner,
+        IBLS bls,
+        IBN256G2 bn256G2,
+        uint256 childChainId
     )
         internal
         returns (address proxyAddr)
     {
-        bytes memory initData = abi.encodeCall(EOFeedVerifier.initialize, (checkpointManager, owner));
+        bytes memory initData = abi.encodeCall(EOFeedVerifier.initialize, (owner, bls, bn256G2, childChainId));
 
         proxyAddr = Upgrades.deployTransparentProxy("EOFeedVerifier.sol", proxyAdmin, initData);
     }
@@ -25,12 +28,14 @@ abstract contract FeedVerifierDeployer is Script {
 contract DeployFeedVerifier is FeedVerifierDeployer {
     function run(
         address proxyAdmin,
-        ICheckpointManager checkpointManager,
-        address owner
+        address owner,
+        IBLS bls,
+        IBN256G2 bn256G2,
+        uint256 childChainId
     )
         external
         returns (address proxyAddr)
     {
-        return deployFeedVerifier(proxyAdmin, checkpointManager, owner);
+        return deployFeedVerifier(proxyAdmin, owner, bls, bn256G2, childChainId);
     }
 }

@@ -3,7 +3,6 @@ pragma solidity 0.8.25;
 
 import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { ICheckpointManager } from "../../src/interfaces/ICheckpointManager.sol";
 
 import { IntegrationBaseTests } from "./IntegrationBase.t.sol";
 
@@ -14,7 +13,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[0], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
+        feedRegistry.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
     }
@@ -24,7 +23,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeed2() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[1], checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
+        feedRegistry.updatePriceFeed(input[1], checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[1]);
         assertEq(feed.value, rates[1]);
     }
@@ -50,7 +49,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
      */
     function test_updatePriceFeeds() public {
         vm.prank(publisher);
-        feedRegistry.updatePriceFeeds(input, checkpointMetas[0], checkpoints[0], signatures[0], bitmaps[0]);
+        feedRegistry.updatePriceFeeds(input, checkpoints[0], signatures[0], bitmaps[0]);
         IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
         assertEq(feed.value, rates[0]);
         feed = feedRegistry.getLatestPriceFeed(symbols[1]);
@@ -77,20 +76,11 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         bytes[] memory _bitmaps;
         uint256[2][] memory aggMessagePoints;
 
-        ICheckpointManager.Validator[] memory validatorSetTmp;
+        IEOFeedVerifier.Validator[] memory validatorSetTmp;
 
         (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, _bitmaps, unhashedLeaves, proves,) = abi.decode(
             out,
-            (
-                uint256,
-                ICheckpointManager.Validator[],
-                uint256[2][],
-                bytes32[],
-                bytes[],
-                bytes[],
-                bytes32[][],
-                bytes32[][]
-            )
+            (uint256, IEOFeedVerifier.Validator[], uint256[2][], bytes32[], bytes[], bytes[], bytes32[][], bytes32[][])
         );
 
         for (uint256 i = 0; i < validatorSetSize; i++) {
@@ -98,26 +88,21 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         }
 
         for (uint256 i = 0; i < _symbolData.length; i++) {
-            input.push(
-                IEOFeedVerifier.LeafInput({
-                    unhashedLeaf: unhashedLeaves[i],
-                    leafIndex: i,
-                    blockNumber: 1,
-                    proof: proves[i]
-                })
-            );
+            input.push(IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[i], leafIndex: i, proof: proves[i] }));
 
             // solhint-disable-next-line func-named-parameters
         }
         signatures.push(aggMessagePoints[0]);
-        checkpoints.push(ICheckpointManager.Checkpoint({ blockNumber: 1, epoch: 1, eventRoot: hashes[0] }));
-        checkpointMetas.push(
-            ICheckpointManager.CheckpointMetadata({
+        checkpoints.push(
+            IEOFeedVerifier.Checkpoint({
+                blockNumber: 1,
+                epoch: 1,
+                eventRoot: hashes[0],
                 blockHash: hashes[1],
-                blockRound: 0,
-                currentValidatorSetHash: hashes[2]
+                blockRound: 0
             })
         );
+
         bitmaps.push(_bitmaps[0]);
     }
 

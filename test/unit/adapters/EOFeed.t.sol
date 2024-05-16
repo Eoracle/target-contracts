@@ -7,7 +7,6 @@ import { MockEOFeedRegistry } from "../../mock/MockEOFeedRegistry.sol";
 import { IEOFeedRegistry } from "../../../src/interfaces/IEOFeedRegistry.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 // solhint-disable ordering
-import { ICheckpointManager } from "../../../src/interfaces/ICheckpointManager.sol";
 
 contract EOFeedTest is Test {
     EOFeed public feed;
@@ -112,12 +111,13 @@ contract EOFeedTest is Test {
         input.unhashedLeaf = abi.encode(pairSymbol, rate, timestamp);
         feedRegistry.updatePriceFeed(
             input,
-            ICheckpointManager.CheckpointMetadata({
-                currentValidatorSetHash: bytes32(0),
+            IEOFeedVerifier.Checkpoint({
+                blockNumber: 0,
+                epoch: 0,
+                eventRoot: bytes32(0),
                 blockHash: bytes32(0),
                 blockRound: 0
             }),
-            ICheckpointManager.Checkpoint({ blockNumber: 0, epoch: 0, eventRoot: bytes32(0) }),
             [uint256(0), uint256(0)],
             bytes("0")
         );
