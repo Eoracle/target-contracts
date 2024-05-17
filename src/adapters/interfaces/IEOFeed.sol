@@ -13,9 +13,9 @@ interface IEOFeed {
     function initialize(
         IEOFeedRegistry feedRegistry,
         uint16 pairSymbol,
-        uint8 decimals_,
-        string memory description_,
-        uint256 version_
+        uint8 rateDecimals,
+        string memory pairDescription,
+        uint256 feedVersion
     )
         external;
 

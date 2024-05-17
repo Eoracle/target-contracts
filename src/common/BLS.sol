@@ -742,7 +742,7 @@ contract BLS is IBLS {
     // prettier-ignore
     uint256 private constant N_G2_Y0 =
         13_392_588_948_715_843_804_641_432_497_768_002_650_278_120_570_034_223_513_918_757_245_338_268_106_653;
-
+    // slither-disable-start too-many-digits
     // sqrt(-3)
     // prettier-ignore
     uint256 private constant Z0 = 0x0000000000000000b3c4d79d41a91759a9e4c7e359b6b89eaec68e62effffffd;
@@ -752,6 +752,8 @@ contract BLS is IBLS {
 
     // prettier-ignore
     uint256 private constant T24 = 0x1000000000000000000000000000000000000000000000000;
+    // slither-disable-end too-many-digits
+
     // prettier-ignore
     uint256 private constant MASK24 = 0xffffffffffffffffffffffffffffffffffffffffffffffff;
 

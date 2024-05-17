@@ -68,6 +68,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
+    // slither-disable-next-line reentrancy-benign,reentrancy-events
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput memory input,
         IEOFeedVerifier.Checkpoint calldata checkpoint,
@@ -78,9 +79,9 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         onlyWhitelisted
     {
         if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
+        _lastProcessedBlockNumber = checkpoint.blockNumber;
         bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
-        _lastProcessedBlockNumber = checkpoint.blockNumber;
     }
 
     /**
@@ -90,6 +91,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
+    // slither-disable-next-line reentrancy-benign,reentrancy-events
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
         IEOFeedVerifier.Checkpoint calldata checkpoint,
@@ -101,12 +103,12 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     {
         if (inputs.length == 0) revert MissingLeafInputs();
         if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
+        _lastProcessedBlockNumber = checkpoint.blockNumber;
 
         bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
         }
-        _lastProcessedBlockNumber = checkpoint.blockNumber;
     }
 
     /**
@@ -115,8 +117,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @return Price feed struct
      */
     function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
-        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
-        return _priceFeeds[symbol];
+        return _getLatestPriceFeed(symbol);
     }
 
     /**
@@ -127,7 +128,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory) {
         PriceFeed[] memory retVal = new PriceFeed[](symbols.length);
         for (uint256 i = 0; i < symbols.length; i++) {
-            retVal[i] = this.getLatestPriceFeed(symbols[i]);
+            retVal[i] = _getLatestPriceFeed(symbols[i]);
         }
         return retVal;
     }
@@ -163,5 +164,10 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
         emit RateUpdated(symbol, rate, timestamp);
+    }
+
+    function _getLatestPriceFeed(uint16 symbol) internal view returns (PriceFeed memory) {
+        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
+        return _priceFeeds[symbol];
     }
 }

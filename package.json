@@ -50,6 +50,7 @@
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
     "prettier:write": "prettier --write \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
+    "slither": "slither .",
     "test": "forge test --force --ffi",
     "test:coverage": "forge coverage --force --ffi",
     "test:coverage:report": "forge coverage --force --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",

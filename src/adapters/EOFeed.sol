@@ -22,25 +22,25 @@ contract EOFeed is IEOFeed, Initializable {
      * @notice Initialize the contract
      * @param feedRegistry The feed registry address
      * @param pairSymbol Pair Symbol
-     * @param decimals_ The decimals of the reate
-     * @param description_ The description of symbols pair
-     * @param version_ The version of feed
+     * @param rateDecimals The decimals of the rate
+     * @param pairDescription The description of symbols pair
+     * @param feedVersion The version of feed
      */
     function initialize(
         IEOFeedRegistry feedRegistry,
         uint16 pairSymbol,
-        uint8 decimals_,
-        string memory description_,
-        uint256 version_
+        uint8 rateDecimals,
+        string memory pairDescription,
+        uint256 feedVersion
     )
         public
         initializer
     {
         _feedRegistry = feedRegistry;
         _pairSymbol = pairSymbol;
-        _decimals = decimals_;
-        _description = description_;
-        _version = version_;
+        _decimals = rateDecimals;
+        _description = pairDescription;
+        _version = feedVersion;
     }
 
     /**
