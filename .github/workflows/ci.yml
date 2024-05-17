@@ -124,15 +124,9 @@ jobs:
         uses: "crytic/slither-action@v0.3.0"
         id: "slither"
         with:
-          fail-on: "none"
+          fail-on: "low"
           sarif: "results.sarif"
-
-      - name: "Upload SARIF file to GitHub code scanning"
-        uses: "github/codeql-action/upload-sarif@v2"
-        with:
-          sarif_file: ${{ steps.slither.outputs.sarif }}
 
       - name: "Add summary"
         run: |
           echo "## Slither result" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Uploaded to GitHub code scanning" >> $GITHUB_STEP_SUMMARY
