@@ -28,6 +28,9 @@ interface IEOFeedVerifier {
     }
 
     event LeafVerified(uint256 indexed id, bytes returnData);
+    event ValidatorSetUpdated(
+        uint256 currentValidatorSetLength, bytes32 currentValidatorSetHash, uint256 totalVotingPower
+    );
 
     /**
      * @notice Verifies leaf

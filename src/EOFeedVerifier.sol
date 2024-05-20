@@ -114,6 +114,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             currentValidatorSet[i] = newValidatorSet[i];
         }
         totalVotingPower = totalPower;
+        emit ValidatorSetUpdated(currentValidatorSetLength, currentValidatorSetHash, totalVotingPower);
     }
 
     /**
@@ -237,7 +238,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         return uint8(bitmap[byteNumber]) & (1 << bitNumber) > 0;
     }
 
-    // slither-disable-next-line unused-state,naming-convention
+    // slither-disable-start unused-state
     // solhint-disable-next-line ordering
     uint256[50] private __gap;
+    // slither-disable-end unused-state
 }

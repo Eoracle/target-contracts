@@ -15,7 +15,8 @@
     "prettier": "^3.0.0",
     "solhint": "^3.6.2",
     "ts-node": "^10.7.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "@openzeppelin/upgrades-core": "^1.32.3"
   },
   "keywords": [
     "blockchain",
@@ -50,6 +51,7 @@
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
     "prettier:write": "prettier --write \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
+    "slither": "slither .",
     "test": "forge test --force ",
     "test:integration": "FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge test --match-contract Integration --force",
     "test:coverage": "FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --force",

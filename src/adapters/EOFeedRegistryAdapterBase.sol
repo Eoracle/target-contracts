@@ -49,17 +49,21 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @param base The base asset address
      * @param quote The quote asset address
      * @param pairSymbol The pair symbol
-     * @param decimals_ The decimals
-     * @param version_ The version
+     * @param pairDescription The description of symbols pair
+     * @param rateDecimals The decimals
+     * @param feedVersion The version of the feed
      * @return IEOFeed The feed
      */
+    // This function can reenter through the external call to the deployed EOFeed, but the external contract is being
+    // deployed by this contract, so it is considered safe
+    // slither-disable-next-line reentrancy-no-eth,reentrancy-benign,reentrancy-events
     function deployEOFeed(
         address base,
         address quote,
         uint16 pairSymbol,
-        string calldata description_,
-        uint8 decimals_,
-        uint256 version_
+        string calldata pairDescription,
+        uint8 rateDecimals,
+        uint256 feedVersion
     )
         external
         onlyOwner
@@ -77,7 +81,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
             revert BaseQuotePairExists();
         }
         address feed = _deployEOFeed();
-        IEOFeed(feed).initialize(_feedRegistry, pairSymbol, decimals_, description_, version_);
+        IEOFeed(feed).initialize(_feedRegistry, pairSymbol, rateDecimals, pairDescription, feedVersion);
 
         _feedEnabled[feed] = true;
 
