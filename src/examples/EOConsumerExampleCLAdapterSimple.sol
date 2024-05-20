@@ -16,14 +16,14 @@ contract EoracleConsumerExampleFeed {
      * Network: Holesky
      * FeedRegistry: TODO - Add address
      */
-    function getPrice() external view returns (int256 answer) {
-        (, answer,,,) = _feed.latestRoundData();
-    }
-
     function usePrice() external {
         int256 value = this.getPrice();
         // Do something
         // .............
         emit FeedUsage(uint256(value), block.timestamp);
+    }
+
+    function getPrice() external view returns (int256 answer) {
+        (, answer,,,) = _feed.latestRoundData();
     }
 }
