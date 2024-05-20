@@ -3,14 +3,45 @@ pragma solidity 0.8.25;
 
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { IBLS } from "../../src/interfaces/IBLS.sol";
+import { IBN256G2 } from "../../src/interfaces/IBN256G2.sol";
 import { UninitializedFeedVerifier, InitializedFeedVerifier } from "./EOFeedVerifierBase.t.sol";
-import { InvalidProof, InvalidAddress, VotingPowerIsZero } from "../../src/interfaces/Errors.sol";
+import {
+    InvalidProof,
+    InvalidAddress,
+    VotingPowerIsZero,
+    FeedVerifierNotInitialized,
+    InvalidEventRoot,
+    AggVotingPowerIsZero,
+    InsufficientVotingPower
+} from "../../src/interfaces/Errors.sol";
 
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
-    function test_RevertWhen_Initialize_InvalidAddress() public {
+    function test_RevertWhen_Initialize_BlsInvalidAddress() public {
         IBLS blsNull;
         vm.expectRevert(InvalidAddress.selector);
         feedVerifier.initialize(address(this), blsNull, bn256G2, childChainId);
+    }
+
+    function test_RevertWhen_Initialize_Bn256G2InvalidAddress() public {
+        IBN256G2 bn256G2Null;
+        vm.expectRevert(InvalidAddress.selector);
+        feedVerifier.initialize(address(this), bls, bn256G2Null, childChainId);
+    }
+
+    function test_RevertWhen_NotInitialized() public {
+        vm.expectRevert(FeedVerifierNotInitialized.selector);
+        feedVerifier.verify(
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] }),
+            IEOFeedVerifier.Checkpoint({
+                epoch: 1,
+                blockNumber: 1,
+                eventRoot: hashes[0],
+                blockHash: hashes[1],
+                blockRound: 0
+            }),
+            aggMessagePoints[0],
+            bitmaps[0]
+        );
     }
 
     function test_Initialize() public {
@@ -45,6 +76,71 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         emit LeafVerified(id, data);
         bytes memory leafData = feedVerifier.verify(input, checkpoint, signature, bitmap);
         assertEq(leafData, data);
+    }
+
+    function test_RevertWhen_InvalidEventRoot_Verify() public {
+        IEOFeedVerifier.LeafInput memory input =
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+        // set invalid event root
+        bytes32 eventRoot = bytes32(0);
+        uint256 blockNumber = 1;
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: blockNumber,
+            eventRoot: eventRoot,
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+
+        vm.expectRevert(InvalidEventRoot.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+    }
+
+    function test_RevertWhen_AggVotingPowerIsZero_Verify() public {
+        IEOFeedVerifier.LeafInput memory input =
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+
+        bytes32 eventRoot = hashes[0];
+        uint256 blockNumber = 1;
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: blockNumber,
+            eventRoot: eventRoot,
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        uint256[2] memory signature = aggMessagePoints[0];
+        // empty bitmap creates zero voting power
+        bytes memory bitmap;
+
+        vm.expectRevert(AggVotingPowerIsZero.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+    }
+
+    function test_RevertWhen_InsufficientVotingPower_Verify() public {
+        IEOFeedVerifier.LeafInput memory input =
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+
+        bytes32 eventRoot = hashes[0];
+        uint256 blockNumber = 1;
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: blockNumber,
+            eventRoot: eventRoot,
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        uint256[2] memory signature = aggMessagePoints[0];
+        // bitmap has one bit set
+        bytes memory bitmap = abi.encodePacked(uint8(1));
+
+        vm.expectRevert(InsufficientVotingPower.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
     }
 
     function test_RevertIf_DataIsAltered_Verify() public {
