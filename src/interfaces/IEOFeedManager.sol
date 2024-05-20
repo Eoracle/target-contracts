@@ -33,5 +33,5 @@ interface IEOFeedManager {
     function getLatestPriceFeeds(uint16[] calldata feedIds) external view returns (PriceFeed[] memory);
 
     function isWhitelistedPublisher(address publisher) external view returns (bool);
-    function isSupportedFeed(uint16 eedId) external view returns (bool);
+    function isSupportedFeed(uint16 feedId) external view returns (bool);
 }
