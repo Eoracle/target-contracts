@@ -56,49 +56,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     /**
      * @inheritdoc IEOFeedVerifier
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
-     */
-    function verify(
-        LeafInput calldata input,
-        Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
-    )
-        external
-        onlyInitialized
-        returns (bytes memory)
-    {
-        _verifySignature(checkpoint, signature, bitmap);
-        bytes memory data = _verifyLeaf(input, checkpoint.eventRoot);
-        return data;
-    }
-
-    /**
-     * @notice Verifies multiple leaves
-     * @param inputs Batch exit inputs for multiple event leaves
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
-     * @return Array of the leaf data fields of all submitted leaves
-     */
-    function batchVerify(
-        LeafInput[] calldata inputs,
-        Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
-    )
-        external
-        onlyInitialized
-        returns (bytes[] memory)
-    {
-        _verifySignature(checkpoint, signature, bitmap);
-        return _verifyLeaves(inputs, checkpoint.eventRoot);
-    }
-
-    /**
-     * @inheritdoc IEOFeedVerifier
      * @notice Function to set a new validator set for the CheckpointManager
      * @param newValidatorSet The new validator set to store
      */
@@ -123,11 +80,11 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param eventRoot the root this event should belong to
      * @return Array of the leaf data fields of all submitted leaves
      */
-    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal returns (bytes[] memory) {
+    function verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) public returns (bytes[] memory) {
         uint256 length = inputs.length;
         bytes[] memory returnData = new bytes[](length);
         for (uint256 i = 0; i < length; i++) {
-            returnData[i] = _verifyLeaf(inputs[i], eventRoot);
+            returnData[i] = verifyLeaf(inputs[i], eventRoot);
         }
         return returnData;
     }
@@ -138,7 +95,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param eventRoot event root the leaf should belong to
      * @return The leaf data field
      */
-    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory) {
+    function verifyLeaf(LeafInput calldata input, bytes32 eventRoot) public returns (bytes memory) {
         bytes32 leaf = keccak256(input.unhashedLeaf);
         if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
             revert InvalidProof();
@@ -158,12 +115,12 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
-    function _verifySignature(
+    function verifySignature(
         Checkpoint calldata checkpoint,
         uint256[2] calldata signature,
         bytes calldata bitmap
     )
-        internal
+        public
         view
     {
         if (checkpoint.eventRoot == bytes32(0)) revert InvalidEventRoot();

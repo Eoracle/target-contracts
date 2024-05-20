@@ -19,6 +19,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
     uint256 internal _lastProcessedBlockNumber;
+    bytes32 internal _lastProcessedEventRoot;
 
     modifier onlyWhitelisted() {
         if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
@@ -80,8 +81,14 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         onlyWhitelisted
     {
         if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
-        _lastProcessedBlockNumber = checkpoint.blockNumber;
-        bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
+        // if the block number has changed, we need to verify the whole checkpoint
+        if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
+            _lastProcessedBlockNumber = checkpoint.blockNumber;
+            _lastProcessedEventRoot = checkpoint.eventRoot;
+            _feedVerifier.verifySignature(checkpoint, signature, bitmap);
+        }
+        bytes memory data = _feedVerifier.verifyLeaf(input, _lastProcessedEventRoot);
+
         _processVerifiedRate(data);
     }
 
@@ -105,9 +112,14 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     {
         if (inputs.length == 0) revert MissingLeafInputs();
         if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
-        _lastProcessedBlockNumber = checkpoint.blockNumber;
+        // if the block number has changed, we need to verify the whole checkpoint
+        if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
+            _lastProcessedBlockNumber = checkpoint.blockNumber;
+            _lastProcessedEventRoot = checkpoint.eventRoot;
+            _feedVerifier.verifySignature(checkpoint, signature, bitmap);
+        }
+        bytes[] memory data = _feedVerifier.verifyLeaves(inputs, _lastProcessedEventRoot);
 
-        bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
         }

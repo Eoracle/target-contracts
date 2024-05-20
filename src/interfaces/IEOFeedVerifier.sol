@@ -33,40 +33,38 @@ interface IEOFeedVerifier {
     );
 
     /**
-     * @notice Verifies leaf
-     * @param input Exit leaf input
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
-     */
-    function verify(
-        LeafInput memory input,
-        Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
-    )
-        external
-        returns (bytes memory leafData);
-
-    /**
-     * @notice Verifies multiple leaves
-     * @param inputs Exit leaves inputs
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
-     */
-    function batchVerify(
-        LeafInput[] memory inputs,
-        Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
-    )
-        external
-        returns (bytes[] memory);
-
-    /**
      * @notice Function to set a new validator set for the CheckpointManager
      * @param newValidatorSet The new validator set to store
      */
     function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
+
+    /**
+     * @notice Verify a batch of exits leaves
+     * @param inputs Batch exit inputs for multiple event leaves
+     * @param eventRoot the root this event should belong to
+     * @return Array of the leaf data fields of all submitted leaves
+     */
+    function verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) external returns (bytes[] memory);
+
+    /**
+     * @notice Verify for one event
+     * @param input Exit leaf input
+     * @param eventRoot event root the leaf should belong to
+     * @return The leaf data field
+     */
+    function verifyLeaf(LeafInput calldata input, bytes32 eventRoot) external returns (bytes memory);
+
+    /**
+     * @notice Verify the signature of the checkpoint
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
+     */
+    function verifySignature(
+        Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
+    )
+        external
+        view;
 }

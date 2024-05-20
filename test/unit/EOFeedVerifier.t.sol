@@ -23,69 +23,41 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
 }
 
 contract EOFeedVerifierTest is InitializedFeedVerifier {
-    function test_verify() public {
+    function test_verifyLeaf() public {
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
 
         bytes32 eventRoot = hashes[0];
-        uint256 blockNumber = 1;
-
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            epoch: 1,
-            blockNumber: blockNumber,
-            eventRoot: eventRoot,
-            blockHash: hashes[1],
-            blockRound: 0
-        });
-        uint256[2] memory signature = aggMessagePoints[0];
-        bytes memory bitmap = bitmaps[0];
 
         (uint256 id,,, bytes memory data) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
         vm.expectEmit(true, true, true, true);
         emit LeafVerified(id, data);
-        bytes memory leafData = feedVerifier.verify(input, checkpoint, signature, bitmap);
+        bytes memory leafData = feedVerifier.verifyLeaf(input, eventRoot);
         assertEq(leafData, data);
     }
 
-    function test_RevertIf_DataIsAltered_Verify() public {
+    function test_RevertIf_DataIsAltered_VerifyLeaf() public {
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
 
         //alter one byte in the leaf unhashed data
         input.unhashedLeaf[0] = input.unhashedLeaf[0] == bytes1(0x10) ? bytes1(0x20) : bytes1(0x10);
-        uint256[2] memory signature = aggMessagePoints[0];
-        bytes memory bitmap = bitmaps[0];
+        bytes32 eventRoot = hashes[0];
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            epoch: 1,
-            blockNumber: 1,
-            eventRoot: hashes[0],
-            blockHash: hashes[1],
-            blockRound: 0
-        });
         vm.expectRevert(InvalidProof.selector);
-        feedVerifier.verify(input, checkpoint, signature, bitmap);
+        feedVerifier.verifyLeaf(input, eventRoot);
     }
 
     function test_batchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
+        bytes32 eventRoot = hashes[0];
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            epoch: 1,
-            blockNumber: 1,
-            eventRoot: hashes[0],
-            blockHash: hashes[1],
-            blockRound: 0
-        });
         inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
         (uint256 id,,, bytes memory data) = abi.decode(inputs[0].unhashedLeaf, (uint256, address, address, bytes));
 
-        uint256[2] memory signature = aggMessagePoints[0];
-        // solhint-disable-next-line func-named-parameters
-
         vm.expectEmit(true, true, true, true);
         emit LeafVerified(id, data);
-        feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
+        feedVerifier.verifyLeaves(inputs, eventRoot);
     }
 
     function test_SetNewValidatorSet() public {
@@ -107,5 +79,22 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         validatorSet[0].votingPower = 0;
         vm.expectRevert(VotingPowerIsZero.selector);
         feedVerifier.setNewValidatorSet(validatorSet);
+    }
+
+    function test_verifySignature() public view {
+        bytes32 eventRoot = hashes[0];
+        uint256 blockNumber = 1;
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: blockNumber,
+            eventRoot: eventRoot,
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+
+        feedVerifier.verifySignature(checkpoint, signature, bitmap);
     }
 }
