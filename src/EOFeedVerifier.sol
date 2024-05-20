@@ -5,7 +5,6 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { Merkle } from "./common/Merkle.sol";
 import {
-    FeedVerifierNotInitialized,
     InvalidProof,
     InvalidAddress,
     InvalidEventRoot,
@@ -29,11 +28,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     uint256 public totalVotingPower;
     mapping(uint256 => Validator) public currentValidatorSet;
     bytes32 public currentValidatorSetHash;
-
-    modifier onlyInitialized() {
-        if (_getInitializedVersion() == 0) revert FeedVerifierNotInitialized();
-        _;
-    }
 
     /**
      * @param owner Owner of the contract
@@ -75,21 +69,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Verify a batch of exits leaves
-     * @param inputs Batch exit inputs for multiple event leaves
-     * @param eventRoot the root this event should belong to
-     * @return Array of the leaf data fields of all submitted leaves
-     */
-    function verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) public returns (bytes[] memory) {
-        uint256 length = inputs.length;
-        bytes[] memory returnData = new bytes[](length);
-        for (uint256 i = 0; i < length; i++) {
-            returnData[i] = verifyLeaf(inputs[i], eventRoot);
-        }
-        return returnData;
-    }
-
-    /**
      * @notice Verify for one event
      * @param input Exit leaf input
      * @param eventRoot event root the leaf should belong to
@@ -107,6 +86,21 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         emit LeafVerified(id, data);
 
         return data;
+    }
+
+    /**
+     * @notice Verify a batch of exits leaves
+     * @param inputs Batch exit inputs for multiple event leaves
+     * @param eventRoot the root this event should belong to
+     * @return Array of the leaf data fields of all submitted leaves
+     */
+    function verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) public returns (bytes[] memory) {
+        uint256 length = inputs.length;
+        bytes[] memory returnData = new bytes[](length);
+        for (uint256 i = 0; i < length; i++) {
+            returnData[i] = verifyLeaf(inputs[i], eventRoot);
+        }
+        return returnData;
     }
 
     /**

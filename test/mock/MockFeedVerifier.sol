@@ -13,7 +13,7 @@ contract MockFeedVerifier is IEOFeedVerifier {
         }
     }
 
-    function verifySignature(Checkpoint calldata, uint256[2] calldata, bytes calldata) public view {
+    function verifySignature(Checkpoint calldata, uint256[2] calldata, bytes calldata) public pure {
         return;
     }
 
