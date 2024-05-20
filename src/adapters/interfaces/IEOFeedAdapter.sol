@@ -13,9 +13,9 @@ interface IEOFeedAdapter {
     function initialize(
         IEOFeedManager feedManager,
         uint16 feedId,
-        uint8 decimals,
-        string memory description,
-        uint256 version
+        uint8 feedDecimals,
+        string memory feedDescription,
+        uint256 feedVersion
     )
         external;
 
@@ -27,7 +27,7 @@ interface IEOFeedAdapter {
     // getRoundData and latestRoundData should both raise "No data present"
     // if they do not have data to report, instead of returning unset values
     // which could be misinterpreted as actual reported values.
-    function getRoundData(uint80 _roundId)
+    function getRoundData(uint80 roundId_)
         external
         view
         returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
