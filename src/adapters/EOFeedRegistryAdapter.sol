@@ -6,7 +6,7 @@ import { EOFeedRegistryAdapterBase } from "./EOFeedRegistryAdapterBase.sol";
 
 /**
  * @title EOFeedRegistryAdapterClone
- * @notice The adapter of EOFeedManager contract for CL FeedManager, uses the beacon
+ * @notice The adapter of EOFeedManager contract for CL FeedRegistry, uses the beacon
  * @dev This contract inherits EOFeedFactoryBeacon, uses the beacon proxy pattern for deploying EOFeedAdapter instances
  */
 // solhint-disable no-empty-blocks
