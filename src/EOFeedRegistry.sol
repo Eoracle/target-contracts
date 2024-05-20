@@ -80,15 +80,9 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         external
         onlyWhitelisted
     {
-        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
-        // if the block number has changed, we need to verify the whole checkpoint
-        if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
-            _lastProcessedBlockNumber = checkpoint.blockNumber;
-            _lastProcessedEventRoot = checkpoint.eventRoot;
-            _feedVerifier.verifySignature(checkpoint, signature, bitmap);
-        }
-        bytes memory data = _feedVerifier.verifyLeaf(input, _lastProcessedEventRoot);
+        _processCheckpoint(checkpoint, signature, bitmap);
 
+        bytes memory data = _feedVerifier.verifyLeaf(input, _lastProcessedEventRoot);
         _processVerifiedRate(data);
     }
 
@@ -111,15 +105,9 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         onlyWhitelisted
     {
         if (inputs.length == 0) revert MissingLeafInputs();
-        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
-        // if the block number has changed, we need to verify the whole checkpoint
-        if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
-            _lastProcessedBlockNumber = checkpoint.blockNumber;
-            _lastProcessedEventRoot = checkpoint.eventRoot;
-            _feedVerifier.verifySignature(checkpoint, signature, bitmap);
-        }
-        bytes[] memory data = _feedVerifier.verifyLeaves(inputs, _lastProcessedEventRoot);
+        _processCheckpoint(checkpoint, signature, bitmap);
 
+        bytes[] memory data = _feedVerifier.verifyLeaves(inputs, _lastProcessedEventRoot);
         for (uint256 i = 0; i < data.length; i++) {
             _processVerifiedRate(data[i]);
         }
@@ -178,6 +166,23 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
         if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
         _priceFeeds[symbol] = PriceFeed(rate, timestamp);
         emit RateUpdated(symbol, rate, timestamp);
+    }
+
+    function _processCheckpoint(
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
+    )
+        internal
+    {
+        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
+        // if the block number has changed, we need to verify the whole checkpoint
+        // Otherwise, we only need to verify the leaves
+        if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
+            _lastProcessedBlockNumber = checkpoint.blockNumber;
+            _lastProcessedEventRoot = checkpoint.eventRoot;
+            _feedVerifier.verifySignature(checkpoint, signature, bitmap);
+        }
     }
 
     function _getLatestPriceFeed(uint16 symbol) internal view returns (PriceFeed memory) {

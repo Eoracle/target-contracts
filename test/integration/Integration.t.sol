@@ -5,6 +5,7 @@ import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { IntegrationBaseTests } from "./IntegrationBase.t.sol";
 import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
+import { InvalidProof } from "../../src/interfaces/Errors.sol";
 
 // solhint-disable max-states-count
 contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests {
@@ -41,6 +42,40 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
             assertEq(feed.value, rates[i]);
             assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[i]).latestAnswer(), int256(rates[i]));
         }
+    }
+
+    /**
+     * @notice update symbol in the same block
+     */
+    function test_updatePriceFeed_SameBlock() public {
+        vm.startPrank(publisher);
+        // it should verify signature during the first call
+        vm.expectCall(
+            address(feedVerifier),
+            abi.encodeWithSelector(feedVerifier.verifySignature.selector, checkpoints[0], signatures[0], bitmaps[0])
+        );
+        feedRegistry.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
+        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
+        assertEq(feed.value, rates[0]);
+
+        // it should not verify signature during the second call in the same block
+        uint256[2] memory emptySignature;
+        feedRegistry.updatePriceFeed(input[1], checkpoints[0], emptySignature, bitmaps[0]);
+        feed = feedRegistry.getLatestPriceFeed(symbols[1]);
+        assertEq(feed.value, rates[1]);
+        vm.stopPrank();
+    }
+
+    /**
+     * @notice should not allow to update feed with data not related to merkle root
+     */
+    function test_RevertWhen_updatePriceFeed_UnsignedData(bytes memory data) public {
+        vm.assume(keccak256(input[0].unhashedLeaf) != keccak256(data));
+        input[0].unhashedLeaf = data;
+        vm.startPrank(publisher);
+        vm.expectRevert(InvalidProof.selector);
+        feedRegistry.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
+        vm.stopPrank();
     }
 
     /**
