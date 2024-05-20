@@ -68,6 +68,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
+    // Reentrancy is not an issue because _feedVerifier is set by the owner
     // slither-disable-next-line reentrancy-benign,reentrancy-events
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput memory input,
@@ -91,6 +92,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */
+    // Reentrancy is not an issue because _feedVerifier is set by the owner
     // slither-disable-next-line reentrancy-benign,reentrancy-events
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,

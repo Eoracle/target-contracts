@@ -114,11 +114,13 @@ jobs:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
 
-      - name: "Install Bun"
-        uses: "oven-sh/setup-bun@v1"
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v2
+        with:
+          node-version: "21.x"
 
       - name: "Install the Node.js dependencies"
-        run: "bun install --frozen-lockfile"
+        run: "npm install"
 
       - name: "Run Slither analysis"
         uses: "crytic/slither-action@v0.3.0"
