@@ -16,6 +16,7 @@ library EOJsonUtils {
         SymbolData[] supportedSymbolsData;
         uint256 targetChainId;
         address targetContractsOwner;
+        bool usePrecompiledModexp;
     }
 
     struct SymbolData {

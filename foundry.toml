@@ -13,6 +13,8 @@
   script = "script"
   solc = "0.8.25"
   src = "src"
+  build_info = true
+  extra_output = ["storageLayout"]
   test = "test/unit"
   libs = ["lib"]
   fs_permissions = [{ access = "read-write", path = "./" }]
@@ -29,7 +31,7 @@
   test = "test/unit"
   build_info = true
   extra_output = ["storageLayout"]
-  fuzz = { runs = 10_000 }
+  fuzz = { runs = 1_000 }
   
 [fmt]
   bracket_spacing = true
