@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEOFeedRegistry } from "../../interfaces/IEOFeedRegistry.sol";
+import { IEOFeedManager } from "../../interfaces/IEOFeedManager.sol";
 
 /**
- * @title IEOFeed
- * @notice Interface for the EOFeed contract.
+ * @title IEOFeedAdapter
+ * @notice Interface for the EOFeedAdapter contract.
  * @dev compatible of AggregatorV3Interface from CL.
  */
-interface IEOFeed {
+interface IEOFeedAdapter {
     // slither-disable-next-line missing-inheritance
     function initialize(
-        IEOFeedRegistry feedRegistry,
-        uint16 pairSymbol,
-        uint8 rateDecimals,
-        string memory pairDescription,
-        uint256 feedVersion
+        IEOFeedManager feedManager,
+        uint16 feedId,
+        uint8 decimals,
+        string memory description,
+        uint256 version
     )
         external;
 
-    function getPairSymbol() external view returns (uint16);
+    function getFeedId() external view returns (uint16);
     function decimals() external view returns (uint8);
     function description() external view returns (string memory);
     function version() external view returns (uint256);

@@ -1,45 +1,45 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEOFeedRegistry } from "../interfaces/IEOFeedRegistry.sol";
-import { IEOFeed } from "./interfaces/IEOFeed.sol";
+import { IEOFeedManager } from "../interfaces/IEOFeedManager.sol";
+import { IEOFeedAdapter } from "./interfaces/IEOFeedAdapter.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
- * @title EOFeed
- * @notice The contract for the symbol pair price feed
+ * @title EOFeedAdapter
+ * @notice Price feed adapter contract
  */
-contract EOFeed is IEOFeed, Initializable {
-    IEOFeedRegistry private _feedRegistry;
+contract EOFeedAdapter is IEOFeedAdapter, Initializable {
+    IEOFeedManager private _feedManager;
 
     uint256 private _version;
     string private _description;
     // next 2 variables will be packed in 1 slot
-    uint16 private _pairSymbol; // should coincide with the symbols pair identifier in the feed registry
+    uint16 private _feedId;
     uint8 private _decimals;
 
     /**
      * @notice Initialize the contract
-     * @param feedRegistry The feed registry address
-     * @param pairSymbol Pair Symbol
-     * @param rateDecimals The decimals of the rate
-     * @param pairDescription The description of symbols pair
+     * @param feedManager The feed manager address
+     * @param feedId Feed id
+     * @param feedDecimals The decimals of the rate
+     * @param feedDescription The description of feed
      * @param feedVersion The version of feed
      */
     function initialize(
-        IEOFeedRegistry feedRegistry,
-        uint16 pairSymbol,
-        uint8 rateDecimals,
-        string memory pairDescription,
+        IEOFeedManager feedManager,
+        uint16 feedId,
+        uint8 feedDecimals,
+        string memory feedDescription,
         uint256 feedVersion
     )
         public
         initializer
     {
-        _feedRegistry = feedRegistry;
-        _pairSymbol = pairSymbol;
-        _decimals = rateDecimals;
-        _description = pairDescription;
+        _feedManager = feedManager;
+        _feedId = feedId;
+        _decimals = feedDecimals;
+        _description = feedDescription;
         _version = feedVersion;
     }
 
@@ -53,7 +53,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return answeredInRound The round id in which the answer was computed
      */
     function getRoundData(uint80) external view returns (uint80, int256, uint256, uint256, uint80) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
     }
 
@@ -66,7 +66,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return answeredInRound The round id in which the answer was computed
      */
     function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
     }
 
@@ -75,7 +75,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return int256 The price
      */
     function latestAnswer() external view returns (int256) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return int256(priceData.value);
     }
 
@@ -84,7 +84,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return uint256 The timestamp
      */
     function latestTimestamp() external view returns (uint256) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return priceData.timestamp;
     }
 
@@ -94,7 +94,7 @@ contract EOFeed is IEOFeed, Initializable {
      * @return int256 The price
      */
     function getAnswer(uint256) external view returns (int256) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return int256(priceData.value);
     }
 
@@ -104,16 +104,16 @@ contract EOFeed is IEOFeed, Initializable {
      * @return uint256 The timestamp
      */
     function getTimestamp(uint256) external view returns (uint256) {
-        IEOFeedRegistry.PriceFeed memory priceData = _feedRegistry.getLatestPriceFeed(_pairSymbol);
+        IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return priceData.timestamp;
     }
 
     /**
-     * @notice Get the pair symbol
-     * @return string The pair symbol
+     * @notice Get the id of the feed
+     * @return uint16 The feed id
      */
-    function getPairSymbol() external view returns (uint16) {
-        return _pairSymbol;
+    function getFeedId() external view returns (uint16) {
+        return _feedId;
     }
 
     /**
@@ -125,7 +125,7 @@ contract EOFeed is IEOFeed, Initializable {
     }
 
     /**
-     * @notice Get the description of the feed symbol pairs
+     * @notice Get the description of the feed
      * @return string The description
      */
     function description() external view returns (string memory) {

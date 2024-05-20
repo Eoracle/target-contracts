@@ -7,18 +7,18 @@ import { stdJson } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 
-contract UpgradeFeedRegistry is Script {
+contract UpgradeFeedManager is Script {
     using stdJson for string;
 
     function run() external {
         string memory config = EOJsonUtils.initOutputConfig();
-        address proxyAddress = config.readAddress(".feedRegistry");
+        address proxyAddress = config.readAddress(".feedManager");
         vm.startBroadcast();
-        Upgrades.upgradeProxy(proxyAddress, "EOFeedRegistryV2.sol", "");
+        Upgrades.upgradeProxy(proxyAddress, "EOFeedManagerV2.sol", "");
         vm.stopBroadcast();
         address implementationAddress = Upgrades.getImplementationAddress(proxyAddress);
         string memory outputConfigJson =
-            EOJsonUtils.OUTPUT_CONFIG.serialize("feedRegistryImplementation", implementationAddress);
+            EOJsonUtils.OUTPUT_CONFIG.serialize("feedManagerImplementation", implementationAddress);
         EOJsonUtils.writeConfig(outputConfigJson);
     }
 }

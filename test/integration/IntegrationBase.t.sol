@@ -5,7 +5,7 @@ import { Test } from "forge-std/Test.sol";
 import { stdJson } from "forge-std/Script.sol";
 import { Utils } from "../utils/Utils.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
+import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { EOFeedRegistryAdapter } from "../../src/adapters/EOFeedRegistryAdapter.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { DeployNewTargetContractSet } from "../../script/deployment/DeployNewTargetContractSet.s.sol";
@@ -19,29 +19,19 @@ import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
 abstract contract IntegrationBaseTests is Test, Utils {
     using stdJson for string;
 
-    EOFeedRegistry public feedRegistry;
-    EOFeedRegistryAdapter public feedRegistryAdapter;
-    EOFeedVerifier public feedVerifier;
+    EOFeedManager public _feedManager;
+    EOFeedRegistryAdapter public _feedRegistryAdapter;
+    EOFeedVerifier public _feedVerifier;
 
-    DeployNewTargetContractSet public mainDeployer;
-    DeployFeedRegistryAdapter public adapterDeployer;
-    SetupCoreContracts public coreContractsSetup;
-    DeployFeeds public feedsDeployer;
+    address public _publisher;
+    address public _owner;
 
-    address public publisher;
-    address public owner;
-    address public adapterProxy;
-
-    uint16[] public symbols;
-    uint256[] public rates;
-    uint256[] public timestamps;
-    uint256 public blockRound = 0;
-    uint256 public epochNumber = 1;
+    uint16[] public _feedIds;
+    uint256[] public _rates;
+    uint256[] public _timestamps;
     // TODO: pass to ts as argument
-    uint256 public blockNumber = 1;
-    uint256 public childChainId;
     uint256 public validatorSetSize;
-    bytes[] public symbolData;
+    bytes[] public feedsData;
     IEOFeedVerifier.Validator[] public validatorSet;
 
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
@@ -56,58 +46,57 @@ abstract contract IntegrationBaseTests is Test, Utils {
     function setUp() public {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
-        publisher = configStructured.publishers[0];
-        owner = configStructured.targetContractsOwner;
-        childChainId = configStructured.childChainId;
+        _publisher = configStructured.publishers[0];
+        _owner = configStructured.targetContractsOwner;
 
-        mainDeployer = new DeployNewTargetContractSet();
-        adapterDeployer = new DeployFeedRegistryAdapter();
-        coreContractsSetup = new SetupCoreContracts();
-        feedsDeployer = new DeployFeeds();
+        DeployNewTargetContractSet mainDeployer = new DeployNewTargetContractSet();
+        DeployFeedRegistryAdapter adapterDeployer = new DeployFeedRegistryAdapter();
+        SetupCoreContracts coreContractsSetup = new SetupCoreContracts();
+        DeployFeeds feedsDeployer = new DeployFeeds();
 
         address feedVerifierAddr;
-        address feedRegistryAddr;
+        address feedManagerAddr;
 
-        (,, feedVerifierAddr, feedRegistryAddr) = mainDeployer.run();
-        coreContractsSetup.run(owner);
+        (,, feedVerifierAddr, feedManagerAddr) = mainDeployer.run();
+        coreContractsSetup.run(_owner);
         address feedRegistryAdapterAddress;
         (, feedRegistryAdapterAddress) = adapterDeployer.run();
-        feedsDeployer.run(owner);
+        feedsDeployer.run(_owner);
 
-        feedVerifier = EOFeedVerifier(feedVerifierAddr);
-        feedRegistry = EOFeedRegistry(feedRegistryAddr);
-        feedRegistryAdapter = EOFeedRegistryAdapter(feedRegistryAdapterAddress);
+        _feedVerifier = EOFeedVerifier(feedVerifierAddr);
+        _feedManager = EOFeedManager(feedManagerAddr);
+        _feedRegistryAdapter = EOFeedRegistryAdapter(feedRegistryAdapterAddress);
 
-        _seedSymbolData(configStructured);
-        _generatePayload(symbolData);
+        _seedfeedsData(configStructured);
+        _generatePayload(feedsData);
 
         this._setValidatorSet(validatorSet);
     }
 
     function _setValidatorSet(IEOFeedVerifier.Validator[] calldata _validatorSet) public {
-        vm.prank(owner);
-        feedVerifier.setNewValidatorSet(_validatorSet);
+        vm.prank(_owner);
+        _feedVerifier.setNewValidatorSet(_validatorSet);
     }
 
-    function _setSupportedSymbols(uint16[] memory symbolsSupported) public {
-        bool[] memory isSupported = new bool[](symbolsSupported.length);
-        for (uint256 i = 0; i < symbolsSupported.length; i++) {
+    function _setSupportedFeeds(uint16[] memory feedsSupported) public {
+        bool[] memory isSupported = new bool[](feedsSupported.length);
+        for (uint256 i = 0; i < feedsSupported.length; i++) {
             isSupported[i] = true;
         }
-        vm.prank(owner);
-        feedRegistry.setSupportedSymbols(symbolsSupported, isSupported);
+        vm.prank(_owner);
+        _feedManager.setSupportedFeeds(feedsSupported, isSupported);
     }
 
-    function _whitelistPublisher(address _publisher) public {
+    function _whitelistPublisher(address publisher) public {
         address[] memory publishers = new address[](1);
         bool[] memory isWhitelisted = new bool[](1);
-        publishers[0] = _publisher;
+        publishers[0] = publisher;
         isWhitelisted[0] = true;
-        vm.prank(owner);
-        feedRegistry.whitelistPublishers(publishers, isWhitelisted);
+        vm.prank(_owner);
+        _feedManager.whitelistPublishers(publishers, isWhitelisted);
     }
 
-    function _generatePayload(bytes[] memory _symbolData) internal virtual;
+    function _generatePayload(bytes[] memory _feedsData) internal virtual;
 
-    function _seedSymbolData(EOJsonUtils.Config memory configStructured) internal virtual;
+    function _seedfeedsData(EOJsonUtils.Config memory configStructured) internal virtual;
 }

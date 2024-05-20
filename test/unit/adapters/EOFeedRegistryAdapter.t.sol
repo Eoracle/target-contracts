@@ -14,12 +14,14 @@ contract EOFeedRegistryAdapterTest is EOFeedRegistryAdapterBaseTest {
 
     function test_FactoryInitialized() public view override {
         assertEq(
-            address(UpgradeableBeacon(EOFeedRegistryAdapter(address(feedRegistryAdapter)).getBeacon()).owner()),
+            address(UpgradeableBeacon(EOFeedRegistryAdapter(address(_feedRegistryAdapter)).getBeacon()).owner()),
             address(this)
         );
         assertEq(
-            address(UpgradeableBeacon(EOFeedRegistryAdapter(address(feedRegistryAdapter)).getBeacon()).implementation()),
-            address(feedImpl)
+            address(
+                UpgradeableBeacon(EOFeedRegistryAdapter(address(_feedRegistryAdapter)).getBeacon()).implementation()
+            ),
+            address(_feedAdapterImplementation)
         );
     }
 }

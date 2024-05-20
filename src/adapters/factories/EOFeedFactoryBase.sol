@@ -4,5 +4,5 @@ pragma solidity 0.8.25;
 abstract contract EOFeedFactoryBase {
     function __EOFeedFactory_init(address impl, address) internal virtual;
 
-    function _deployEOFeed() internal virtual returns (address);
+    function _deployEOFeedAdapter() internal virtual returns (address);
 }

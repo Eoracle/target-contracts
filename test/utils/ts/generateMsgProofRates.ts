@@ -26,7 +26,7 @@ let validatorSet: any[] = [];
 const chainId = 42420;
 const domainArgPosition = 2;
 const validatorSetSizeArgPosition = 3;
-const symbolArgsPosition = 4;
+const feedArgsPosition = 4;
 let eventRoot1: any;
 let blockHash: any;
 let currentValidatorSetHash: any;
@@ -34,19 +34,19 @@ let bitmaps: any[] = [];
 let unhashedLeaves: any[] = [];
 let proves: any[] = [];
 let leavesArray: any[] = [];
-let symbol: any[] = [];
+let feedId: any[] = [];
 let rate: any[] = [];
 let timestamp: any[] = [];
 
 async function generateMsg() {
   const argsLen = process.argv.length;
-  const symbolArgs = process.argv.slice(symbolArgsPosition, argsLen);
+  const feedArgs = process.argv.slice(feedArgsPosition, argsLen);
   [domain] = ethers.utils.defaultAbiCoder.decode(["bytes32"], process.argv[domainArgPosition]);
   [validatorSetSize] = ethers.utils.defaultAbiCoder.decode(["uint256"], process.argv[validatorSetSizeArgPosition]);
-  for (let i = 0; i < symbolArgs.length; i++) {
-    [symbol[i], rate[i], timestamp[i]] = ethers.utils.defaultAbiCoder.decode(
+  for (let i = 0; i < feedArgs.length; i++) {
+    [feedId[i], rate[i], timestamp[i]] = ethers.utils.defaultAbiCoder.decode(
       ["uint16", "uint256", "uint256"],
-      symbolArgs[i],
+      feedArgs[i],
     );
   }
 
@@ -106,8 +106,8 @@ function generateSignatureMultipleLeaves() {
   const receiver = accounts[1];
   let _data;
   let _unhashedLeaf;
-  for (let i = 0; i < symbol.length; i++) {
-    _data = ethers.utils.defaultAbiCoder.encode(["uint16", "uint256", "uint256"], [symbol[i], rate[i], timestamp[i]]);
+  for (let i = 0; i < feedId.length; i++) {
+    _data = ethers.utils.defaultAbiCoder.encode(["uint16", "uint256", "uint256"], [feedId[i], rate[i], timestamp[i]]);
     _unhashedLeaf = ethers.utils.defaultAbiCoder.encode(
       ["uint", "address", "address", "bytes"],
       [id + i, sender, receiver, _data],
@@ -119,7 +119,7 @@ function generateSignatureMultipleLeaves() {
   // generate remaining leaves needed for merkle tree, if rates amount is 9, then we need 7 more leaves to make it 16
   // floor(log2(9)) + 1 = 4 : merkle tree height
   // 2^4 = 16 : merkle tree width
-  for (let i = symbol.length; i < _calculateMerkleWidth(symbol.length); i++) {
+  for (let i = feedId.length; i < _calculateMerkleWidth(feedId.length); i++) {
     leaves.push(ethers.utils.keccak256(ethers.utils.randomBytes(32)));
   }
 
@@ -190,7 +190,7 @@ function generateSignatureMultipleLeaves() {
 
   const leafIndex = 0;
 
-  for (let i = 0; i < symbol.length; i++) {
+  for (let i = 0; i < feedId.length; i++) {
     const proof = tree.getHexProof(leaves[leafIndex + i]);
     proves.push(proof);
   }

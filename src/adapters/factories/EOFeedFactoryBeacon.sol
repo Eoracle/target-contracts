@@ -17,16 +17,16 @@ abstract contract EOFeedFactoryBeacon is Initializable, EOFeedFactoryBase {
     }
 
     /**
-     * @dev Initializes the factory with the feed implementation.
+     * @dev Initializes the factory with the feedAdapter implementation.
      */
     function __EOFeedFactory_init(address impl, address initialOwner) internal override onlyInitializing {
         _beacon = address(new UpgradeableBeacon(impl, initialOwner));
     }
 
     /**
-     * @dev Deploys a new feed instance via Beacon proxy.
+     * @dev Deploys a new feedAdapter instance via Beacon proxy.
      */
-    function _deployEOFeed() internal override returns (address) {
+    function _deployEOFeedAdapter() internal override returns (address) {
         // TODO: can be done with predictable address using create2
         return address(new BeaconProxy(_beacon, ""));
     }

@@ -4,24 +4,24 @@ pragma solidity 0.8.25;
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Test } from "forge-std/Test.sol";
 import { Utils } from "../utils/Utils.sol";
-import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
+import { IEOFeedManager } from "../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { EOFeedRegistry } from "../../src/EOFeedRegistry.sol";
+import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { MockFeedVerifier } from "../mock/MockFeedVerifier.sol";
 import {
     CallerIsNotWhitelisted,
-    SymbolNotSupported,
+    FeedNotSupported,
     MissingLeafInputs,
     BlockNumberAlreadyProcessed
 } from "../../src/interfaces/Errors.sol";
 
-contract EOFeedRegistryTests is Test, Utils {
-    EOFeedRegistry private registry;
+contract EOFeedManagerTests is Test, Utils {
+    EOFeedManager private registry;
     IEOFeedVerifier private verifier;
     address private publisher = makeAddr("publisher");
     address private owner = makeAddr("owner");
     address private notOwner = makeAddr("notOwner");
-    uint16 private symbol = 1;
+    uint16 private feedId = 1;
     uint256 private rate = 1_000_000;
     uint256 private timestamp = 9_999_999_999;
     bytes32 private blockHash = keccak256("BLOCK_HASH");
@@ -31,11 +31,11 @@ contract EOFeedRegistryTests is Test, Utils {
     uint256 private epochNumber = 1;
     uint256 private blockNumber = 1;
 
-    event RateUpdated(uint16 symbol, uint256 rate, uint256 timestamp);
+    event RateUpdated(uint16 feedId, uint256 rate, uint256 timestamp);
 
     function setUp() public {
         verifier = new MockFeedVerifier();
-        registry = new EOFeedRegistry();
+        registry = new EOFeedManager();
         vm.startPrank(owner);
         registry.initialize(verifier, owner);
         vm.stopPrank();
@@ -61,28 +61,28 @@ contract EOFeedRegistryTests is Test, Utils {
         assertEq(registry.isWhitelistedPublisher(notOwner), false);
     }
 
-    function test_RevertWhen_setSupportedSymbolsNotOwner() public {
+    function test_RevertWhen_setSupportedFeedsNotOwner() public {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
-        _setSupportedSymbol(notOwner, symbol);
+        _setSupportedFeed(notOwner, feedId);
     }
 
-    function test_setSupportedSymbols() public {
-        uint16[] memory symbols = new uint16[](5);
+    function test_setSupportedFeeds() public {
+        uint16[] memory feedIds = new uint16[](5);
         bool[] memory isSupported = new bool[](5);
         for (uint256 i = 0; i < 5; i++) {
-            symbols[i] = uint16(i);
+            feedIds[i] = uint16(i);
             isSupported[i] = true;
         }
         vm.prank(owner);
-        registry.setSupportedSymbols(symbols, isSupported);
+        registry.setSupportedFeeds(feedIds, isSupported);
         for (uint256 i = 0; i < 5; i++) {
-            assert(registry.isSupportedSymbol(symbols[i]));
+            assert(registry.isSupportedFeed(feedIds[i]));
         }
-        assertEq(registry.isSupportedSymbol(6), false);
+        assertEq(registry.isSupportedFeed(6), false);
     }
 
     function test_RevertWhen_updatePriceFeedNotWhitelisted() public {
-        bytes memory ratesData = abi.encode(symbol, rate, timestamp);
+        bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
         IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
@@ -100,8 +100,8 @@ contract EOFeedRegistryTests is Test, Utils {
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
     }
 
-    function test_RevertWhen_updatePriceFeedSymbolNotSupported() public {
-        bytes memory ratesData = abi.encode(symbol, rate, timestamp);
+    function test_RevertWhen_updatePriceFeedFeedNotSupported() public {
+        bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
         IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
@@ -117,13 +117,13 @@ contract EOFeedRegistryTests is Test, Utils {
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
 
         _whitelistPublisher(owner, publisher);
-        vm.expectRevert(abi.encodeWithSelector(SymbolNotSupported.selector, symbol));
+        vm.expectRevert(abi.encodeWithSelector(FeedNotSupported.selector, feedId));
         vm.prank(publisher);
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
     }
 
     function test_updatePriceFeed() public {
-        bytes memory ratesData = abi.encode(symbol, rate, timestamp);
+        bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
         IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
@@ -138,17 +138,17 @@ contract EOFeedRegistryTests is Test, Utils {
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
         _whitelistPublisher(owner, publisher);
-        _setSupportedSymbol(owner, symbol);
+        _setSupportedFeed(owner, feedId);
         vm.expectEmit(true, true, true, true);
-        emit RateUpdated(symbol, rate, timestamp);
+        emit RateUpdated(feedId, rate, timestamp);
         vm.prank(publisher);
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
-        IEOFeedRegistry.PriceFeed memory feed = registry.getLatestPriceFeed(1);
-        assertEq(feed.value, rate);
+        IEOFeedManager.PriceFeed memory feedAdapter = registry.getLatestPriceFeed(1);
+        assertEq(feedAdapter.value, rate);
     }
 
     function test_RevertWhen_BlockNumberAlreadyProcessed_updatePriceFeed() public {
-        bytes memory ratesData = abi.encode(symbol, rate, timestamp);
+        bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
         IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
@@ -163,7 +163,7 @@ contract EOFeedRegistryTests is Test, Utils {
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
         _whitelistPublisher(owner, publisher);
-        _setSupportedSymbol(owner, symbol);
+        _setSupportedFeed(owner, feedId);
         vm.startPrank(publisher);
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
         checkpoint.blockNumber--;
@@ -172,9 +172,9 @@ contract EOFeedRegistryTests is Test, Utils {
     }
 
     function test_updatePriceFeeds() public {
-        bytes memory ratesData0 = abi.encode(symbol, rate, timestamp);
+        bytes memory ratesData0 = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf0 = abi.encode(1, address(0), address(0), ratesData0);
-        bytes memory ratesData1 = abi.encode(symbol + 1, rate + 1, timestamp + 1);
+        bytes memory ratesData1 = abi.encode(feedId + 1, rate + 1, timestamp + 1);
         bytes memory unhashedLeaf1 = abi.encode(2, address(0), address(0), ratesData1);
 
         IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
@@ -192,14 +192,14 @@ contract EOFeedRegistryTests is Test, Utils {
         inputs[1] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf1, leafIndex: 1, proof: new bytes32[](0) });
 
         _whitelistPublisher(owner, publisher);
-        _setSupportedSymbol(owner, symbol);
-        _setSupportedSymbol(owner, symbol + 1);
+        _setSupportedFeed(owner, feedId);
+        _setSupportedFeed(owner, feedId + 1);
         vm.prank(publisher);
         registry.updatePriceFeeds(inputs, checkpoint, signature, bitmap);
-        uint16[] memory symbols = new uint16[](2);
-        symbols[0] = symbol;
-        symbols[1] = symbol + 1;
-        IEOFeedRegistry.PriceFeed[] memory feeds = registry.getLatestPriceFeeds(symbols);
+        uint16[] memory feedIds = new uint16[](2);
+        feedIds[0] = feedId;
+        feedIds[1] = feedId + 1;
+        IEOFeedManager.PriceFeed[] memory feeds = registry.getLatestPriceFeeds(feedIds);
         assertEq(feeds[0].value, rate);
         assertEq(feeds[1].value, rate + 1);
     }
@@ -223,8 +223,8 @@ contract EOFeedRegistryTests is Test, Utils {
         registry.updatePriceFeeds(inputs, checkpoint, signature, bitmap);
     }
 
-    function test_RevertWhen_SymbolNotSupported_GetLatestPriceFeed() public {
-        vm.expectRevert(abi.encodeWithSelector(SymbolNotSupported.selector, 999));
+    function test_RevertWhen_FeedNotSupported_GetLatestPriceFeed() public {
+        vm.expectRevert(abi.encodeWithSelector(FeedNotSupported.selector, 999));
         registry.getLatestPriceFeed(999);
     }
 
@@ -237,12 +237,12 @@ contract EOFeedRegistryTests is Test, Utils {
         registry.whitelistPublishers(publishers, isWhitelisted);
     }
 
-    function _setSupportedSymbol(address _executer, uint16 _symbol) private {
-        uint16[] memory symbols = new uint16[](1);
+    function _setSupportedFeed(address _executer, uint16 _feedId) private {
+        uint16[] memory feedIds = new uint16[](1);
         bool[] memory isSupported = new bool[](1);
-        symbols[0] = _symbol;
+        feedIds[0] = _feedId;
         isSupported[0] = true;
         vm.prank(_executer);
-        registry.setSupportedSymbols(symbols, isSupported);
+        registry.setSupportedFeeds(feedIds, isSupported);
     }
 }

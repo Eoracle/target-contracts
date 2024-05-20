@@ -12,7 +12,7 @@ contract MockERC20 {
 
     string public name;
 
-    string public symbol;
+    string public feedId;
 
     uint8 public decimals;
 
@@ -59,7 +59,7 @@ contract MockERC20 {
         require(!initialized, "ALREADY_INITIALIZED");
 
         name = _name;
-        symbol = _symbol;
+        feedId = _symbol;
         decimals = _decimals;
 
         INITIAL_CHAIN_ID = _pureChainId();

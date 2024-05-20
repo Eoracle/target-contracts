@@ -13,7 +13,8 @@ contract EOFeedRegistryAdapterCloneTest is EOFeedRegistryAdapterBaseTest {
 
     function test_FactoryInitialized() public view override {
         assertEq(
-            address(EOFeedRegistryAdapterClone(address(feedRegistryAdapter)).getFeedImplementation()), address(feedImpl)
+            address(EOFeedRegistryAdapterClone(address(_feedRegistryAdapter)).getFeedAdapterImplementation()),
+            address(_feedAdapterImplementation)
         );
     }
 }

@@ -2,37 +2,38 @@
 pragma solidity 0.8.25;
 
 import { Test } from "forge-std/Test.sol";
-import { EOFeed } from "../../../src/adapters/EOFeed.sol";
-import { MockEOFeedRegistry } from "../../mock/MockEOFeedRegistry.sol";
-import { IEOFeedRegistry } from "../../../src/interfaces/IEOFeedRegistry.sol";
+import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
+import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
+import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 // solhint-disable ordering
 
-contract EOFeedTest is Test {
-    EOFeed public feed;
-    IEOFeedRegistry public feedRegistry;
+contract EOFeedAdapterTest is Test {
+    uint8 public constant DECIMALS = 8;
+    string public constant DESCRIPTION = "ETH/USD";
+    uint256 public constant VERSION = 1;
+    uint16 public constant FEED_ID = 1;
+    uint256 public constant RATE1 = 100_000_000;
+    uint256 public constant RATE2 = 200_000_000;
+
+    EOFeedAdapter internal _feedAdapter;
+    IEOFeedManager internal _feedManager;
     address internal _owner;
-    uint8 internal _decimals = 8;
-    uint16 internal _pairSymbol = 1;
-    string internal _description = "ETH/USD";
-    uint256 internal _version = 1;
     uint256 internal _lastTimestamp;
-    uint256 internal constant RATE1 = 100_000_000;
-    uint256 internal constant RATE2 = 200_000_000;
 
     function setUp() public virtual {
         _owner = makeAddr("_owner");
 
-        feedRegistry = new MockEOFeedRegistry();
-        feed = new EOFeed();
-        feed.initialize(feedRegistry, _pairSymbol, _decimals, _description, _version);
-        _updatePriceFeed(_pairSymbol, RATE1, block.timestamp);
+        _feedManager = new MockEOFeedManager();
+        _feedAdapter = new EOFeedAdapter();
+        _feedAdapter.initialize(_feedManager, FEED_ID, DECIMALS, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, RATE1, block.timestamp);
         _lastTimestamp = block.timestamp;
     }
 
     function test_GetRoundData() public view {
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.getRoundData(1);
+            _feedAdapter.getRoundData(1);
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE1));
         assertEq(startedAt, _lastTimestamp);
@@ -42,7 +43,7 @@ contract EOFeedTest is Test {
 
     function test_LatestRoundData() public view {
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.latestRoundData();
+            _feedAdapter.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE1));
         assertEq(startedAt, _lastTimestamp);
@@ -51,65 +52,65 @@ contract EOFeedTest is Test {
     }
 
     function test_LatestAnswer() public view {
-        assertEq(feed.latestAnswer(), int256(RATE1));
+        assertEq(_feedAdapter.latestAnswer(), int256(RATE1));
     }
 
     function test_LatestTimestamp() public view {
-        assertEq(feed.latestTimestamp(), _lastTimestamp);
+        assertEq(_feedAdapter.latestTimestamp(), _lastTimestamp);
     }
 
     function test_LatestRound() public view {
-        assertEq(feed.latestRound(), 0);
+        assertEq(_feedAdapter.latestRound(), 0);
     }
 
     function test_GetAnswer() public view {
-        assertEq(feed.getAnswer(1), int256(RATE1));
+        assertEq(_feedAdapter.getAnswer(1), int256(RATE1));
     }
 
     function test_GetTimestamp() public view {
-        assertEq(feed.getTimestamp(1), _lastTimestamp);
+        assertEq(_feedAdapter.getTimestamp(1), _lastTimestamp);
     }
 
     function test_Decimals() public view {
-        assertEq(feed.decimals(), _decimals);
+        assertEq(_feedAdapter.decimals(), DECIMALS);
     }
 
     function test_Description() public view {
-        assertEq(feed.description(), _description);
+        assertEq(_feedAdapter.description(), DESCRIPTION);
     }
 
     function test_Version() public view {
-        assertEq(feed.version(), _version);
+        assertEq(_feedAdapter.version(), VERSION);
     }
 
     function test_UpdatePrice() public {
-        _updatePriceFeed(_pairSymbol, RATE2, block.timestamp);
+        _updatePriceFeed(FEED_ID, RATE2, block.timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.getRoundData(2);
+            _feedAdapter.getRoundData(2);
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE2));
         assertEq(startedAt, block.timestamp);
         assertEq(updatedAt, block.timestamp);
         assertEq(answeredInRound, 0);
 
-        (roundId, answer, startedAt, updatedAt, answeredInRound) = feed.latestRoundData();
+        (roundId, answer, startedAt, updatedAt, answeredInRound) = _feedAdapter.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(RATE2));
         assertEq(startedAt, block.timestamp);
         assertEq(updatedAt, block.timestamp);
         assertEq(answeredInRound, 0);
 
-        assertEq(feed.latestAnswer(), int256(RATE2));
-        assertEq(feed.latestTimestamp(), block.timestamp);
-        assertEq(feed.latestRound(), 0);
-        assertEq(feed.getAnswer(2), int256(RATE2));
-        assertEq(feed.getTimestamp(2), block.timestamp);
+        assertEq(_feedAdapter.latestAnswer(), int256(RATE2));
+        assertEq(_feedAdapter.latestTimestamp(), block.timestamp);
+        assertEq(_feedAdapter.latestRound(), 0);
+        assertEq(_feedAdapter.getAnswer(2), int256(RATE2));
+        assertEq(_feedAdapter.getTimestamp(2), block.timestamp);
     }
 
     function testFuzz_GetRoundData(uint256 rate, uint256 timestamp) public {
-        _updatePriceFeed(_pairSymbol, rate, timestamp);
+        _updatePriceFeed(FEED_ID, rate, timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.getRoundData(3);
+            _feedAdapter.getRoundData(3);
         assertEq(roundId, 0);
         assertEq(answer, int256(rate));
         assertEq(startedAt, timestamp);
@@ -118,9 +119,9 @@ contract EOFeedTest is Test {
     }
 
     function testFuzz_LatestRoundData(uint256 rate, uint256 timestamp) public {
-        _updatePriceFeed(_pairSymbol, rate, timestamp);
+        _updatePriceFeed(FEED_ID, rate, timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
-            feed.latestRoundData();
+            _feedAdapter.latestRoundData();
         assertEq(roundId, 0);
         assertEq(answer, int256(rate));
         assertEq(startedAt, timestamp);
@@ -128,10 +129,10 @@ contract EOFeedTest is Test {
         assertEq(answeredInRound, 0);
     }
 
-    function _updatePriceFeed(uint16 pairSymbol, uint256 rate, uint256 timestamp) internal {
+    function _updatePriceFeed(uint16 feedId, uint256 rate, uint256 timestamp) internal {
         IEOFeedVerifier.LeafInput memory input;
-        input.unhashedLeaf = abi.encode(pairSymbol, rate, timestamp);
-        feedRegistry.updatePriceFeed(
+        input.unhashedLeaf = abi.encode(feedId, rate, timestamp);
+        _feedManager.updatePriceFeed(
             input,
             IEOFeedVerifier.Checkpoint({
                 blockNumber: 0,
