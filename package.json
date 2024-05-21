@@ -54,9 +54,10 @@
     "slither": "slither .",
     "test": "forge test --force ",
     "test:integration": "FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge test --match-contract Integration --force",
-    "test:coverage": "FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --force",
-    "test:coverage:report": "forge build && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --report lcov && lcov --remove lcov.info  -o lcov.info 'test/*' && genhtml lcov.info --branch-coverage --output-dir coverage",
-    "pre-commit": "if ! git diff --cached --quiet --exit-code -- '*.sol'; then FOUNDRY_PROFILE='snapshot' forge snapshot --force && npm run test:coverage:report && git add .gas-snapshot; fi && npx lint-staged",
+    "test:coverage": "forge clean && forge build && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage",
+    "test:coverage:report": "forge clean && forge build && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --report lcov && lcov --remove lcov.info  -o lcov.info 'test/*' && genhtml lcov.info --branch-coverage --output-dir coverage",
+    "docs": "forge doc --build",
+    "pre-commit": "if ! git diff --cached --quiet --exit-code -- '*.sol'; then FOUNDRY_PROFILE='snapshot' forge snapshot --force && npm run test:coverage:report && npm run docs && git add docs && git add .gas-snapshot; fi && npx lint-staged",
     "pre-push": "git diff HEAD --ignore-submodules --quiet && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge test  --force --watch-delay 500ms",
     "prepare": "husky install"
   },
