@@ -4,11 +4,11 @@ pragma solidity 0.8.25;
 
 import { Script } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
-import { EOFeedRegistry } from "src/EOFeedRegistry.sol";
+import { EOFeedManager } from "src/EOFeedManager.sol";
 import { IEOFeedVerifier } from "src/interfaces/IEOFeedVerifier.sol";
 
-abstract contract FeedRegistryDeployer is Script {
-    function deployFeedRegistry(
+abstract contract FeedManagerDeployer is Script {
+    function deployFeedManager(
         address proxyAdmin,
         IEOFeedVerifier feedVerifier,
         address owner
@@ -16,13 +16,13 @@ abstract contract FeedRegistryDeployer is Script {
         internal
         returns (address proxyAddr)
     {
-        bytes memory initData = abi.encodeCall(EOFeedRegistry.initialize, (feedVerifier, owner));
+        bytes memory initData = abi.encodeCall(EOFeedManager.initialize, (feedVerifier, owner));
 
-        proxyAddr = Upgrades.deployTransparentProxy("EOFeedRegistry.sol", proxyAdmin, initData);
+        proxyAddr = Upgrades.deployTransparentProxy("EOFeedManager.sol", proxyAdmin, initData);
     }
 }
 
-contract DeployFeedRegistry is FeedRegistryDeployer {
+contract DeployFeedManager is FeedManagerDeployer {
     function run(
         address proxyAdmin,
         IEOFeedVerifier feedVerifier,
@@ -31,6 +31,6 @@ contract DeployFeedRegistry is FeedRegistryDeployer {
         external
         returns (address proxyAddr)
     {
-        return deployFeedRegistry(proxyAdmin, feedVerifier, owner);
+        return deployFeedManager(proxyAdmin, feedVerifier, owner);
     }
 }

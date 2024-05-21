@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEOFeed } from "./IEOFeed.sol";
+import { IEOFeedAdapter } from "./IEOFeedAdapter.sol";
 
 /**
  * @title IEOFeedRegistryAdapter
- * @notice Interface for the FeedRegistry contract.
+ * @notice Interface for the FeedManager contract.
  * @dev Simplified version of FeedRegistryInterface from CL.
  */
 interface IEOFeedRegistryAdapter {
@@ -48,9 +48,16 @@ interface IEOFeedRegistryAdapter {
 
     // Registry getters
 
-    function getFeed(address base, address quote) external view returns (IEOFeed feed);
+    function getFeed(address base, address quote) external view returns (IEOFeedAdapter feedAdapter);
 
-    function isFeedEnabled(address feed) external view returns (bool);
+    function isFeedEnabled(address feedAdapter) external view returns (bool);
 
-    function getRoundFeed(address base, address quote, uint80 roundId) external view returns (IEOFeed feed);
+    function getRoundFeed(
+        address base,
+        address quote,
+        uint80 roundId
+    )
+        external
+        view
+        returns (IEOFeedAdapter feedAdapter);
 }

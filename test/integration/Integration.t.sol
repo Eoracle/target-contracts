@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
+import { IEOFeedManager } from "../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { IntegrationBaseTests } from "./IntegrationBase.t.sol";
 import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
@@ -9,65 +9,65 @@ import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
 // solhint-disable max-states-count
 contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests {
     function test_updatePriceFeed() public {
-        vm.prank(publisher);
-        feedRegistry.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
-        IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[0]);
-        assertEq(feed.value, rates[0]);
-        assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[0]).latestAnswer(), int256(rates[0]));
+        vm.prank(_publisher);
+        _feedManager.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
+        IEOFeedManager.PriceFeed memory feedAdapter = _feedManager.getLatestPriceFeed(_feedIds[0]);
+        assertEq(feedAdapter.value, _rates[0]);
+        assertEq(_feedRegistryAdapter.getFeedById(_feedIds[0]).latestAnswer(), int256(_rates[0]));
     }
 
     /**
-     * @notice update first symbol and then second symbol
+     * @notice update price for first feed and then second feed
      */
     function test_updatePriceFeed_SeparateCalls() public {
-        for (uint256 i = 0; i < symbols.length; i++) {
-            vm.prank(publisher);
-            feedRegistry.updatePriceFeed(input[i], checkpoints[0], signatures[0], bitmaps[0]);
-            IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[i]);
-            assertEq(feed.value, rates[i]);
-            assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[i]).latestAnswer(), int256(rates[i]));
+        for (uint256 i = 0; i < _feedIds.length; i++) {
+            vm.prank(_publisher);
+            _feedManager.updatePriceFeed(input[i], checkpoints[0], signatures[0], bitmaps[0]);
+            IEOFeedManager.PriceFeed memory feedAdapter = _feedManager.getLatestPriceFeed(_feedIds[i]);
+            assertEq(feedAdapter.value, _rates[i]);
+            assertEq(_feedRegistryAdapter.getFeedById(_feedIds[i]).latestAnswer(), int256(_rates[i]));
         }
     }
 
     /**
-     * @notice update first symbol and then second symbol
+     * @notice update price feeds in reverse order
      */
     function test_updatePriceFeed_SeparateCallsReverse() public {
-        for (uint256 i = symbols.length; i > 0;) {
+        for (uint256 i = _feedIds.length; i > 0;) {
             i--;
-            vm.prank(publisher);
-            feedRegistry.updatePriceFeed(input[i], checkpoints[0], signatures[0], bitmaps[0]);
-            IEOFeedRegistry.PriceFeed memory feed = feedRegistry.getLatestPriceFeed(symbols[i]);
-            assertEq(feed.value, rates[i]);
-            assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[i]).latestAnswer(), int256(rates[i]));
+            vm.prank(_publisher);
+            _feedManager.updatePriceFeed(input[i], checkpoints[0], signatures[0], bitmaps[0]);
+            IEOFeedManager.PriceFeed memory feedAdapter = _feedManager.getLatestPriceFeed(_feedIds[i]);
+            assertEq(feedAdapter.value, _rates[i]);
+            assertEq(_feedRegistryAdapter.getFeedById(_feedIds[i]).latestAnswer(), int256(_rates[i]));
         }
     }
 
     /**
-     * @notice update first and second symbol symultaneously
+     * @notice update first and second price feeds simultaneously
      */
     function test_updatePriceFeeds() public {
-        vm.prank(publisher);
-        feedRegistry.updatePriceFeeds(input, checkpoints[0], signatures[0], bitmaps[0]);
-        IEOFeedRegistry.PriceFeed memory feed;
-        for (uint256 i = 0; i < symbols.length; i++) {
-            feed = feedRegistry.getLatestPriceFeed(symbols[i]);
-            assertEq(feed.value, rates[i]);
-            assertEq(feedRegistryAdapter.getFeedByPairSymbol(symbols[i]).latestAnswer(), int256(rates[i]));
+        vm.prank(_publisher);
+        _feedManager.updatePriceFeeds(input, checkpoints[0], signatures[0], bitmaps[0]);
+        IEOFeedManager.PriceFeed memory feedAdapter;
+        for (uint256 i = 0; i < _feedIds.length; i++) {
+            feedAdapter = _feedManager.getLatestPriceFeed(_feedIds[i]);
+            assertEq(feedAdapter.value, _rates[i]);
+            assertEq(_feedRegistryAdapter.getFeedById(_feedIds[i]).latestAnswer(), int256(_rates[i]));
         }
     }
 
-    function _generatePayload(bytes[] memory _symbolData) internal override {
-        require(_symbolData.length > 0, "SYMBOLDATA_EMPTY");
-        uint256 len = 5 + _symbolData.length;
+    function _generatePayload(bytes[] memory _feedsData) internal override {
+        require(_feedsData.length > 0, "FEEDSDATA_EMPTY");
+        uint256 len = 5 + _feedsData.length;
         string[] memory cmd = new string[](len);
         cmd[0] = "npx";
         cmd[1] = "ts-node";
         cmd[2] = "test/utils/ts/generateMsgProofRates.ts";
         cmd[3] = vm.toString(abi.encode(DOMAIN));
         cmd[4] = vm.toString(abi.encode(VALIDATOR_SET_SIZE));
-        for (uint256 i = 0; i < _symbolData.length; i++) {
-            cmd[5 + i] = vm.toString(_symbolData[i]);
+        for (uint256 i = 0; i < _feedsData.length; i++) {
+            cmd[5 + i] = vm.toString(_feedsData[i]);
         }
 
         bytes memory out = vm.ffi(cmd);
@@ -88,7 +88,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
             validatorSet.push(validatorSetTmp[i]);
         }
 
-        for (uint256 i = 0; i < _symbolData.length; i++) {
+        for (uint256 i = 0; i < _feedsData.length; i++) {
             input.push(IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[i], leafIndex: i, proof: proves[i] }));
 
             // solhint-disable-next-line func-named-parameters
@@ -107,12 +107,12 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         bitmaps.push(_bitmaps[0]);
     }
 
-    function _seedSymbolData(EOJsonUtils.Config memory configStructured) internal override {
-        for (uint256 i = 0; i < configStructured.supportedSymbols.length; i++) {
-            symbols.push(uint16(configStructured.supportedSymbols[i]));
-            rates.push(100 + configStructured.supportedSymbols[i]);
-            timestamps.push(9_999_999_999);
-            symbolData.push(abi.encode(symbols[i], rates[i], timestamps[i]));
+    function _seedfeedsData(EOJsonUtils.Config memory configStructured) internal override {
+        for (uint256 i = 0; i < configStructured.supportedFeedIds.length; i++) {
+            _feedIds.push(uint16(configStructured.supportedFeedIds[i]));
+            _rates.push(100 + configStructured.supportedFeedIds[i]);
+            _timestamps.push(9_999_999_999);
+            feedsData.push(abi.encode(_feedIds[i], _rates[i], _timestamps[i]));
         }
     }
 }

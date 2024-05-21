@@ -12,19 +12,19 @@ library EOJsonUtils {
         uint256 childChainId;
         address proxyAdminOwner;
         address[] publishers;
-        uint256[] supportedSymbols;
-        SymbolData[] supportedSymbolsData;
+        uint256[] supportedFeedIds;
+        FeedData[] supportedFeedsData;
         uint256 targetChainId;
         address targetContractsOwner;
         bool usePrecompiledModexp;
     }
 
-    struct SymbolData {
+    struct FeedData {
         address base;
         uint256 decimals;
         string description;
+        uint256 feedId;
         address quote;
-        uint256 symbolId;
     }
 
     // Cheat code address, 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D.

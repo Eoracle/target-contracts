@@ -2,11 +2,11 @@
 pragma solidity 0.8.25;
 
 /*//////////////////////////////////////////////////////////////////////////
-                                EOFeedRegistry
+                                EOFeedManager
 //////////////////////////////////////////////////////////////////////////*/
 error CallerIsNotWhitelisted(address caller);
 error MissingLeafInputs();
-error SymbolNotSupported(uint16 symbol);
+error FeedNotSupported(uint16 feedId);
 error BlockNumberAlreadyProcessed();
 
 /*//////////////////////////////////////////////////////////////////////////

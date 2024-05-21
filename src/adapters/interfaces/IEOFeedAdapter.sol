@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEOFeedRegistry } from "../../interfaces/IEOFeedRegistry.sol";
+import { IEOFeedManager } from "../../interfaces/IEOFeedManager.sol";
 
 /**
- * @title IEOFeed
- * @notice Interface for the EOFeed contract.
+ * @title IEOFeedAdapter
+ * @notice Interface for the EOFeedAdapter contract.
  * @dev compatible of AggregatorV3Interface from CL.
  */
-interface IEOFeed {
+interface IEOFeedAdapter {
     // slither-disable-next-line missing-inheritance
     function initialize(
-        IEOFeedRegistry feedRegistry,
-        uint16 pairSymbol,
-        uint8 rateDecimals,
-        string memory pairDescription,
+        IEOFeedManager feedManager,
+        uint16 feedId,
+        uint8 feedDecimals,
+        string memory feedDescription,
         uint256 feedVersion
     )
         external;
 
-    function getPairSymbol() external view returns (uint16);
+    function getFeedId() external view returns (uint16);
     function decimals() external view returns (uint8);
     function description() external view returns (string memory);
     function version() external view returns (uint256);
@@ -27,7 +27,7 @@ interface IEOFeed {
     // getRoundData and latestRoundData should both raise "No data present"
     // if they do not have data to report, instead of returning unset values
     // which could be misinterpreted as actual reported values.
-    function getRoundData(uint80 _roundId)
+    function getRoundData(uint80 roundId_)
         external
         view
         returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);

@@ -6,8 +6,8 @@ import { EOFeedRegistryAdapterBase } from "./EOFeedRegistryAdapterBase.sol";
 
 /**
  * @title EOFeedRegistryAdapterClone
- * @notice The adapter of EOFeedRegistry contract for CL FeedRegistry
- * @dev This contract uses the clone pattern for deploying EOFeed instances
+ * @notice The adapter of EOFeedManager contract for CL FeedRegistry
+ * @dev This contract uses the clone pattern for deploying EOFeedAdapter instances
  */
 // solhint-disable no-empty-blocks
 contract EOFeedRegistryAdapterClone is EOFeedRegistryAdapterBase, EOFeedFactoryClone { }

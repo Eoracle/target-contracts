@@ -4,18 +4,18 @@ pragma solidity 0.8.25;
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
-import { IEOFeedRegistry } from "./interfaces/IEOFeedRegistry.sol";
+import { IEOFeedManager } from "./interfaces/IEOFeedManager.sol";
 import {
     CallerIsNotWhitelisted,
     MissingLeafInputs,
-    SymbolNotSupported,
+    FeedNotSupported,
     BlockNumberAlreadyProcessed
 } from "./interfaces/Errors.sol";
 
-contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
+contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     mapping(uint16 => PriceFeed) internal _priceFeeds;
     mapping(address => bool) internal _whitelistedPublishers;
-    mapping(uint16 => bool) internal _supportedSymbols;
+    mapping(uint16 => bool) internal _supportedFeedIds;
     // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
     uint256 internal _lastProcessedBlockNumber;
@@ -37,14 +37,14 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     }
 
     /**
-     * @notice Set the supported symbols
-     * @param symbols Array of symbols
-     * @param isSupported Array of booleans indicating whether the symbol is supported
+     * @notice Set the supported feeds
+     * @param feedIds Array of feed ids
+     * @param isSupported Array of booleans indicating whether the feed is supported
      */
-    function setSupportedSymbols(uint16[] calldata symbols, bool[] calldata isSupported) external onlyOwner {
-        for (uint256 i = 0; i < symbols.length; i++) {
+    function setSupportedFeeds(uint16[] calldata feedIds, bool[] calldata isSupported) external onlyOwner {
+        for (uint256 i = 0; i < feedIds.length; i++) {
             // TODO: check if it not already the needed value
-            _supportedSymbols[symbols[i]] = isSupported[i];
+            _supportedFeedIds[feedIds[i]] = isSupported[i];
         }
     }
 
@@ -62,7 +62,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     }
 
     /**
-     * @notice Update the price feed for a symbol
+     * @notice Update the price for a feed
      * @param input A leaf to prove the price feeds
      * @param checkpoint Checkpoint data
      * @param signature Aggregated signature of the checkpoint
@@ -86,7 +86,7 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     }
 
     /**
-     * @notice Update the price feeds for multiple symbols
+     * @notice Update the price for multiple feeds
      * @param inputs Array of leafs to prove the price feeds
      * @param checkpoint Checkpoint data
      * @param signature Aggregated signature of the checkpoint
@@ -114,23 +114,23 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     }
 
     /**
-     * @notice Get the latest price feed for a symbol
-     * @param symbol Symbol of the price feed
-     * @return Price feed struct
+     * @notice Get the latest price for a feed
+     * @param feedId Feed id
+     * @return PriceFeed struct
      */
-    function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
-        return _getLatestPriceFeed(symbol);
+    function getLatestPriceFeed(uint16 feedId) external view returns (PriceFeed memory) {
+        return _getLatestPriceFeed(feedId);
     }
 
     /**
-     * @notice Get the latest price feeds for multiple symbols
-     * @param symbols Array of symbols
+     * @notice Get the latest price feeds for multiple feeds
+     * @param feedIds Array of feed ids
      * @return Array of price feed structs
      */
-    function getLatestPriceFeeds(uint16[] calldata symbols) external view returns (PriceFeed[] memory) {
-        PriceFeed[] memory retVal = new PriceFeed[](symbols.length);
-        for (uint256 i = 0; i < symbols.length; i++) {
-            retVal[i] = _getLatestPriceFeed(symbols[i]);
+    function getLatestPriceFeeds(uint16[] calldata feedIds) external view returns (PriceFeed[] memory) {
+        PriceFeed[] memory retVal = new PriceFeed[](feedIds.length);
+        for (uint256 i = 0; i < feedIds.length; i++) {
+            retVal[i] = _getLatestPriceFeed(feedIds[i]);
         }
         return retVal;
     }
@@ -145,12 +145,12 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     }
 
     /**
-     * @notice Check if a symbol is supported
-     * @param symbol Symbol to check
-     * @return Boolean indicating whether the symbol is supported
+     * @notice Check if a feed is supported
+     * @param feedId feed Id to check
+     * @return Boolean indicating whether the feed is supported
      */
-    function isSupportedSymbol(uint16 symbol) external view returns (bool) {
-        return _supportedSymbols[symbol];
+    function isSupportedFeed(uint16 feedId) external view returns (bool) {
+        return _supportedFeedIds[feedId];
     }
 
     /**
@@ -162,14 +162,14 @@ contract EOFeedRegistry is Initializable, OwnableUpgradeable, IEOFeedRegistry {
     }
 
     function _processVerifiedRate(bytes memory data) internal {
-        (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
-        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
-        _priceFeeds[symbol] = PriceFeed(rate, timestamp);
-        emit RateUpdated(symbol, rate, timestamp);
+        (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
+        if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);
+        _priceFeeds[feedId] = PriceFeed(rate, timestamp);
+        emit RateUpdated(feedId, rate, timestamp);
     }
 
-    function _getLatestPriceFeed(uint16 symbol) internal view returns (PriceFeed memory) {
-        if (!_supportedSymbols[symbol]) revert SymbolNotSupported(symbol);
-        return _priceFeeds[symbol];
+    function _getLatestPriceFeed(uint16 feedId) internal view returns (PriceFeed memory) {
+        if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);
+        return _priceFeeds[feedId];
     }
 }

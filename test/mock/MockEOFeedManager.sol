@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEOFeedRegistry } from "../../src/interfaces/IEOFeedRegistry.sol";
+import { IEOFeedManager } from "../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
 
-contract MockEOFeedRegistry is IEOFeedRegistry {
-    uint16 public constant NOT_SUPPORTED_SYMBOL = 1000;
+contract MockEOFeedManager is IEOFeedManager {
+    uint16 public constant NOT_SUPPORTED_FEED = 1000;
     mapping(uint16 => PriceFeed) public priceFeeds;
 
     function updatePriceFeed(
@@ -19,9 +19,9 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
     )
         external
     {
-        (uint16 symbol, uint256 rate, uint256 timestamp) = abi.decode(input.unhashedLeaf, (uint16, uint256, uint256));
+        (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(input.unhashedLeaf, (uint16, uint256, uint256));
 
-        priceFeeds[symbol] = PriceFeed(rate, timestamp);
+        priceFeeds[feedId] = PriceFeed(rate, timestamp);
     }
 
     function updatePriceFeeds(
@@ -33,21 +33,21 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
         external
     {
         for (uint256 i = 0; i < inputs.length; i++) {
-            (uint16 symbol, uint256 rate, uint256 timestamp) =
+            (uint16 feedId, uint256 rate, uint256 timestamp) =
                 abi.decode(inputs[i].unhashedLeaf, (uint16, uint256, uint256));
 
-            priceFeeds[symbol] = PriceFeed(rate, timestamp);
+            priceFeeds[feedId] = PriceFeed(rate, timestamp);
         }
     }
 
-    function getLatestPriceFeed(uint16 symbol) external view returns (PriceFeed memory) {
-        return priceFeeds[symbol];
+    function getLatestPriceFeed(uint16 feedId) external view returns (PriceFeed memory) {
+        return priceFeeds[feedId];
     }
 
-    function getLatestPriceFeeds(uint16[] memory symbols) external view returns (PriceFeed[] memory) {
-        PriceFeed[] memory feeds = new PriceFeed[](symbols.length);
-        for (uint256 i = 0; i < symbols.length; i++) {
-            feeds[i] = priceFeeds[symbols[i]];
+    function getLatestPriceFeeds(uint16[] memory feedIds) external view returns (PriceFeed[] memory) {
+        PriceFeed[] memory feeds = new PriceFeed[](feedIds.length);
+        for (uint256 i = 0; i < feedIds.length; i++) {
+            feeds[i] = priceFeeds[feedIds[i]];
         }
         return feeds;
     }
@@ -58,7 +58,7 @@ contract MockEOFeedRegistry is IEOFeedRegistry {
         return true;
     }
 
-    function isSupportedSymbol(uint16 symbolId) external pure returns (bool) {
-        return symbolId != NOT_SUPPORTED_SYMBOL;
+    function isSupportedFeed(uint16 feedId) external pure returns (bool) {
+        return feedId != NOT_SUPPORTED_FEED;
     }
 }
