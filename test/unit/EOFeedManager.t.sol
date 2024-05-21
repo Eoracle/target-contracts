@@ -9,10 +9,7 @@ import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { MockFeedVerifier } from "../mock/MockFeedVerifier.sol";
 import {
-    CallerIsNotWhitelisted,
-    FeedNotSupported,
-    MissingLeafInputs,
-    BlockNumberAlreadyProcessed
+    CallerIsNotWhitelisted, FeedNotSupported, MissingLeafInputs, SymbolReplay
 } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedManagerTests is Test, Utils {
@@ -147,7 +144,7 @@ contract EOFeedManagerTests is Test, Utils {
         assertEq(feedAdapter.value, rate);
     }
 
-    function test_RevertWhen_BlockNumberAlreadyProcessed_updatePriceFeed() public {
+    function test_RevertWhen_SymbolReplay_updatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
@@ -166,8 +163,7 @@ contract EOFeedManagerTests is Test, Utils {
         _setSupportedFeed(owner, feedId);
         vm.startPrank(publisher);
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
-        checkpoint.blockNumber--;
-        vm.expectRevert(abi.encodeWithSelector(BlockNumberAlreadyProcessed.selector));
+        vm.expectRevert(abi.encodeWithSelector(SymbolReplay.selector, feedId));
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
     }
 

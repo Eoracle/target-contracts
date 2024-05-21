@@ -5,6 +5,7 @@ import { IEOFeedManager } from "../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { IntegrationBaseTests } from "./IntegrationBase.t.sol";
 import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
+import { InvalidProof } from "../../src/interfaces/Errors.sol";
 
 // solhint-disable max-states-count
 contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests {
@@ -41,6 +42,36 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
             assertEq(feedAdapter.value, _rates[i]);
             assertEq(_feedRegistryAdapter.getFeedById(_feedIds[i]).latestAnswer(), int256(_rates[i]));
         }
+    }
+
+    /**
+     * @notice update symbol in the same block
+     */
+    function test_updatePriceFeed_SameBlock() public {
+        vm.startPrank(_publisher);
+        // it should verify signature during the first call
+        _feedManager.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
+        IEOFeedManager.PriceFeed memory feed = _feedManager.getLatestPriceFeed(_feedIds[0]);
+        assertEq(feed.value, _rates[0]);
+
+        // it should not verify signature during the second call in the same block
+        uint256[2] memory emptySignature;
+        _feedManager.updatePriceFeed(input[1], checkpoints[0], emptySignature, bitmaps[0]);
+        feed = _feedManager.getLatestPriceFeed(_feedIds[1]);
+        assertEq(feed.value, _rates[1]);
+        vm.stopPrank();
+    }
+
+    /**
+     * @notice should not allow to update feed with data not related to merkle root
+     */
+    function test_RevertWhen_updatePriceFeed_UnsignedData(bytes memory data) public {
+        vm.assume(keccak256(input[0].unhashedLeaf) != keccak256(data));
+        input[0].unhashedLeaf = data;
+        vm.startPrank(_publisher);
+        vm.expectRevert(InvalidProof.selector);
+        _feedManager.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
+        vm.stopPrank();
     }
 
     /**
