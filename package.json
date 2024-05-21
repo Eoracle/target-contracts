@@ -55,8 +55,8 @@
     "test": "forge test --force ",
     "test:integration": "FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge test --match-contract Integration --force",
     "test:coverage": "FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --force",
-    "test:coverage:report": "FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --force --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage",
-    "pre-commit": "if ! git diff --cached --quiet --exit-code -- '*.sol'; then FOUNDRY_PROFILE='snapshot' forge snapshot --force && git add .gas-snapshot; fi && npx lint-staged",
+    "test:coverage:report": "forge build && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --report lcov && lcov --remove lcov.info  -o lcov.info 'test/*' && genhtml lcov.info --branch-coverage --output-dir coverage",
+    "pre-commit": "if ! git diff --cached --quiet --exit-code -- '*.sol'; then FOUNDRY_PROFILE='snapshot' forge snapshot --force && npm run test:coverage:report && git add .gas-snapshot; fi && npx lint-staged",
     "pre-push": "git diff HEAD --ignore-submodules --quiet && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge test  --force --watch-delay 500ms",
     "prepare": "husky install"
   },

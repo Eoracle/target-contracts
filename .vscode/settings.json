@@ -5,5 +5,6 @@
   "[solidity]": {
     "editor.defaultFormatter": "JuanBlanco.solidity"
   },
-  "solidity.formatter": "forge"
+  "solidity.formatter": "forge",
+  "security.olympix.project.includePath": "src"
 }
