@@ -4,8 +4,8 @@ Repository for the Eoracle target smart contracts
 
 ## Documentation
 
-- [EOFeedManager](src/EOFeedManager.sol/contract.EOFeedManager.md)
-- [EOFeedVerifier](src/EOFeedVerifier.sol/contract.EOFeedVerifier.md)
+- [EOFeedManager](docs/src/src/EOFeedManager.sol/contract.EOFeedManager.md)
+- [EOFeedVerifier](docs/src/src/EOFeedVerifier.sol/contract.EOFeedVerifier.md)
 
 [Full list](docs/src/SUMMARY.md)
 
