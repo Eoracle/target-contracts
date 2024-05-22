@@ -9,7 +9,7 @@ library EOJsonUtils {
     using stdJson for string;
 
     struct Config {
-        uint256 childChainId;
+        uint256 eoracleChainId;
         address proxyAdminOwner;
         address[] publishers;
         uint256[] supportedFeedIds;
@@ -65,9 +65,9 @@ library EOJsonUtils {
     }
 
     function getFilePath(string memory fileName) internal view returns (string memory) {
-        uint256 childChainId = VM.envUint("CHILD_CHAIN_ID");
+        uint256 eoracleChainId = VM.envUint("EORACLE_CHAIN_ID");
         return string.concat(
-            "script/config/", Strings.toString(block.chainid), "/", Strings.toString(childChainId), "/", fileName
+            "script/config/", Strings.toString(block.chainid), "/", Strings.toString(eoracleChainId), "/", fileName
         );
     }
 

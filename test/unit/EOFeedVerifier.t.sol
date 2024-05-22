@@ -16,14 +16,14 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
     function test_RevertWhen_Initialize_InvalidAddress() public {
         IBLS blsNull;
         vm.expectRevert(InvalidAddress.selector);
-        feedVerifier.initialize(address(this), blsNull, bn256G2, childChainId);
+        feedVerifier.initialize(address(this), blsNull, bn256G2, eoracleChainId);
     }
 
     function test_Initialize() public {
-        feedVerifier.initialize(address(this), bls, bn256G2, childChainId);
+        feedVerifier.initialize(address(this), bls, bn256G2, eoracleChainId);
         assertEq(address(feedVerifier.bls()), address(bls));
         assertEq(address(feedVerifier.bn256G2()), address(bn256G2));
-        assertEq(feedVerifier.childChainId(), childChainId);
+        assertEq(feedVerifier.eoracleChainId(), eoracleChainId);
         assertEq(feedVerifier.owner(), address(this));
     }
 }

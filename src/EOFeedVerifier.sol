@@ -22,7 +22,7 @@ using Merkle for bytes32;
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
 
-    uint256 internal _childChainId;
+    uint256 internal _eoracleChainId;
     IBLS internal _bls;
     IBN256G2 internal _bn256G2;
     uint256 internal _currentValidatorSetLength;
@@ -42,16 +42,16 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param owner Owner of the contract
      * @param bls_ Address of the BLS library contract
      * @param bn256G2_ Address of the Bn256G2 library contract
-     * @param childChainId_ Chain ID of the child chain
+     * @param eoracleChainId_ Chain ID of the child chain
      */
-    function initialize(address owner, IBLS bls_, IBN256G2 bn256G2_, uint256 childChainId_) external initializer {
+    function initialize(address owner, IBLS bls_, IBN256G2 bn256G2_, uint256 eoracleChainId_) external initializer {
         if (
             address(bls_) == address(0) || address(bls_).code.length == 0 || address(bn256G2_) == address(0)
                 || address(bn256G2_).code.length == 0
         ) {
             revert InvalidAddress();
         }
-        _childChainId = childChainId_;
+        _eoracleChainId = eoracleChainId_;
         _bls = bls_;
         _bn256G2 = bn256G2_;
         __Ownable_init(owner);
@@ -114,8 +114,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @notice Returns the ID of the child chain.
      * @return The child chain ID.
      */
-    function childChainId() external view returns (uint256) {
-        return _childChainId;
+    function eoracleChainId() external view returns (uint256) {
+        return _eoracleChainId;
     }
 
     /**
@@ -287,7 +287,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             keccak256(
                 // solhint-disable-next-line func-named-parameters
                 abi.encode(
-                    _childChainId,
+                    _eoracleChainId,
                     checkpoint.blockNumber,
                     checkpoint.blockHash,
                     checkpoint.blockRound,
