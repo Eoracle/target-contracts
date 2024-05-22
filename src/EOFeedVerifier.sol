@@ -5,7 +5,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { Merkle } from "./common/Merkle.sol";
 import {
-    FeedVerifierNotInitialized,
+    CallerIsNotFeedManager,
     InvalidProof,
     InvalidAddress,
     InvalidEventRoot,
@@ -22,35 +22,38 @@ using Merkle for bytes32;
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
 
-    uint256 public eoracleChainId;
-    IBLS public bls;
-    IBN256G2 public bn256G2;
-    uint256 public currentValidatorSetLength;
-    uint256 public totalVotingPower;
-    mapping(uint256 => Validator) public currentValidatorSet;
-    bytes32 public currentValidatorSetHash;
+    uint256 internal _eoracleChainId;
+    IBLS internal _bls;
+    IBN256G2 internal _bn256G2;
+    uint256 internal _currentValidatorSetLength;
+    uint256 internal _totalVotingPower;
+    mapping(uint256 => Validator) internal _currentValidatorSet;
+    bytes32 internal _currentValidatorSetHash;
+    uint256 internal _lastProcessedBlockNumber;
+    bytes32 internal _lastProcessedEventRoot;
+    address internal _feedManager;
 
-    modifier onlyInitialized() {
-        if (_getInitializedVersion() == 0) revert FeedVerifierNotInitialized();
+    modifier onlyFeedManager() {
+        if (msg.sender != _feedManager) revert CallerIsNotFeedManager();
         _;
     }
 
     /**
      * @param owner Owner of the contract
-     * @param _bls Address of the BLS library contract
-     * @param _bn256G2 Address of the Bn256G2 library contract
-     * @param _eoracleChainId Chain ID of the child chain
+     * @param bls_ Address of the BLS library contract
+     * @param bn256G2_ Address of the Bn256G2 library contract
+     * @param eoracleChainId_ Chain ID of the child chain
      */
-    function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _eoracleChainId) external initializer {
+    function initialize(address owner, IBLS bls_, IBN256G2 bn256G2_, uint256 eoracleChainId_) external initializer {
         if (
-            address(_bls) == address(0) || address(_bls).code.length == 0 || address(_bn256G2) == address(0)
-                || address(_bn256G2).code.length == 0
+            address(bls_) == address(0) || address(bls_).code.length == 0 || address(bn256G2_) == address(0)
+                || address(bn256G2_).code.length == 0
         ) {
             revert InvalidAddress();
         }
-        eoracleChainId = _eoracleChainId;
-        bls = _bls;
-        bn256G2 = _bn256G2;
+        _eoracleChainId = eoracleChainId_;
+        _bls = bls_;
+        _bn256G2 = bn256G2_;
         __Ownable_init(owner);
     }
 
@@ -67,10 +70,10 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         bytes calldata bitmap
     )
         external
-        onlyInitialized
+        onlyFeedManager
         returns (bytes memory)
     {
-        _verifySignature(checkpoint, signature, bitmap);
+        _processCheckpoint(checkpoint, signature, bitmap);
         bytes memory data = _verifyLeaf(input, checkpoint.eventRoot);
         return data;
     }
@@ -90,11 +93,102 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         bytes calldata bitmap
     )
         external
-        onlyInitialized
+        onlyFeedManager
         returns (bytes[] memory)
     {
-        _verifySignature(checkpoint, signature, bitmap);
+        _processCheckpoint(checkpoint, signature, bitmap);
         return _verifyLeaves(inputs, checkpoint.eventRoot);
+    }
+
+    /**
+     * @notice Sets the address of the feed manager.
+     * @param feedManager_ The address of the new feed manager.
+     */
+    function setFeedManager(address feedManager_) external onlyOwner {
+        if (feedManager_ == address(0)) revert InvalidAddress();
+        _feedManager = feedManager_;
+        emit FeedManagerSet(feedManager_);
+    }
+
+    /**
+     * @notice Returns the ID of the child chain.
+     * @return The child chain ID.
+     */
+    function eoracleChainId() external view returns (uint256) {
+        return _eoracleChainId;
+    }
+
+    /**
+     * @notice Returns the BLS contract.
+     * @return The BLS contract.
+     */
+    function bls() external view returns (IBLS) {
+        return _bls;
+    }
+
+    /**
+     * @notice Returns the BN256G2 contract.
+     * @return The BN256G2 contract.
+     */
+    function bn256G2() external view returns (IBN256G2) {
+        return _bn256G2;
+    }
+
+    /**
+     * @notice Returns the length of the current validator set.
+     * @return The number of validators in the current set.
+     */
+    function currentValidatorSetLength() external view returns (uint256) {
+        return _currentValidatorSetLength;
+    }
+
+    /**
+     * @notice Returns the total voting power of the current validator set.
+     * @return The total voting power.
+     */
+    function totalVotingPower() external view returns (uint256) {
+        return _totalVotingPower;
+    }
+
+    /**
+     * @notice Returns the validator at the specified index in the current validator set.
+     * @param index The index of the validator in the current set.
+     * @return The validator at the given index.
+     */
+    function currentValidatorSet(uint256 index) external view returns (Validator memory) {
+        return _currentValidatorSet[index];
+    }
+
+    /**
+     * @notice Returns the hash of the current validator set.
+     * @return The hash of the current validator set.
+     */
+    function currentValidatorSetHash() external view returns (bytes32) {
+        return _currentValidatorSetHash;
+    }
+
+    /**
+     * @notice Returns the block number of the last processed block.
+     * @return The last processed block number.
+     */
+    function lastProcessedBlockNumber() external view returns (uint256) {
+        return _lastProcessedBlockNumber;
+    }
+
+    /**
+     * @notice Returns the event root of the last processed block.
+     * @return The last processed event root.
+     */
+    function lastProcessedEventRoot() external view returns (bytes32) {
+        return _lastProcessedEventRoot;
+    }
+
+    /**
+     * @notice Returns the address of the feed manager.
+     * @return The address of the feed manager.
+     */
+    function feedManager() external view returns (address) {
+        return _feedManager;
     }
 
     /**
@@ -104,17 +198,41 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner {
         uint256 length = newValidatorSet.length;
-        currentValidatorSetLength = length;
-        currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
+        _currentValidatorSetLength = length;
+        _currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
         uint256 totalPower = 0;
         for (uint256 i = 0; i < length; i++) {
             uint256 votingPower = newValidatorSet[i].votingPower;
             if (votingPower == 0) revert VotingPowerIsZero();
             totalPower += votingPower;
-            currentValidatorSet[i] = newValidatorSet[i];
+            _currentValidatorSet[i] = newValidatorSet[i];
         }
-        totalVotingPower = totalPower;
-        emit ValidatorSetUpdated(currentValidatorSetLength, currentValidatorSetHash, totalVotingPower);
+        _totalVotingPower = totalPower;
+        emit ValidatorSetUpdated(_currentValidatorSetLength, _currentValidatorSetHash, _totalVotingPower);
+    }
+
+    /**
+     * @notice Function to verify the checkpoint signature
+     * @param checkpoint Checkpoint data
+     * @param signature Aggregated signature of the checkpoint
+     * @param bitmap Bitmap of the validators who signed the checkpoint
+     */
+    function _processCheckpoint(
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
+        uint256[2] calldata signature,
+        bytes calldata bitmap
+    )
+        internal
+    {
+        // if the eventRoot has not changed, we don't need to verify the whole checkpoint again
+        if (checkpoint.eventRoot == _lastProcessedEventRoot) {
+            return;
+        }
+        _verifySignature(checkpoint, signature, bitmap);
+        if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
+            _lastProcessedBlockNumber = checkpoint.blockNumber;
+            _lastProcessedEventRoot = checkpoint.eventRoot;
+        }
     }
 
     /**
@@ -144,10 +262,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             revert InvalidProof();
         }
 
-        (uint256 id, /* address sender */, /* address receiver */, bytes memory data) =
+        ( /* uint256 id */ , /* address sender */, /* address receiver */, bytes memory data) =
             abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
-
-        emit LeafVerified(id, data);
 
         return data;
     }
@@ -171,32 +287,32 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             keccak256(
                 // solhint-disable-next-line func-named-parameters
                 abi.encode(
-                    eoracleChainId,
+                    _eoracleChainId,
                     checkpoint.blockNumber,
                     checkpoint.blockHash,
                     checkpoint.blockRound,
                     checkpoint.epoch,
                     checkpoint.eventRoot,
-                    currentValidatorSetHash,
-                    currentValidatorSetHash
+                    _currentValidatorSetHash,
+                    _currentValidatorSetHash
                 )
             )
         );
 
-        uint256[2] memory message = bls.hashToPoint(DOMAIN, hash);
+        uint256[2] memory message = _bls.hashToPoint(DOMAIN, hash);
 
-        uint256 length = currentValidatorSetLength;
+        uint256 length = _currentValidatorSetLength;
         // slither-disable-next-line uninitialized-local
         uint256[4] memory aggPubkey;
         uint256 aggVotingPower = 0;
         for (uint256 i = 0; i < length; i++) {
             if (_getValueFromBitmap(bitmap, i)) {
                 if (aggVotingPower == 0) {
-                    aggPubkey = currentValidatorSet[i].blsKey;
+                    aggPubkey = _currentValidatorSet[i].blsKey;
                 } else {
-                    uint256[4] memory blsKey = currentValidatorSet[i].blsKey;
+                    uint256[4] memory blsKey = _currentValidatorSet[i].blsKey;
                     // slither-disable-next-line calls-loop
-                    (aggPubkey[0], aggPubkey[1], aggPubkey[2], aggPubkey[3]) = bn256G2.ecTwistAdd({
+                    (aggPubkey[0], aggPubkey[1], aggPubkey[2], aggPubkey[3]) = _bn256G2.ecTwistAdd({
                         pt1xx: aggPubkey[0],
                         pt1xy: aggPubkey[1],
                         pt1yx: aggPubkey[2],
@@ -207,14 +323,14 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
                         pt2yy: blsKey[3]
                     });
                 }
-                aggVotingPower += currentValidatorSet[i].votingPower;
+                aggVotingPower += _currentValidatorSet[i].votingPower;
             }
         }
 
         if (aggVotingPower == 0) revert AggVotingPowerIsZero();
-        if (aggVotingPower <= ((2 * totalVotingPower) / 3)) revert InsufficientVotingPower();
+        if (aggVotingPower <= ((2 * _totalVotingPower) / 3)) revert InsufficientVotingPower();
 
-        (bool callSuccess, bool result) = bls.verifySingle(signature, aggPubkey, message);
+        (bool callSuccess, bool result) = _bls.verifySingle(signature, aggPubkey, message);
 
         if (!callSuccess || !result) revert SignatureVerficationFailed();
     }

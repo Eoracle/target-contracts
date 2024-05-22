@@ -45,4 +45,8 @@ contract MockFeedVerifier is IEOFeedVerifier {
         }
         return returnData;
     }
+
+    function setFeedManager(address) external pure {
+        return;
+    }
 }

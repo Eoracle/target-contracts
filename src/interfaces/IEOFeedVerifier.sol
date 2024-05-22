@@ -27,10 +27,10 @@ interface IEOFeedVerifier {
         uint256 votingPower;
     }
 
-    event LeafVerified(uint256 indexed id, bytes returnData);
     event ValidatorSetUpdated(
         uint256 currentValidatorSetLength, bytes32 currentValidatorSetHash, uint256 totalVotingPower
     );
+    event FeedManagerSet(address feedManager);
 
     /**
      * @notice Verifies leaf
@@ -69,4 +69,10 @@ interface IEOFeedVerifier {
      * @param newValidatorSet The new validator set to store
      */
     function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
+
+    /**
+     * @notice Sets the address of the feed manager.
+     * @param feedManager The address of the new feed manager.
+     */
+    function setFeedManager(address feedManager) external;
 }

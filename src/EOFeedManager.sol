@@ -5,12 +5,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedManager } from "./interfaces/IEOFeedManager.sol";
-import {
-    CallerIsNotWhitelisted,
-    MissingLeafInputs,
-    FeedNotSupported,
-    BlockNumberAlreadyProcessed
-} from "./interfaces/Errors.sol";
+import { CallerIsNotWhitelisted, MissingLeafInputs, FeedNotSupported, SymbolReplay } from "./interfaces/Errors.sol";
 
 contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     mapping(uint16 => PriceFeed) internal _priceFeeds;
@@ -18,7 +13,6 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     mapping(uint16 => bool) internal _supportedFeedIds;
     // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
-    uint256 internal _lastProcessedBlockNumber;
 
     modifier onlyWhitelisted() {
         if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
@@ -79,8 +73,6 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         external
         onlyWhitelisted
     {
-        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
-        _lastProcessedBlockNumber = checkpoint.blockNumber;
         bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
         _processVerifiedRate(data);
     }
@@ -104,8 +96,6 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         onlyWhitelisted
     {
         if (inputs.length == 0) revert MissingLeafInputs();
-        if (checkpoint.blockNumber < _lastProcessedBlockNumber) revert BlockNumberAlreadyProcessed();
-        _lastProcessedBlockNumber = checkpoint.blockNumber;
 
         bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {
@@ -164,6 +154,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     function _processVerifiedRate(bytes memory data) internal {
         (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
         if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);
+        if (_priceFeeds[feedId].timestamp >= timestamp) revert SymbolReplay(feedId);
         _priceFeeds[feedId] = PriceFeed(rate, timestamp);
         emit RateUpdated(feedId, rate, timestamp);
     }

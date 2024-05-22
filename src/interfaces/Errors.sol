@@ -7,12 +7,12 @@ pragma solidity 0.8.25;
 error CallerIsNotWhitelisted(address caller);
 error MissingLeafInputs();
 error FeedNotSupported(uint16 feedId);
-error BlockNumberAlreadyProcessed();
+error SymbolReplay(uint16 feedId);
 
 /*//////////////////////////////////////////////////////////////////////////
                                 EOFeedVerifier
 //////////////////////////////////////////////////////////////////////////*/
-error FeedVerifierNotInitialized();
+error CallerIsNotFeedManager();
 error InvalidProof();
 error InvalidAddress();
 error InvalidValidatorSetHash();

@@ -66,13 +66,16 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
         feedManagerProxy = deployFeedManager(
             configStructured.proxyAdminOwner, IEOFeedVerifier(feedVerifierProxy), configStructured.targetContractsOwner
         );
+        vm.stopBroadcast();
+        vm.broadcast(configStructured.targetContractsOwner);
+        // set feedManager in feedVerifier
+        IEOFeedVerifier(feedVerifierProxy).setFeedManager(feedManagerProxy);
+
         EOJsonUtils.OUTPUT_CONFIG.serialize("feedManager", feedManagerProxy);
 
         implementationAddress = Upgrades.getImplementationAddress(feedManagerProxy);
         string memory outputConfigJson =
             EOJsonUtils.OUTPUT_CONFIG.serialize("feedManagerImplementation", implementationAddress);
         EOJsonUtils.writeConfig(outputConfigJson);
-
-        vm.stopBroadcast();
     }
 }

@@ -46,7 +46,6 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     bytes32[][] public leavesArray;
 
     event ExitProcessed(uint256 indexed id, bool indexed success, bytes returnData);
-    event LeafVerified(uint256 indexed id, bytes returnData);
 
     function setUp() public virtual {
         bls = new BLS();
@@ -89,5 +88,6 @@ abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
         address proxyAddress = deployer.run(admin, address(this), bls, bn256G2, eoracleChainId);
         feedVerifier = EOFeedVerifier(proxyAddress);
         feedVerifier.setNewValidatorSet(validatorSet);
+        feedVerifier.setFeedManager(address(this));
     }
 }
