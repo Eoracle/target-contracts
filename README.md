@@ -95,7 +95,7 @@ $ npm run test:coverage:report
 
 ### Configuration file
 
-Configuration file is located by path `script/config/{targetChaonId}/{childChainId}/targetContractSetConfig.json`
+Configuration file is located by path `script/config/{targetChainId}/{childChainId}/targetContractSetConfig.json`
 
 #### Configuration attributes
 
@@ -124,7 +124,7 @@ Configuration file is located by path `script/config/{targetChaonId}/{childChain
 
 ### Deploy 
 
-For all deploy script to work, you need to have next valid nvironment variables:
+For all deploy scripts to work, you need to set [configuration file](#configuration-file) and .env file with the following environment variables 
 - PRIVATE_KEY - private key of deployer 
 - OWNER_PRIVATE_KEY - private key of the contracts owner (needed for Setup core contracts and Deploy feeds adapters)
 - RPC_URL - rpc url of the target chain

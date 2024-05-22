@@ -57,7 +57,7 @@
     "test:coverage": "forge clean && forge build && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage",
     "test:coverage:report": "forge clean && forge build && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge coverage --report lcov && lcov --remove lcov.info  -o lcov.info 'test/*' && genhtml lcov.info --branch-coverage --output-dir coverage",
     "docs": "forge doc --build",
-    "gas-snapshot": "FOUNDRY_PROFILE='snapshot' forge snapshot --force",
+    "gas-snapshot": "forge snapshot --force",
     "pre-commit": "if ! git diff --cached --quiet --exit-code -- '*.sol'; then npm run gas-snapshot && git add .gas-snapshot; fi && npx lint-staged",
     "pre-push": "git diff HEAD --ignore-submodules --quiet && FOUNDRY_PROFILE='full_test' CHILD_CHAIN_ID=42420 forge test  --force --watch-delay 500ms",
     "prepare": "husky install"
