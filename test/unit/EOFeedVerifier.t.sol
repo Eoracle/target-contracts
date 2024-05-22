@@ -126,7 +126,6 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
             blockRound: 0
         });
         inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
-        (,,, bytes memory data) = abi.decode(inputs[0].unhashedLeaf, (uint256, address, address, bytes));
 
         uint256[2] memory signature = aggMessagePoints[0];
         // solhint-disable-next-line func-named-parameters

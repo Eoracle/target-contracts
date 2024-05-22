@@ -236,39 +236,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Verify a batch of exits leaves
-     * @param inputs Batch exit inputs for multiple event leaves
-     * @param eventRoot the root this event should belong to
-     * @return Array of the leaf data fields of all submitted leaves
-     */
-    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal returns (bytes[] memory) {
-        uint256 length = inputs.length;
-        bytes[] memory returnData = new bytes[](length);
-        for (uint256 i = 0; i < length; i++) {
-            returnData[i] = _verifyLeaf(inputs[i], eventRoot);
-        }
-        return returnData;
-    }
-
-    /**
-     * @notice Verify for one event
-     * @param input Exit leaf input
-     * @param eventRoot event root the leaf should belong to
-     * @return The leaf data field
-     */
-    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory) {
-        bytes32 leaf = keccak256(input.unhashedLeaf);
-        if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
-            revert InvalidProof();
-        }
-
-        ( /* uint256 id */ , /* address sender */, /* address receiver */, bytes memory data) =
-            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
-
-        return data;
-    }
-
-    /**
      * @notice Verify the signature of the checkpoint
      * @param checkpoint Checkpoint data
      * @param signature Aggregated signature of the checkpoint
@@ -333,6 +300,39 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         (bool callSuccess, bool result) = _bls.verifySingle(signature, aggPubkey, message);
 
         if (!callSuccess || !result) revert SignatureVerficationFailed();
+    }
+
+    /**
+     * @notice Verify a batch of exits leaves
+     * @param inputs Batch exit inputs for multiple event leaves
+     * @param eventRoot the root this event should belong to
+     * @return Array of the leaf data fields of all submitted leaves
+     */
+    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal pure returns (bytes[] memory) {
+        uint256 length = inputs.length;
+        bytes[] memory returnData = new bytes[](length);
+        for (uint256 i = 0; i < length; i++) {
+            returnData[i] = _verifyLeaf(inputs[i], eventRoot);
+        }
+        return returnData;
+    }
+
+    /**
+     * @notice Verify for one event
+     * @param input Exit leaf input
+     * @param eventRoot event root the leaf should belong to
+     * @return The leaf data field
+     */
+    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal pure returns (bytes memory) {
+        bytes32 leaf = keccak256(input.unhashedLeaf);
+        if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
+            revert InvalidProof();
+        }
+
+        ( /* uint256 id */ , /* address sender */, /* address receiver */, bytes memory data) =
+            abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
+
+        return data;
     }
 
     /**
