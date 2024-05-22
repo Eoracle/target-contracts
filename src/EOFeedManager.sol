@@ -74,7 +74,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         onlyWhitelisted
     {
         bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
-        _processVerifiedRate(data);
+        _processVerifiedRate(data, checkpoint.blockNumber);
     }
 
     /**
@@ -99,7 +99,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
 
         bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
         for (uint256 i = 0; i < data.length; i++) {
-            _processVerifiedRate(data[i]);
+            _processVerifiedRate(data[i], checkpoint.blockNumber);
         }
     }
 
@@ -151,11 +151,11 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         return _feedVerifier;
     }
 
-    function _processVerifiedRate(bytes memory data) internal {
+    function _processVerifiedRate(bytes memory data, uint256 blockNumber) internal {
         (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
         if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);
         if (_priceFeeds[feedId].timestamp >= timestamp) revert SymbolReplay(feedId);
-        _priceFeeds[feedId] = PriceFeed(rate, timestamp);
+        _priceFeeds[feedId] = PriceFeed(rate, timestamp, blockNumber);
         emit RateUpdated(feedId, rate, timestamp);
     }
 

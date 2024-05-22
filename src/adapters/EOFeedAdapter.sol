@@ -54,7 +54,13 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      */
     function getRoundData(uint80) external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
-        return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
+        return (
+            uint80(priceData.eoracleBlockNumber),
+            int256(priceData.value),
+            priceData.timestamp,
+            priceData.timestamp,
+            uint80(priceData.eoracleBlockNumber)
+        );
     }
 
     /**
@@ -67,7 +73,13 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      */
     function latestRoundData() external view returns (uint80, int256, uint256, uint256, uint80) {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
-        return (0, int256(priceData.value), priceData.timestamp, priceData.timestamp, 0);
+        return (
+            uint80(priceData.eoracleBlockNumber),
+            int256(priceData.value),
+            priceData.timestamp,
+            priceData.timestamp,
+            uint80(priceData.eoracleBlockNumber)
+        );
     }
 
     /**
