@@ -20,6 +20,7 @@ contract EOFeedAdapterTest is Test {
     IEOFeedManager internal _feedManager;
     address internal _owner;
     uint256 internal _lastTimestamp;
+    uint256 internal _lastBlockNumber;
 
     function setUp() public virtual {
         _owner = makeAddr("_owner");
@@ -27,28 +28,29 @@ contract EOFeedAdapterTest is Test {
         _feedManager = new MockEOFeedManager();
         _feedAdapter = new EOFeedAdapter();
         _feedAdapter.initialize(_feedManager, FEED_ID, DECIMALS, DESCRIPTION, VERSION);
-        _updatePriceFeed(FEED_ID, RATE1, block.timestamp);
         _lastTimestamp = block.timestamp;
+        _lastBlockNumber = block.number;
+        _updatePriceFeed(FEED_ID, RATE1, block.timestamp);
     }
 
     function test_GetRoundData() public view {
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             _feedAdapter.getRoundData(1);
-        assertEq(roundId, 0);
+        assertEq(roundId, _lastBlockNumber);
         assertEq(answer, int256(RATE1));
         assertEq(startedAt, _lastTimestamp);
         assertEq(updatedAt, _lastTimestamp);
-        assertEq(answeredInRound, 0);
+        assertEq(answeredInRound, _lastBlockNumber);
     }
 
     function test_LatestRoundData() public view {
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             _feedAdapter.latestRoundData();
-        assertEq(roundId, 0);
+        assertEq(roundId, _lastBlockNumber);
         assertEq(answer, int256(RATE1));
         assertEq(startedAt, _lastTimestamp);
         assertEq(updatedAt, _lastTimestamp);
-        assertEq(answeredInRound, 0);
+        assertEq(answeredInRound, _lastBlockNumber);
     }
 
     function test_LatestAnswer() public view {
@@ -87,18 +89,18 @@ contract EOFeedAdapterTest is Test {
         _updatePriceFeed(FEED_ID, RATE2, block.timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             _feedAdapter.getRoundData(2);
-        assertEq(roundId, 0);
+        assertEq(roundId, _lastBlockNumber);
         assertEq(answer, int256(RATE2));
         assertEq(startedAt, block.timestamp);
         assertEq(updatedAt, block.timestamp);
-        assertEq(answeredInRound, 0);
+        assertEq(answeredInRound, _lastBlockNumber);
 
         (roundId, answer, startedAt, updatedAt, answeredInRound) = _feedAdapter.latestRoundData();
-        assertEq(roundId, 0);
+        assertEq(roundId, _lastBlockNumber);
         assertEq(answer, int256(RATE2));
         assertEq(startedAt, block.timestamp);
         assertEq(updatedAt, block.timestamp);
-        assertEq(answeredInRound, 0);
+        assertEq(answeredInRound, _lastBlockNumber);
 
         assertEq(_feedAdapter.latestAnswer(), int256(RATE2));
         assertEq(_feedAdapter.latestTimestamp(), block.timestamp);
@@ -111,22 +113,22 @@ contract EOFeedAdapterTest is Test {
         _updatePriceFeed(FEED_ID, rate, timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             _feedAdapter.getRoundData(3);
-        assertEq(roundId, 0);
+        assertEq(roundId, _lastBlockNumber);
         assertEq(answer, int256(rate));
         assertEq(startedAt, timestamp);
         assertEq(updatedAt, timestamp);
-        assertEq(answeredInRound, 0);
+        assertEq(answeredInRound, _lastBlockNumber);
     }
 
     function testFuzz_LatestRoundData(uint256 rate, uint256 timestamp) public {
         _updatePriceFeed(FEED_ID, rate, timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             _feedAdapter.latestRoundData();
-        assertEq(roundId, 0);
+        assertEq(roundId, _lastBlockNumber);
         assertEq(answer, int256(rate));
         assertEq(startedAt, timestamp);
         assertEq(updatedAt, timestamp);
-        assertEq(answeredInRound, 0);
+        assertEq(answeredInRound, _lastBlockNumber);
     }
 
     function _updatePriceFeed(uint16 feedId, uint256 rate, uint256 timestamp) internal {
@@ -135,7 +137,7 @@ contract EOFeedAdapterTest is Test {
         _feedManager.updatePriceFeed(
             input,
             IEOFeedVerifier.Checkpoint({
-                blockNumber: 0,
+                blockNumber: _lastBlockNumber,
                 epoch: 0,
                 eventRoot: bytes32(0),
                 blockHash: bytes32(0),
