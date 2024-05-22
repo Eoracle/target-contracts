@@ -28,7 +28,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     IBN256G2 public bn256G2;
     DeployFeedVerifier public deployer;
 
-    uint256 public childChainId = 1;
+    uint256 public eoracleChainId = 1;
     uint256 public validatorSetSize;
     IEOFeedVerifier.Validator[] public validatorSet;
     IEOFeedVerifier.LeafInput[] public leafInputs;
@@ -85,7 +85,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
 abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
     function setUp() public virtual override {
         super.setUp();
-        address proxyAddress = deployer.run(admin, address(this), bls, bn256G2, childChainId);
+        address proxyAddress = deployer.run(admin, address(this), bls, bn256G2, eoracleChainId);
         feedVerifier = EOFeedVerifier(proxyAddress);
         feedVerifier.setNewValidatorSet(validatorSet);
         feedVerifier.setFeedManager(address(this));

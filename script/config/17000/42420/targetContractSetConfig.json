@@ -2,7 +2,7 @@
   "usePrecompiledModexp": true,
   "proxyAdminOwner": "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34",
   "targetContractsOwner": "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34",
-  "childChainId": 42420,
+  "eoracleChainId": 42420,
   "targetChainId": 17000,
   "publishers": ["0x077758247f36a5ec1d11b0A583f717eeD66578bf", "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34"],
   "supportedFeedIds": [1, 2, 41, 42],

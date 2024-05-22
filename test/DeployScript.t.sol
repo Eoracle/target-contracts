@@ -49,9 +49,9 @@ contract DeployScriptTest is Test {
     }
 
     function test_Deploy_FeedVerifier() public view {
-        uint256 childChainId = config.readUint(".childChainId");
+        uint256 eoracleChainId = config.readUint(".eoracleChainId");
         assertEq(EOFeedVerifier(feedVerifierProxy).owner(), targetContractsOwner);
-        assertEq(EOFeedVerifier(feedVerifierProxy).childChainId(), childChainId);
+        assertEq(EOFeedVerifier(feedVerifierProxy).eoracleChainId(), eoracleChainId);
         assertEq(address(EOFeedVerifier(feedVerifierProxy).bls()), bls);
         assertEq(address(EOFeedVerifier(feedVerifierProxy).bn256G2()), bn256G2);
         assertEq(feedVerifierProxy, outputConfig.readAddress(".feedVerifier"));

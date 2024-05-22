@@ -92,7 +92,7 @@ EOFeedRegistryAdapterTest:test_RevertWhen_DeployFeedAdapter_NotSupportedFeed() (
 EOFeedRegistryAdapterTest:test_RevertWhen_setFeedManager_NotOwner() (gas: 13719)
 EOFeedRegistryAdapterTest:test_SetFeedManager() (gas: 571051)
 EOFeedRegistryAdapterTest:test_Version() (gas: 334533)
-EOFeedVerifierInitialize:test_Initialize() (gas: 139887)
+EOFeedVerifierInitialize:test_Initialize() (gas: 139953)
 EOFeedVerifierInitialize:test_RevertWhen_Initialize_InvalidAddress() (gas: 35629)
 EOFeedVerifierPrecompiledTest:test_RevertIf_DataIsAltered_Verify() (gas: 615330)
 EOFeedVerifierPrecompiledTest:test_RevertWhen_AggVotingPowerIsZero_Verify() (gas: 140187)
