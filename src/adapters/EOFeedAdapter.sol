@@ -33,9 +33,10 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         string memory feedDescription,
         uint256 feedVersion
     )
-        public
+        external
         initializer
     {
+        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedManager = feedManager;
         _feedId = feedId;
         _decimals = feedDecimals;

@@ -28,7 +28,7 @@ contract EOFeedManagerTests is Test, Utils {
     uint256 private epochNumber = 1;
     uint256 private blockNumber = 1;
 
-    event RateUpdated(uint16 feedId, uint256 rate, uint256 timestamp);
+    event RateUpdated(uint16 indexed feedId, uint256 rate, uint256 timestamp);
 
     function setUp() public {
         verifier = new MockFeedVerifier();
@@ -136,7 +136,7 @@ contract EOFeedManagerTests is Test, Utils {
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
         _whitelistPublisher(owner, publisher);
         _setSupportedFeed(owner, feedId);
-        vm.expectEmit(true, true, true, true);
+        vm.expectEmit(true, false, false, true);
         emit RateUpdated(feedId, rate, timestamp);
         vm.prank(publisher);
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);

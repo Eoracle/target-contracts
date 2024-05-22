@@ -10,7 +10,7 @@ interface IEOFeedManager {
         uint256 eoracleBlockNumber;
     }
 
-    event RateUpdated(uint16 feedId, uint256 rate, uint256 timestamp);
+    event RateUpdated(uint16 indexed feedId, uint256 rate, uint256 timestamp);
 
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput calldata input,
