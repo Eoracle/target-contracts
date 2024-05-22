@@ -45,19 +45,6 @@ Get a test coverage report:
 $ forge coverage
 ```
 
-### Deploy
-
-Deploy to Anvil:
-
-```sh
-$ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
-```
-
-For this script to work, you need to have a `MNEMONIC` environment variable set to a valid [BIP39 mnemonic](https://iancoleman.io/bip39/).
-
-For instructions on how to deploy to a testnet or mainnet, check out the
-[Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
-
 ### Gas Usage
 
 Get a gas report:
@@ -108,7 +95,7 @@ $ npm run test:coverage:report
 
 ### Configuration file
 
-Configuration file is located by path `script/config/{targetChaonId}/{eoracleChainId}/targetContractSetConfig.json`
+Configuration file is located by path `script/config/{targetChainId}/{eoracleChainId}/targetContractSetConfig.json`
 
 #### Configuration attributes
 
@@ -137,7 +124,7 @@ Configuration file is located by path `script/config/{targetChaonId}/{eoracleCha
 
 ### Deploy 
 
-For all deploy script to work, you need to have next valid nvironment variables:
+For all deploy scripts to work, you need to set [configuration file](#configuration-file) and .env file with the following environment variables 
 - PRIVATE_KEY - private key of deployer 
 - OWNER_PRIVATE_KEY - private key of the contracts owner (needed for Setup core contracts and Deploy feeds adapters)
 - RPC_URL - rpc url of the target chain
