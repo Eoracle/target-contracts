@@ -18,7 +18,7 @@ contract SetupCoreContracts is Script {
     EOFeedManager public feedManager;
 
     function run() external {
-        run(vm.addr(vm.envUint("PRIVATE_KEY")));
+        run(vm.addr(vm.envUint("OWNER_PRIVATE_KEY")));
     }
 
     function run(address broadcastFrom) public {
