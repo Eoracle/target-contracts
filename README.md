@@ -95,7 +95,7 @@ $ npm run test:coverage:report
 
 ### Configuration file
 
-Configuration file is located by path `script/config/{targetChainId}/{childChainId}/targetContractSetConfig.json`
+Configuration file is located by path `script/config/{targetChainId}/{eoracleChainId}/targetContractSetConfig.json`
 
 #### Configuration attributes
 
@@ -106,7 +106,7 @@ Configuration file is located by path `script/config/{targetChainId}/{childChain
 
 - **targetContractsOwner** - the owner of core contracts
 
-- **childChainId** - id of the child chain
+- **eoracleChainId** - id of the child chain
 
 - **targetChainId** - id of the target chain
 
@@ -129,7 +129,7 @@ For all deploy scripts to work, you need to set [configuration file](#configurat
 - OWNER_PRIVATE_KEY - private key of the contracts owner (needed for Setup core contracts and Deploy feeds adapters)
 - RPC_URL - rpc url of the target chain
 - ETHERSCAN_API_KEY - key for verification
-- CHILD_CHAIN_ID - id of the child chain
+- EORACLE_CHAIN_ID - id of the child chain
 
 #### Deploy core contracts
 

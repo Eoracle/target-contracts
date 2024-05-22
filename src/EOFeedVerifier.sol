@@ -22,7 +22,7 @@ using Merkle for bytes32;
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
 
-    uint256 public childChainId;
+    uint256 public eoracleChainId;
     IBLS public bls;
     IBN256G2 public bn256G2;
     uint256 public currentValidatorSetLength;
@@ -39,16 +39,16 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param owner Owner of the contract
      * @param _bls Address of the BLS library contract
      * @param _bn256G2 Address of the Bn256G2 library contract
-     * @param _childChainId Chain ID of the child chain
+     * @param _eoracleChainId Chain ID of the child chain
      */
-    function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _childChainId) external initializer {
+    function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _eoracleChainId) external initializer {
         if (
             address(_bls) == address(0) || address(_bls).code.length == 0 || address(_bn256G2) == address(0)
                 || address(_bn256G2).code.length == 0
         ) {
             revert InvalidAddress();
         }
-        childChainId = _childChainId;
+        eoracleChainId = _eoracleChainId;
         bls = _bls;
         bn256G2 = _bn256G2;
         __Ownable_init(owner);
@@ -171,7 +171,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             keccak256(
                 // solhint-disable-next-line func-named-parameters
                 abi.encode(
-                    childChainId,
+                    eoracleChainId,
                     checkpoint.blockNumber,
                     checkpoint.blockHash,
                     checkpoint.blockRound,

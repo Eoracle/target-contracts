@@ -12,10 +12,10 @@
 bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
 ```
 
-### childChainId
+### eoracleChainId
 
 ```solidity
-uint256 public childChainId;
+uint256 public eoracleChainId;
 ```
 
 ### bls
@@ -71,17 +71,17 @@ modifier onlyInitialized();
 ### initialize
 
 ```solidity
-function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _childChainId) external initializer;
+function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _eoracleChainId) external initializer;
 ```
 
 **Parameters**
 
-| Name            | Type       | Description                             |
-| --------------- | ---------- | --------------------------------------- |
-| `owner`         | `address`  | Owner of the contract                   |
-| `_bls`          | `IBLS`     | Address of the BLS library contract     |
-| `_bn256G2`      | `IBN256G2` | Address of the Bn256G2 library contract |
-| `_childChainId` | `uint256`  | Chain ID of the child chain             |
+| Name              | Type       | Description                             |
+| ----------------- | ---------- | --------------------------------------- |
+| `owner`           | `address`  | Owner of the contract                   |
+| `_bls`            | `IBLS`     | Address of the BLS library contract     |
+| `_bn256G2`        | `IBN256G2` | Address of the Bn256G2 library contract |
+| `_eoracleChainId` | `uint256`  | Chain ID of the child chain             |
 
 ### verify
 
