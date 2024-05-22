@@ -1,6 +1,6 @@
 # IEOFeedVerifier
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/ad9e9f7d406e96d8227780565e0953208bab6e55/src/interfaces/IEOFeedVerifier.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/interfaces/IEOFeedVerifier.sol)
 
 **Author:** Lightblocks
 
@@ -70,18 +70,32 @@ function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
 | ----------------- | ------------- | ------------------------------ |
 | `newValidatorSet` | `Validator[]` | The new validator set to store |
 
-## Events
+### setFeedManager
 
-### LeafVerified
+Sets the address of the feed manager.
 
 ```solidity
-event LeafVerified(uint256 indexed id, bytes returnData);
+function setFeedManager(address feedManager) external;
 ```
+
+**Parameters**
+
+| Name          | Type      | Description                          |
+| ------------- | --------- | ------------------------------------ |
+| `feedManager` | `address` | The address of the new feed manager. |
+
+## Events
 
 ### ValidatorSetUpdated
 
 ```solidity
 event ValidatorSetUpdated(uint256 currentValidatorSetLength, bytes32 currentValidatorSetHash, uint256 totalVotingPower);
+```
+
+### FeedManagerSet
+
+```solidity
+event FeedManagerSet(address feedManager);
 ```
 
 ## Structs

@@ -1,6 +1,6 @@
 # EOFeedFactoryBeacon
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/ad9e9f7d406e96d8227780565e0953208bab6e55/src/adapters/factories/EOFeedFactoryBeacon.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/adapters/factories/EOFeedFactoryBeacon.sol)
 
 **Inherits:** Initializable,
 [EOFeedFactoryBase](/src/adapters/factories/EOFeedFactoryBase.sol/abstract.EOFeedFactoryBase.md)

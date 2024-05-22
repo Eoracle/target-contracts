@@ -1,6 +1,6 @@
 # EOFeedManager
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/ad9e9f7d406e96d8227780565e0953208bab6e55/src/EOFeedManager.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/EOFeedManager.sol)
 
 **Inherits:** Initializable, OwnableUpgradeable,
 [IEOFeedManager](/src/interfaces/IEOFeedManager.sol/interface.IEOFeedManager.md)
@@ -29,12 +29,6 @@ mapping(uint16 => bool) internal _supportedFeedIds;
 
 ```solidity
 IEOFeedVerifier internal _feedVerifier;
-```
-
-### \_lastProcessedBlockNumber
-
-```solidity
-uint256 internal _lastProcessedBlockNumber;
 ```
 
 ## Functions

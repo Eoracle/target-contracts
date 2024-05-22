@@ -42,7 +42,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param owner Owner of the contract
      * @param bls_ Address of the BLS library contract
      * @param bn256G2_ Address of the Bn256G2 library contract
-     * @param eoracleChainId_ Chain ID of the child chain
+     * @param eoracleChainId_ Chain ID of the eoracle chain
      */
     function initialize(address owner, IBLS bls_, IBN256G2 bn256G2_, uint256 eoracleChainId_) external initializer {
         if (
@@ -111,8 +111,8 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Returns the ID of the child chain.
-     * @return The child chain ID.
+     * @notice Returns the ID of the eoracle chain.
+     * @return The eoracle chain ID.
      */
     function eoracleChainId() external view returns (uint256) {
         return _eoracleChainId;

@@ -1,6 +1,6 @@
 # EOFeedVerifier
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/ad9e9f7d406e96d8227780565e0953208bab6e55/src/EOFeedVerifier.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/EOFeedVerifier.sol)
 
 **Inherits:** [IEOFeedVerifier](/src/interfaces/IEOFeedVerifier.sol/interface.IEOFeedVerifier.md), OwnableUpgradeable
 
@@ -12,46 +12,64 @@
 bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
 ```
 
-### eoracleChainId
+### \_eoracleChainId
 
 ```solidity
-uint256 public eoracleChainId;
+uint256 internal _eoracleChainId;
 ```
 
-### bls
+### \_bls
 
 ```solidity
-IBLS public bls;
+IBLS internal _bls;
 ```
 
-### bn256G2
+### \_bn256G2
 
 ```solidity
-IBN256G2 public bn256G2;
+IBN256G2 internal _bn256G2;
 ```
 
-### currentValidatorSetLength
+### \_currentValidatorSetLength
 
 ```solidity
-uint256 public currentValidatorSetLength;
+uint256 internal _currentValidatorSetLength;
 ```
 
-### totalVotingPower
+### \_totalVotingPower
 
 ```solidity
-uint256 public totalVotingPower;
+uint256 internal _totalVotingPower;
 ```
 
-### currentValidatorSet
+### \_currentValidatorSet
 
 ```solidity
-mapping(uint256 => Validator) public currentValidatorSet;
+mapping(uint256 => Validator) internal _currentValidatorSet;
 ```
 
-### currentValidatorSetHash
+### \_currentValidatorSetHash
 
 ```solidity
-bytes32 public currentValidatorSetHash;
+bytes32 internal _currentValidatorSetHash;
+```
+
+### \_lastProcessedBlockNumber
+
+```solidity
+uint256 internal _lastProcessedBlockNumber;
+```
+
+### \_lastProcessedEventRoot
+
+```solidity
+bytes32 internal _lastProcessedEventRoot;
+```
+
+### \_feedManager
+
+```solidity
+address internal _feedManager;
 ```
 
 ### \_\_gap
@@ -62,16 +80,16 @@ uint256[50] private __gap;
 
 ## Functions
 
-### onlyInitialized
+### onlyFeedManager
 
 ```solidity
-modifier onlyInitialized();
+modifier onlyFeedManager();
 ```
 
 ### initialize
 
 ```solidity
-function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _eoracleChainId) external initializer;
+function initialize(address owner, IBLS bls_, IBN256G2 bn256G2_, uint256 eoracleChainId_) external initializer;
 ```
 
 **Parameters**
@@ -79,9 +97,9 @@ function initialize(address owner, IBLS _bls, IBN256G2 _bn256G2, uint256 _eoracl
 | Name              | Type       | Description                             |
 | ----------------- | ---------- | --------------------------------------- |
 | `owner`           | `address`  | Owner of the contract                   |
-| `_bls`            | `IBLS`     | Address of the BLS library contract     |
-| `_bn256G2`        | `IBN256G2` | Address of the Bn256G2 library contract |
-| `_eoracleChainId` | `uint256`  | Chain ID of the child chain             |
+| `bls_`            | `IBLS`     | Address of the BLS library contract     |
+| `bn256G2_`        | `IBN256G2` | Address of the Bn256G2 library contract |
+| `eoracleChainId_` | `uint256`  | Chain ID of the eoracle chain           |
 
 ### verify
 
@@ -95,7 +113,7 @@ function verify(
     bytes calldata bitmap
 )
     external
-    onlyInitialized
+    onlyFeedManager
     returns (bytes memory);
 ```
 
@@ -120,7 +138,7 @@ function batchVerify(
     bytes calldata bitmap
 )
     external
-    onlyInitialized
+    onlyFeedManager
     returns (bytes[] memory);
 ```
 
@@ -139,6 +157,166 @@ function batchVerify(
 | -------- | --------- | ----------------------------------------------------- |
 | `<none>` | `bytes[]` | Array of the leaf data fields of all submitted leaves |
 
+### setFeedManager
+
+Sets the address of the feed manager.
+
+```solidity
+function setFeedManager(address feedManager_) external onlyOwner;
+```
+
+**Parameters**
+
+| Name           | Type      | Description                          |
+| -------------- | --------- | ------------------------------------ |
+| `feedManager_` | `address` | The address of the new feed manager. |
+
+### eoracleChainId
+
+Returns the ID of the eoracle chain.
+
+```solidity
+function eoracleChainId() external view returns (uint256);
+```
+
+**Returns**
+
+| Name     | Type      | Description           |
+| -------- | --------- | --------------------- |
+| `<none>` | `uint256` | The eoracle chain ID. |
+
+### bls
+
+Returns the BLS contract.
+
+```solidity
+function bls() external view returns (IBLS);
+```
+
+**Returns**
+
+| Name     | Type   | Description       |
+| -------- | ------ | ----------------- |
+| `<none>` | `IBLS` | The BLS contract. |
+
+### bn256G2
+
+Returns the BN256G2 contract.
+
+```solidity
+function bn256G2() external view returns (IBN256G2);
+```
+
+**Returns**
+
+| Name     | Type       | Description           |
+| -------- | ---------- | --------------------- |
+| `<none>` | `IBN256G2` | The BN256G2 contract. |
+
+### currentValidatorSetLength
+
+Returns the length of the current validator set.
+
+```solidity
+function currentValidatorSetLength() external view returns (uint256);
+```
+
+**Returns**
+
+| Name     | Type      | Description                                  |
+| -------- | --------- | -------------------------------------------- |
+| `<none>` | `uint256` | The number of validators in the current set. |
+
+### totalVotingPower
+
+Returns the total voting power of the current validator set.
+
+```solidity
+function totalVotingPower() external view returns (uint256);
+```
+
+**Returns**
+
+| Name     | Type      | Description             |
+| -------- | --------- | ----------------------- |
+| `<none>` | `uint256` | The total voting power. |
+
+### currentValidatorSet
+
+Returns the validator at the specified index in the current validator set.
+
+```solidity
+function currentValidatorSet(uint256 index) external view returns (Validator memory);
+```
+
+**Parameters**
+
+| Name    | Type      | Description                                    |
+| ------- | --------- | ---------------------------------------------- |
+| `index` | `uint256` | The index of the validator in the current set. |
+
+**Returns**
+
+| Name     | Type        | Description                       |
+| -------- | ----------- | --------------------------------- |
+| `<none>` | `Validator` | The validator at the given index. |
+
+### currentValidatorSetHash
+
+Returns the hash of the current validator set.
+
+```solidity
+function currentValidatorSetHash() external view returns (bytes32);
+```
+
+**Returns**
+
+| Name     | Type      | Description                            |
+| -------- | --------- | -------------------------------------- |
+| `<none>` | `bytes32` | The hash of the current validator set. |
+
+### lastProcessedBlockNumber
+
+Returns the block number of the last processed block.
+
+```solidity
+function lastProcessedBlockNumber() external view returns (uint256);
+```
+
+**Returns**
+
+| Name     | Type      | Description                      |
+| -------- | --------- | -------------------------------- |
+| `<none>` | `uint256` | The last processed block number. |
+
+### lastProcessedEventRoot
+
+Returns the event root of the last processed block.
+
+```solidity
+function lastProcessedEventRoot() external view returns (bytes32);
+```
+
+**Returns**
+
+| Name     | Type      | Description                    |
+| -------- | --------- | ------------------------------ |
+| `<none>` | `bytes32` | The last processed event root. |
+
+### feedManager
+
+Returns the address of the feed manager.
+
+```solidity
+function feedManager() external view returns (address);
+```
+
+**Returns**
+
+| Name     | Type      | Description                      |
+| -------- | --------- | -------------------------------- |
+| `<none>` | `address` | The address of the feed manager. |
+
 ### setNewValidatorSet
 
 Function to set a new validator set for the CheckpointManager
@@ -153,47 +331,26 @@ function setNewValidatorSet(Validator[] calldata newValidatorSet) public overrid
 | ----------------- | ------------- | ------------------------------ |
 | `newValidatorSet` | `Validator[]` | The new validator set to store |
 
-### \_verifyLeaves
+### \_processCheckpoint
 
-Verify a batch of exits leaves
+Function to verify the checkpoint signature
 
 ```solidity
-function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal returns (bytes[] memory);
+function _processCheckpoint(
+    IEOFeedVerifier.Checkpoint calldata checkpoint,
+    uint256[2] calldata signature,
+    bytes calldata bitmap
+)
+    internal;
 ```
 
 **Parameters**
 
-| Name        | Type          | Description                                 |
-| ----------- | ------------- | ------------------------------------------- |
-| `inputs`    | `LeafInput[]` | Batch exit inputs for multiple event leaves |
-| `eventRoot` | `bytes32`     | the root this event should belong to        |
-
-**Returns**
-
-| Name     | Type      | Description                                           |
-| -------- | --------- | ----------------------------------------------------- |
-| `<none>` | `bytes[]` | Array of the leaf data fields of all submitted leaves |
-
-### \_verifyLeaf
-
-Verify for one event
-
-```solidity
-function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal returns (bytes memory);
-```
-
-**Parameters**
-
-| Name        | Type        | Description                          |
-| ----------- | ----------- | ------------------------------------ |
-| `input`     | `LeafInput` | Exit leaf input                      |
-| `eventRoot` | `bytes32`   | event root the leaf should belong to |
-
-**Returns**
-
-| Name     | Type    | Description         |
-| -------- | ------- | ------------------- |
-| `<none>` | `bytes` | The leaf data field |
+| Name         | Type                         | Description                                        |
+| ------------ | ---------------------------- | -------------------------------------------------- |
+| `checkpoint` | `IEOFeedVerifier.Checkpoint` | Checkpoint data                                    |
+| `signature`  | `uint256[2]`                 | Aggregated signature of the checkpoint             |
+| `bitmap`     | `bytes`                      | Bitmap of the validators who signed the checkpoint |
 
 ### \_verifySignature
 
@@ -216,6 +373,48 @@ function _verifySignature(
 | `checkpoint` | `Checkpoint` | Checkpoint data                                    |
 | `signature`  | `uint256[2]` | Aggregated signature of the checkpoint             |
 | `bitmap`     | `bytes`      | Bitmap of the validators who signed the checkpoint |
+
+### \_verifyLeaves
+
+Verify a batch of exits leaves
+
+```solidity
+function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal pure returns (bytes[] memory);
+```
+
+**Parameters**
+
+| Name        | Type          | Description                                 |
+| ----------- | ------------- | ------------------------------------------- |
+| `inputs`    | `LeafInput[]` | Batch exit inputs for multiple event leaves |
+| `eventRoot` | `bytes32`     | the root this event should belong to        |
+
+**Returns**
+
+| Name     | Type      | Description                                           |
+| -------- | --------- | ----------------------------------------------------- |
+| `<none>` | `bytes[]` | Array of the leaf data fields of all submitted leaves |
+
+### \_verifyLeaf
+
+Verify for one event
+
+```solidity
+function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal pure returns (bytes memory);
+```
+
+**Parameters**
+
+| Name        | Type        | Description                          |
+| ----------- | ----------- | ------------------------------------ |
+| `input`     | `LeafInput` | Exit leaf input                      |
+| `eventRoot` | `bytes32`   | event root the leaf should belong to |
+
+**Returns**
+
+| Name     | Type    | Description         |
+| -------- | ------- | ------------------- |
+| `<none>` | `bytes` | The leaf data field |
 
 ### \_getValueFromBitmap
 
