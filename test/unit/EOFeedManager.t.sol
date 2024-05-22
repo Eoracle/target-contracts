@@ -142,7 +142,7 @@ contract EOFeedManagerTests is Test, Utils {
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
         IEOFeedManager.PriceFeed memory feedAdapter = registry.getLatestPriceFeed(1);
         assertEq(feedAdapter.value, rate);
-        assertEq(feedAdapter.sourceBlockNumber, checkpoint.blockNumber);
+        assertEq(feedAdapter.eoracleBlockNumber, checkpoint.blockNumber);
     }
 
     function test_RevertWhen_SymbolReplay_updatePriceFeed() public {
@@ -199,8 +199,8 @@ contract EOFeedManagerTests is Test, Utils {
         IEOFeedManager.PriceFeed[] memory feeds = registry.getLatestPriceFeeds(feedIds);
         assertEq(feeds[0].value, rate);
         assertEq(feeds[1].value, rate + 1);
-        assertEq(feeds[0].sourceBlockNumber, checkpoint.blockNumber);
-        assertEq(feeds[1].sourceBlockNumber, checkpoint.blockNumber);
+        assertEq(feeds[0].eoracleBlockNumber, checkpoint.blockNumber);
+        assertEq(feeds[1].eoracleBlockNumber, checkpoint.blockNumber);
     }
 
     function test_RevertWhen_IncorrectInput_updatePriceFeeds() public {

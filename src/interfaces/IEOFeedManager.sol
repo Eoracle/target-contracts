@@ -7,7 +7,7 @@ interface IEOFeedManager {
     struct PriceFeed {
         uint256 value;
         uint256 timestamp;
-        uint256 sourceBlockNumber;
+        uint256 eoracleBlockNumber;
     }
 
     event RateUpdated(uint16 feedId, uint256 rate, uint256 timestamp);
