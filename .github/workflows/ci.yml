@@ -3,7 +3,7 @@ name: "CI"
 env:
   API_KEY_ALCHEMY: ${{ secrets.API_KEY_ALCHEMY }}
   FOUNDRY_PROFILE: "full_test"
-  CHILD_CHAIN_ID: 42420
+  EORACLE_CHAIN_ID: 42420
 
 on:
   workflow_dispatch:

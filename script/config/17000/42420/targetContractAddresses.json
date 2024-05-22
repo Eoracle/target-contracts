@@ -1,9 +1,17 @@
 {
-  "bls": "0xdb939dca1d8729d47132cf4948c61341047ca9aa",
-  "bn256G2": "0xe1d306815dfbc77e419b8a0c13f035f3f885e6ec",
-  "checkpointManager": "0x1d8ca5381e7bac524194d1b5c0e04029ed2c6bea",
-  "feedVerifier": "0xe67a36ab0d3f1846b94fcab0bebe36e6f4a9e63f",
-  "feedManager": "0xf9047e89bb422cc8fb23b8bec51a26c9a15bbbfd",
-  "feedRegistryAdapter": "0xf099658ccc89e6b6facab3f3bb9ec2978c6944b9",
-  "proxyAdmin": ""
+  "bls": "0xD44Eaf8d4Ae5aAccF072be229d475F2fd2268236",
+  "bn256G2": "0x80f07024D2ddb73EdAB778106eb08418cEf4B8F6",
+  "feedAdapterImplementation": "0x379Dc319AFb155CCf8a8f6803B1Ce8f92C3Cc482",
+  "feedManager": "0x04eDb90d92c03875Cd14eF5D38C68fC6191C7303",
+  "feedManagerImplementation": "0x804D5103aBdeBeF393C279984c11C8DebEf332c3",
+  "feedRegistryAdapter": "0x8AA8AB9052C071Eb0521678048d07fBa6e53B857",
+  "feedRegistryAdapterImplementation": "0x3376B2Ac265c3F630e581A2dF93C3fb23cc78498",
+  "feedVerifier": "0x22943024936C4434Da58Cfa0302f5685C2C71171",
+  "feedVerifierImplementation": "0x1D6A3393233Afb354Adb46Cc149BB25cB6c0a364",
+  "feeds": {
+    "BTC/USD": "0x2245FFf18335A052aA4FE40B70540dc70e919876",
+    "ETH/USD": "0x82cc211D5B08e934eF26dc3Eb61C6964aEA2253E",
+    "sFRAX/FRAX": "0x77dC2A64941330e982af7177B341087baad8cfe7",
+    "sfrxETH/frxETH": "0xec546e8e26CEE3bD44982f665b904c15f77F64DF"
+  }
 }
