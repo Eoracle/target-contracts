@@ -1,6 +1,6 @@
 # SafeMath
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/f4fda3a61e4cccb09ed94cf04c4ed0f0b162d9e8/src/libraries/SafeMath.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/ad9e9f7d406e96d8227780565e0953208bab6e55/src/libraries/SafeMath.sol)
 
 _Wrappers over Solidity's arithmetic operations. NOTE: `SafeMath` is generally not needed starting with Solidity 0.8,
 since the compiler now has built in overflow checking._

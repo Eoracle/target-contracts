@@ -1,6 +1,6 @@
 # EOFeedFactoryClone
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/f4fda3a61e4cccb09ed94cf04c4ed0f0b162d9e8/src/adapters/factories/EOFeedFactoryClone.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/ad9e9f7d406e96d8227780565e0953208bab6e55/src/adapters/factories/EOFeedFactoryClone.sol)
 
 **Inherits:** Initializable,
 [EOFeedFactoryBase](/src/adapters/factories/EOFeedFactoryBase.sol/abstract.EOFeedFactoryBase.md)
