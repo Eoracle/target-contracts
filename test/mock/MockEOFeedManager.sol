@@ -13,7 +13,7 @@ contract MockEOFeedManager is IEOFeedManager {
 
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput calldata input,
-        IEOFeedVerifier.Checkpoint calldata,
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
         uint256[2] calldata,
         bytes calldata
     )
@@ -21,12 +21,12 @@ contract MockEOFeedManager is IEOFeedManager {
     {
         (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(input.unhashedLeaf, (uint16, uint256, uint256));
 
-        priceFeeds[feedId] = PriceFeed(rate, timestamp);
+        priceFeeds[feedId] = PriceFeed(rate, timestamp, checkpoint.blockNumber);
     }
 
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        IEOFeedVerifier.Checkpoint calldata,
+        IEOFeedVerifier.Checkpoint calldata checkpoint,
         uint256[2] calldata,
         bytes calldata
     )
@@ -36,7 +36,7 @@ contract MockEOFeedManager is IEOFeedManager {
             (uint16 feedId, uint256 rate, uint256 timestamp) =
                 abi.decode(inputs[i].unhashedLeaf, (uint16, uint256, uint256));
 
-            priceFeeds[feedId] = PriceFeed(rate, timestamp);
+            priceFeeds[feedId] = PriceFeed(rate, timestamp, checkpoint.blockNumber);
         }
     }
 

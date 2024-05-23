@@ -51,11 +51,10 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @param feedDescription The description of feed
      * @param feedDecimals The decimals
      * @param feedVersion The version of the feed
-     * @return IEOFeedAdapter The feedAdapter
+     * @return IEOFeedAdapter The feed adapter
      */
     // This function can reenter through the external call to the deployed EOFeedAdapter, but the external contract is
-    // being
-    // deployed by this contract, so it is considered safe
+    // being deployed by this contract, so it is considered safe
     // slither-disable-next-line reentrancy-no-eth,reentrancy-benign,reentrancy-events
     function deployEOFeedAdapter(
         address base,
@@ -163,13 +162,19 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     {
         IEOFeedManager.PriceFeed memory feedData =
             _feedManager.getLatestPriceFeed(_tokenAddressesToFeedIds[base][quote]);
-        return (0, int256(feedData.value), feedData.timestamp, feedData.timestamp, 0);
+        return (
+            uint80(feedData.eoracleBlockNumber),
+            int256(feedData.value),
+            feedData.timestamp,
+            feedData.timestamp,
+            uint80(feedData.eoracleBlockNumber)
+        );
     }
 
     /**
      * @notice Get the round data for a given base/quote pair
      * @dev Calls the getLatestPriceFeed function from the feed manager, not from feedAdapter itself
-     *      currently the roundId is not used and 0 is returned
+     *      currently the roundId is not used and latest round is returned
      * @param base The base asset address
      * @param quote The quote asset address
      * @return roundId The roundId
@@ -189,7 +194,13 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     {
         IEOFeedManager.PriceFeed memory feedData =
             _feedManager.getLatestPriceFeed(_tokenAddressesToFeedIds[base][quote]);
-        return (0, int256(feedData.value), feedData.timestamp, feedData.timestamp, 0);
+        return (
+            uint80(feedData.eoracleBlockNumber),
+            int256(feedData.value),
+            feedData.timestamp,
+            feedData.timestamp,
+            uint80(feedData.eoracleBlockNumber)
+        );
     }
 
     /**
@@ -274,12 +285,12 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @notice Get the latest round for a given base/quote pair
      * @dev Calls the getLatestPriceFeed function from the feed manager, not from Feed itself
      *      currently the roundId is not used and 0 is returned
-     * @param
-     * @param
+     * @param base The base asset address
+     * @param quote The quote asset address
      * @return uint256 The latest round
      */
-    function latestRound(address, address) external pure returns (uint256) {
-        return 0;
+    function latestRound(address base, address quote) external view returns (uint256) {
+        return _feedManager.getLatestPriceFeed(_tokenAddressesToFeedIds[base][quote]).eoracleBlockNumber;
     }
 
     /**

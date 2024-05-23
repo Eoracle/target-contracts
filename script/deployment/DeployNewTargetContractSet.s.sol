@@ -27,7 +27,9 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
 
         require(configStructured.targetChainId == block.chainid, "Wrong chain id for this config.");
 
-        require(configStructured.childChainId == vm.envUint("CHILD_CHAIN_ID"), "Wrong CHILD_CHAIN_ID for this config.");
+        require(
+            configStructured.eoracleChainId == vm.envUint("EORACLE_CHAIN_ID"), "Wrong EORACLE_CHAIN_ID for this config."
+        );
 
         vm.startBroadcast();
 
@@ -51,7 +53,7 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
             configStructured.targetContractsOwner,
             IBLS(bls),
             IBN256G2(bn256G2),
-            configStructured.childChainId
+            configStructured.eoracleChainId
         );
         EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifier", feedVerifierProxy);
 
