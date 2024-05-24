@@ -12,7 +12,7 @@ import {
     CallerIsNotWhitelisted, FeedNotSupported, MissingLeafInputs, SymbolReplay
 } from "../../src/interfaces/Errors.sol";
 
-contract EOFeedManagerTests is Test, Utils {
+contract EOFeedManagerTest is Test, Utils {
     EOFeedManager private registry;
     IEOFeedVerifier private verifier;
     address private publisher = makeAddr("publisher");
@@ -38,12 +38,12 @@ contract EOFeedManagerTests is Test, Utils {
         vm.stopPrank();
     }
 
-    function test_RevertWhen_whitelistPublishersNotOwner() public {
+    function test_RevertWhen_NotOwner_WhitelistPublishers() public {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _whitelistPublisher(notOwner, publisher);
     }
 
-    function test_whitelistPublishers() public {
+    function test_WhitelistPublishers() public {
         address[] memory publishers = new address[](5);
         bool[] memory isWhitelisted = new bool[](5);
         for (uint256 i = 0; i < 5; i++) {
@@ -58,7 +58,7 @@ contract EOFeedManagerTests is Test, Utils {
         assertEq(registry.isWhitelistedPublisher(notOwner), false);
     }
 
-    function test_RevertWhen_setSupportedFeedsNotOwner() public {
+    function test_RevertWhen_SetSupportedFeedsNotOwner() public {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _setSupportedFeed(notOwner, feedId);
     }
@@ -78,7 +78,7 @@ contract EOFeedManagerTests is Test, Utils {
         assertEq(registry.isSupportedFeed(6), false);
     }
 
-    function test_RevertWhen_updatePriceFeedNotWhitelisted() public {
+    function test_RevertWhen_NotWhitelisted_UpdatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
@@ -97,7 +97,7 @@ contract EOFeedManagerTests is Test, Utils {
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
     }
 
-    function test_RevertWhen_updatePriceFeedFeedNotSupported() public {
+    function test_RevertWhen_FeedNotSupported_UpdatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
@@ -119,7 +119,7 @@ contract EOFeedManagerTests is Test, Utils {
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
     }
 
-    function test_updatePriceFeed() public {
+    function test_UpdatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
@@ -145,7 +145,7 @@ contract EOFeedManagerTests is Test, Utils {
         assertEq(feedAdapter.eoracleBlockNumber, checkpoint.blockNumber);
     }
 
-    function test_RevertWhen_SymbolReplay_updatePriceFeed() public {
+    function test_RevertWhen_SymbolReplay_UpdatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
@@ -168,7 +168,7 @@ contract EOFeedManagerTests is Test, Utils {
         registry.updatePriceFeed(input, checkpoint, signature, bitmap);
     }
 
-    function test_updatePriceFeeds() public {
+    function test_UpdatePriceFeeds() public {
         bytes memory ratesData0 = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf0 = abi.encode(1, address(0), address(0), ratesData0);
         bytes memory ratesData1 = abi.encode(feedId + 1, rate + 1, timestamp + 1);
@@ -203,7 +203,34 @@ contract EOFeedManagerTests is Test, Utils {
         assertEq(feeds[1].eoracleBlockNumber, checkpoint.blockNumber);
     }
 
-    function test_RevertWhen_IncorrectInput_updatePriceFeeds() public {
+    function test_RevertWhen_NotWhitelisted_UpdatePriceFeeds() public {
+        bytes memory ratesData0 = abi.encode(feedId, rate, timestamp);
+        bytes memory unhashedLeaf0 = abi.encode(1, address(0), address(0), ratesData0);
+        bytes memory ratesData1 = abi.encode(feedId + 1, rate + 1, timestamp + 1);
+        bytes memory unhashedLeaf1 = abi.encode(2, address(0), address(0), ratesData1);
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            blockNumber: blockNumber,
+            epoch: epochNumber,
+            eventRoot: eventRoot,
+            blockHash: blockHash,
+            blockRound: blockRound
+        });
+        uint256[2] memory signature = [uint256(1), uint256(2)];
+        bytes memory bitmap = bytes("1");
+
+        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](2);
+        inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf0, leafIndex: 0, proof: new bytes32[](0) });
+        inputs[1] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf1, leafIndex: 1, proof: new bytes32[](0) });
+
+        _whitelistPublisher(owner, publisher);
+        _setSupportedFeed(owner, feedId);
+        _setSupportedFeed(owner, feedId + 1);
+        vm.expectRevert(abi.encodeWithSelector(CallerIsNotWhitelisted.selector, address(this)));
+        registry.updatePriceFeeds(inputs, checkpoint, signature, bitmap);
+    }
+
+    function test_RevertWhen_IncorrectInput_UpdatePriceFeeds() public {
         IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
             blockNumber: 0,
             epoch: 0,

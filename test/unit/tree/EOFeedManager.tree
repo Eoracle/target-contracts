@@ -1,0 +1,17 @@
+EOFeedManagerTests
+├── when not owner
+│   └── it should revert whitelistPublishers
+│   └── it should revert setSupportedFeeds
+└── when owner
+    ├── when whitelistPublishers
+    |   └── it should return publishers are whitelisted
+    ├── when setSupportedFeeds
+    |   └── it should return feeds are supported
+    ├── when publisher not whitelisted
+    |   ├── it should revert updatePriceFeed
+    |   └── it should revert
+    └── when publisher whitelisted
+        ├── when feed not supported
+        |   └── it should revert updatePriceFeed
+        └── when feed supported
+            └── it should updatePriceFeed
