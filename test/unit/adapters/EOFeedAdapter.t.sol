@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { Test } from "forge-std/Test.sol";
+import { Test, console } from "forge-std/Test.sol";
 import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
 import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
@@ -62,7 +62,7 @@ contract EOFeedAdapterTest is Test {
     }
 
     function test_LatestRound() public view {
-        assertEq(_feedAdapter.latestRound(), 0);
+        assertEq(_feedAdapter.latestRound(), _lastBlockNumber);
     }
 
     function test_GetAnswer() public view {
@@ -89,6 +89,7 @@ contract EOFeedAdapterTest is Test {
         _updatePriceFeed(FEED_ID, RATE2, block.timestamp);
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
             _feedAdapter.getRoundData(2);
+        console.log(_lastBlockNumber);
         assertEq(roundId, _lastBlockNumber);
         assertEq(answer, int256(RATE2));
         assertEq(startedAt, block.timestamp);
@@ -104,7 +105,7 @@ contract EOFeedAdapterTest is Test {
 
         assertEq(_feedAdapter.latestAnswer(), int256(RATE2));
         assertEq(_feedAdapter.latestTimestamp(), block.timestamp);
-        assertEq(_feedAdapter.latestRound(), 0);
+        assertEq(_feedAdapter.latestRound(), _lastBlockNumber);
         assertEq(_feedAdapter.getAnswer(2), int256(RATE2));
         assertEq(_feedAdapter.getTimestamp(2), block.timestamp);
     }

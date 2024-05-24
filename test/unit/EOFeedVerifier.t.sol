@@ -9,7 +9,9 @@ import {
     InvalidAddress,
     VotingPowerIsZero,
     AggVotingPowerIsZero,
-    InsufficientVotingPower
+    InsufficientVotingPower,
+    CallerIsNotFeedManager,
+    InvalidEventRoot
 } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
@@ -29,6 +31,17 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
 }
 
 contract EOFeedVerifierTest is InitializedFeedVerifier {
+    function test_SetFeedManager() public {
+        address feedManagerAddr = makeAddr("feedManager");
+        feedVerifier.setFeedManager(feedManagerAddr);
+        assertEq(feedVerifier.feedManager(), feedManagerAddr);
+    }
+
+    function test_RevertWhen_SetFeedManagerInvalidAddress() public {
+        vm.expectRevert(InvalidAddress.selector);
+        feedVerifier.setFeedManager(address(0));
+    }
+
     function test_verify() public {
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
@@ -49,6 +62,56 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         (,,, bytes memory data) = abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
         bytes memory leafData = feedVerifier.verify(input, checkpoint, signature, bitmap);
         assertEq(leafData, data);
+        assertEq(feedVerifier.lastProcessedBlockNumber(), blockNumber);
+        assertEq(feedVerifier.lastProcessedEventRoot(), eventRoot);
+    }
+
+    function test_RevertWhen_Verify_CalledByNotFeedManager() public {
+        IEOFeedVerifier.LeafInput memory input =
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+
+        bytes32 eventRoot = hashes[0];
+        uint256 blockNumber = 1;
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: blockNumber,
+            eventRoot: eventRoot,
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+
+        vm.expectRevert(CallerIsNotFeedManager.selector);
+        vm.prank(alice);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+    }
+
+    function test_RevertWhen_Verify_InvalidEventRoot() public {
+        IEOFeedVerifier.LeafInput memory input =
+            IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+
+        bytes32 eventRoot = hashes[0];
+        uint256 blockNumber = 1;
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: blockNumber,
+            eventRoot: eventRoot,
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+
+        eventRoot = bytes32(0);
+        checkpoint.eventRoot = eventRoot;
+
+        vm.expectRevert(InvalidEventRoot.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
     }
 
     function test_RevertWhen_AggVotingPowerIsZero_Verify() public {
@@ -130,6 +193,25 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         uint256[2] memory signature = aggMessagePoints[0];
         // solhint-disable-next-line func-named-parameters
 
+        feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
+    }
+
+    function test_RevertWhen_BatchVerify_CalledByNotFeedManager() public {
+        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: 1,
+            eventRoot: hashes[0],
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+
+        uint256[2] memory signature = aggMessagePoints[0];
+
+        vm.expectRevert(CallerIsNotFeedManager.selector);
+        vm.prank(alice);
         feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
     }
 
