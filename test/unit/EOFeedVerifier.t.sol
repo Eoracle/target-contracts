@@ -215,6 +215,29 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
     }
 
+    function test_RevertWhen_BatchVerify_InvalidEventRoot() public {
+        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
+
+        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: 1,
+            eventRoot: hashes[0],
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+        inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+
+        uint256[2] memory signature = aggMessagePoints[0];
+        // solhint-disable-next-line func-named-parameters
+
+        feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
+
+        checkpoint.eventRoot = bytes32(0);
+
+        vm.expectRevert(InvalidEventRoot.selector);
+        feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
+    }
+
     function test_SetNewValidatorSet() public {
         feedVerifier.setNewValidatorSet(validatorSet);
         uint256 totalPower = 0;
