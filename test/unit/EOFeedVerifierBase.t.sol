@@ -80,6 +80,20 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     function _setBN256G2() internal virtual {
         bn256G2 = new BN256G2();
     }
+
+    function _getDefaultInput() internal view returns (IEOFeedVerifier.LeafInput memory) {
+        return IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+    }
+
+    function _getDefaultCheckpoint() internal view returns (IEOFeedVerifier.Checkpoint memory) {
+        return IEOFeedVerifier.Checkpoint({
+            epoch: 1,
+            blockNumber: 1,
+            eventRoot: hashes[0],
+            blockHash: hashes[1],
+            blockRound: 0
+        });
+    }
 }
 
 abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
