@@ -37,11 +37,6 @@
   tab_width = 4
   wrap_comments = true
 
-[etherscan]
-  mainnet = { key = "${ETHERSCAN_API_KEY}" }
-  sepolia = { key = "${ETHERSCAN_API_KEY}" }
-  cardona = { key = "${POLYGONSCAN_API_KEY}", chain = 2442, url = "https://api-cardona-zkevm.polygonscan.com/api" }
-  
 [rpc_endpoints]
   mainnet = "${MAINNET_RPC_URL}"
   sepolia = "${SEPOLIA_RPC_URL}"
