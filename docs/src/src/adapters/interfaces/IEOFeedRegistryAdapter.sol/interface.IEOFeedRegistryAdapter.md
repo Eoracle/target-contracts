@@ -1,6 +1,6 @@
 # IEOFeedRegistryAdapter
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/1999827c161f91e9bc99ac290d34e4d278bf02c5/src/adapters/interfaces/IEOFeedRegistryAdapter.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/326365dd645fcf8a14532250ed14441e57e11e4f/src/adapters/interfaces/IEOFeedRegistryAdapter.sol)
 
 Interface for the FeedManager contract.
 
