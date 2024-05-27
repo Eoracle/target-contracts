@@ -26,9 +26,11 @@ let validatorSet: any[] = [];
 const chainId = 42420;
 const domainArgPosition = 2;
 const validatorSetSizeArgPosition = 3;
-const feedArgsPosition = 4;
+const blockNumberPosition = 4;
+const feedArgsPosition = 5;
 let eventRoot1: any;
 let blockHash: any;
+let blockNumber: any;
 let currentValidatorSetHash: any;
 let bitmaps: any[] = [];
 let unhashedLeaves: any[] = [];
@@ -43,6 +45,7 @@ async function generateMsg() {
   const feedArgs = process.argv.slice(feedArgsPosition, argsLen);
   [domain] = ethers.utils.defaultAbiCoder.decode(["bytes32"], process.argv[domainArgPosition]);
   [validatorSetSize] = ethers.utils.defaultAbiCoder.decode(["uint256"], process.argv[validatorSetSizeArgPosition]);
+  [blockNumber] = ethers.utils.defaultAbiCoder.decode(["uint256"], process.argv[blockNumberPosition]);
   for (let i = 0; i < feedArgs.length; i++) {
     [feedId[i], rate[i], timestamp[i]] = ethers.utils.defaultAbiCoder.decode(
       ["uint16", "uint256", "uint256"],
@@ -128,7 +131,7 @@ function generateSignatureMultipleLeaves() {
   eventRoot1 = tree.getHexRoot();
   const checkpoint = {
     epoch: 1,
-    blockNumber: 1,
+    blockNumber: blockNumber,
     eventRoot: eventRoot1,
   };
 

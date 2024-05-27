@@ -67,18 +67,18 @@ abstract contract IntegrationBaseTests is Test, Utils {
         _feedManager = EOFeedManager(feedManagerAddr);
         _feedRegistryAdapter = EOFeedRegistryAdapter(feedRegistryAdapterAddress);
 
-        _seedfeedsData(configStructured);
+        _seedfeedsData(configStructured, uint256(100));
         _generatePayload(feedsData);
 
-        this._setValidatorSet(validatorSet);
+        _setValidatorSet(validatorSet);
     }
 
-    function _setValidatorSet(IEOFeedVerifier.Validator[] calldata _validatorSet) public {
+    function _setValidatorSet(IEOFeedVerifier.Validator[] memory _validatorSet) internal {
         vm.prank(_owner);
         _feedVerifier.setNewValidatorSet(_validatorSet);
     }
 
-    function _setSupportedFeeds(uint16[] memory feedsSupported) public {
+    function _setSupportedFeeds(uint16[] memory feedsSupported) internal {
         bool[] memory isSupported = new bool[](feedsSupported.length);
         for (uint256 i = 0; i < feedsSupported.length; i++) {
             isSupported[i] = true;
@@ -87,7 +87,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
         _feedManager.setSupportedFeeds(feedsSupported, isSupported);
     }
 
-    function _whitelistPublisher(address publisher) public {
+    function _whitelistPublisher(address publisher) internal {
         address[] memory publishers = new address[](1);
         bool[] memory isWhitelisted = new bool[](1);
         publishers[0] = publisher;
@@ -96,7 +96,74 @@ abstract contract IntegrationBaseTests is Test, Utils {
         _feedManager.whitelistPublishers(publishers, isWhitelisted);
     }
 
-    function _generatePayload(bytes[] memory _feedsData) internal virtual;
+    function _generatePayload(bytes[] memory _feedsData) internal virtual {
+        require(_feedsData.length > 0, "FEEDSDATA_EMPTY");
+        delete validatorSet;
+        delete input;
+        delete checkpoints;
+        delete signatures;
+        delete bitmaps;
 
-    function _seedfeedsData(EOJsonUtils.Config memory configStructured) internal virtual;
+        uint256 blockNumber = block.number;
+        uint256 len = 6 + _feedsData.length;
+        string[] memory cmd = new string[](len);
+        cmd[0] = "npx";
+        cmd[1] = "ts-node";
+        cmd[2] = "test/utils/ts/generateMsgProofRates.ts";
+        cmd[3] = vm.toString(abi.encode(DOMAIN));
+        cmd[4] = vm.toString(abi.encode(VALIDATOR_SET_SIZE));
+        cmd[5] = vm.toString(abi.encode(blockNumber));
+        for (uint256 i = 0; i < _feedsData.length; i++) {
+            cmd[6 + i] = vm.toString(_feedsData[i]);
+        }
+
+        bytes memory out = vm.ffi(cmd);
+        bytes[] memory unhashedLeaves;
+        bytes32[][] memory proves;
+        bytes32[] memory hashes;
+        bytes[] memory _bitmaps;
+        uint256[2][] memory aggMessagePoints;
+
+        IEOFeedVerifier.Validator[] memory validatorSetTmp;
+
+        (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, _bitmaps, unhashedLeaves, proves,) = abi.decode(
+            out,
+            (uint256, IEOFeedVerifier.Validator[], uint256[2][], bytes32[], bytes[], bytes[], bytes32[][], bytes32[][])
+        );
+
+        for (uint256 i = 0; i < validatorSetSize; i++) {
+            validatorSet.push(validatorSetTmp[i]);
+        }
+
+        for (uint256 i = 0; i < _feedsData.length; i++) {
+            input.push(IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[i], leafIndex: i, proof: proves[i] }));
+
+            // solhint-disable-next-line func-named-parameters
+        }
+        signatures.push(aggMessagePoints[0]);
+        checkpoints.push(
+            IEOFeedVerifier.Checkpoint({
+                blockNumber: blockNumber,
+                epoch: 1,
+                eventRoot: hashes[0],
+                blockHash: hashes[1],
+                blockRound: 0
+            })
+        );
+
+        bitmaps.push(_bitmaps[0]);
+    }
+
+    function _seedfeedsData(EOJsonUtils.Config memory configStructured, uint256 initialRate) internal virtual {
+        delete feedsData;
+        delete _rates;
+        delete _feedIds;
+        delete _timestamps;
+        for (uint256 i = 0; i < configStructured.supportedFeedIds.length; i++) {
+            _feedIds.push(uint16(configStructured.supportedFeedIds[i]));
+            _rates.push(initialRate + configStructured.supportedFeedIds[i]);
+            _timestamps.push(block.timestamp);
+            feedsData.push(abi.encode(_feedIds[i], _rates[i], _timestamps[i]));
+        }
+    }
 }
