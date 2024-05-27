@@ -8,7 +8,6 @@
 - [CallerIsNotFeedManager](Errors.sol/error.CallerIsNotFeedManager.md)
 - [InvalidProof](Errors.sol/error.InvalidProof.md)
 - [InvalidAddress](Errors.sol/error.InvalidAddress.md)
-- [InvalidValidatorSetHash](Errors.sol/error.InvalidValidatorSetHash.md)
 - [InvalidEventRoot](Errors.sol/error.InvalidEventRoot.md)
 - [VotingPowerIsZero](Errors.sol/error.VotingPowerIsZero.md)
 - [AggVotingPowerIsZero](Errors.sol/error.AggVotingPowerIsZero.md)
