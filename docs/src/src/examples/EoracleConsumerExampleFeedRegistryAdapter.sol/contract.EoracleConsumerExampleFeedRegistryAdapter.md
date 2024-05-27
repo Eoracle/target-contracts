@@ -1,6 +1,6 @@
 # EoracleConsumerExampleFeedRegistryAdapter
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/examples/EoracleConsumerExampleFeedRegistryAdapter.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/836becbe8b5ae010bb5578a508ed70676be90884/src/examples/EoracleConsumerExampleFeedRegistryAdapter.sol)
 
 ## State Variables
 
@@ -33,11 +33,11 @@ function getFeedRegistryAdapter() external view returns (IEOFeedRegistryAdapter)
 ### getEthUsdPrice
 
 ```solidity
-function getEthUsdPrice() public view returns (int256);
+function getEthUsdPrice() external view returns (int256);
 ```
 
 ### getPrice
 
 ```solidity
-function getPrice(address base, address quote) public view returns (int256);
+function getPrice(address base, address quote) external view returns (int256);
 ```

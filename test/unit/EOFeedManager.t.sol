@@ -9,7 +9,11 @@ import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { MockFeedVerifier } from "../mock/MockFeedVerifier.sol";
 import {
-    CallerIsNotWhitelisted, FeedNotSupported, MissingLeafInputs, SymbolReplay
+    InvalidAddress,
+    CallerIsNotWhitelisted,
+    FeedNotSupported,
+    MissingLeafInputs,
+    SymbolReplay
 } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedManagerTest is Test, Utils {
@@ -34,13 +38,43 @@ contract EOFeedManagerTest is Test, Utils {
         verifier = new MockFeedVerifier();
         registry = new EOFeedManager();
         vm.startPrank(owner);
-        registry.initialize(verifier, owner);
+        registry.initialize(address(verifier), owner);
         vm.stopPrank();
+    }
+
+    function test_RevertWhen_NotOwner_SetFeedVerifier() public {
+        address newVerifier = makeAddr("newVerifier");
+        vm.prank(notOwner);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
+        registry.setFeedVerifier(newVerifier);
+    }
+
+    function test_RevertWhen_ZeroAddress_SetFeedVerifier() public {
+        vm.expectRevert(abi.encodeWithSelector(InvalidAddress.selector));
+        vm.prank(owner);
+        registry.setFeedVerifier(address(0));
+    }
+
+    function test_SetFeedVerifier() public {
+        vm.prank(owner);
+        address newVerifier = makeAddr("newVerifier");
+        registry.setFeedVerifier(newVerifier);
+        assertEq(address(registry.getFeedVerifier()), newVerifier);
     }
 
     function test_RevertWhen_NotOwner_WhitelistPublishers() public {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _whitelistPublisher(notOwner, publisher);
+    }
+
+    function test_RevertWhen_ZeroAddress_WhitelistPublishers() public {
+        address[] memory publishers = new address[](1);
+        bool[] memory isWhitelisted = new bool[](1);
+        publishers[0] = address(0);
+        isWhitelisted[0] = true;
+        vm.expectRevert(abi.encodeWithSelector(InvalidAddress.selector));
+        vm.prank(owner);
+        registry.whitelistPublishers(publishers, isWhitelisted);
     }
 
     function test_WhitelistPublishers() public {

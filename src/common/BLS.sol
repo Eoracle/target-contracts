@@ -762,7 +762,6 @@ contract BLS is IBLS {
      */
     function verifySingle(
         uint256[2] calldata signature,
-        // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
         uint256[4] calldata pubkey,
         uint256[2] calldata message
     )
@@ -802,7 +801,6 @@ contract BLS is IBLS {
      */
     function verifyMultiple(
         uint256[2] calldata signature,
-        // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
         uint256[4][] calldata pubkeys,
         uint256[2][] calldata messages
     )
@@ -815,7 +813,6 @@ contract BLS is IBLS {
         require(size > 0, "BLS: number of public key is zero");
         // solhint-disable-next-line reason-string
         require(size == messages.length, "BLS: number of public keys and messages must be equal");
-        // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
         uint256 inputSize = (size + 1) * 6;
         uint256[] memory input = new uint256[](inputSize);
         input[0] = signature[0];
@@ -825,7 +822,6 @@ contract BLS is IBLS {
         input[4] = N_G2_Y1;
         input[5] = N_G2_Y0;
         for (uint256 i = 0; i < size; i++) {
-            // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
             input[i * 6 + 6] = messages[i][0];
             input[i * 6 + 7] = messages[i][1];
             input[i * 6 + 8] = pubkeys[i][1];
@@ -869,7 +865,6 @@ contract BLS is IBLS {
         input[4] = N_G2_Y1;
         input[5] = N_G2_Y0;
         for (uint256 i = 0; i < size; i++) {
-            // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
             input[i * 6 + 6] = message[0];
             input[i * 6 + 7] = message[1];
             input[i * 6 + 8] = pubkeys[i][1];
@@ -896,7 +891,6 @@ contract BLS is IBLS {
         uint256[2] memory u = this.hashToField(domain, message);
         uint256[2] memory p0 = this.mapToPoint(u[0]);
         uint256[2] memory p1 = this.mapToPoint(u[1]);
-        // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
         uint256[4] memory bnAddInput;
         bnAddInput[0] = p0[0];
         bnAddInput[1] = p0[1];
@@ -924,7 +918,6 @@ contract BLS is IBLS {
         (, bool decision) = sqrt(x);
 
         uint256 a0 = mulmod(x, x, N);
-        // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
         a0 = addmod(a0, 4, N);
         uint256 a1 = mulmod(x, Z0, N);
         uint256 a2 = mulmod(a1, a0, N);
@@ -938,7 +931,6 @@ contract BLS is IBLS {
         // check curve
         a1 = mulmod(x, x, N);
         a1 = mulmod(a1, x, N);
-        // @audit-info Aderyn: L-5: Define and use constant variables instead of using literals
         a1 = addmod(a1, 3, N);
         bool found;
         (a1, found) = sqrt(a1);

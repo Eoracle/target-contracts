@@ -1,6 +1,6 @@
 # EOFeedRegistryAdapterBase
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/adapters/EOFeedRegistryAdapterBase.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/836becbe8b5ae010bb5578a508ed70676be90884/src/adapters/EOFeedRegistryAdapterBase.sol)
 
 **Inherits:** OwnableUpgradeable,
 [EOFeedFactoryBase](/src/adapters/factories/EOFeedFactoryBase.sol/abstract.EOFeedFactoryBase.md),
@@ -42,12 +42,26 @@ uint256[50] private __gap;
 
 ## Functions
 
+### onlyNonZeroAddress
+
+```solidity
+modifier onlyNonZeroAddress(address addr);
+```
+
 ### initialize
 
 Initialize the contract
 
 ```solidity
-function initialize(address feedManager, address feedAdapterImplementation, address owner) external initializer;
+function initialize(
+    address feedManager,
+    address feedAdapterImplementation,
+    address owner
+)
+    external
+    initializer
+    onlyNonZeroAddress(feedManager)
+    onlyNonZeroAddress(feedAdapterImplementation);
 ```
 
 **Parameters**
@@ -63,7 +77,7 @@ function initialize(address feedManager, address feedAdapterImplementation, addr
 Set the feed manager
 
 ```solidity
-function setFeedManager(address feedManager) external onlyOwner;
+function setFeedManager(address feedManager) external onlyOwner onlyNonZeroAddress(feedManager);
 ```
 
 **Parameters**
@@ -248,7 +262,7 @@ function latestRoundData(
 Get the round data for a given base/quote pair
 
 _Calls the getLatestPriceFeed function from the feed manager, not from feedAdapter itself currently the roundId is not
-used and 0 is returned_
+used and latest round is returned_
 
 ```solidity
 function getRoundData(
@@ -446,15 +460,15 @@ _Calls the getLatestPriceFeed function from the feed manager, not from Feed itse
 0 is returned_
 
 ```solidity
-function latestRound(address, address) external pure returns (uint256);
+function latestRound(address base, address quote) external view returns (uint256);
 ```
 
 **Parameters**
 
-| Name     | Type      | Description |
-| -------- | --------- | ----------- |
-| `<none>` | `address` |             |
-| `<none>` | `address` |             |
+| Name    | Type      | Description             |
+| ------- | --------- | ----------------------- |
+| `base`  | `address` | The base asset address  |
+| `quote` | `address` | The quote asset address |
 
 **Returns**
 

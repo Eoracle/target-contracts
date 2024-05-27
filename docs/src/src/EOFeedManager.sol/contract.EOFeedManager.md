@@ -1,6 +1,6 @@
 # EOFeedManager
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/EOFeedManager.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/836becbe8b5ae010bb5578a508ed70676be90884/src/EOFeedManager.sol)
 
 **Inherits:** Initializable, OwnableUpgradeable,
 [IEOFeedManager](/src/interfaces/IEOFeedManager.sol/interface.IEOFeedManager.md)
@@ -39,6 +39,12 @@ IEOFeedVerifier internal _feedVerifier;
 modifier onlyWhitelisted();
 ```
 
+### onlyNonZeroAddress
+
+```solidity
+modifier onlyNonZeroAddress(address addr);
+```
+
 ### initialize
 
 Initialize the contract with the feed verifier address
@@ -46,15 +52,29 @@ Initialize the contract with the feed verifier address
 _The feed verifier contract must be deployed first_
 
 ```solidity
-function initialize(IEOFeedVerifier feedVerifier, address owner) external initializer;
+function initialize(address feedVerifier, address owner) external onlyNonZeroAddress(feedVerifier) initializer;
 ```
 
 **Parameters**
 
-| Name           | Type              | Description                           |
-| -------------- | ----------------- | ------------------------------------- |
-| `feedVerifier` | `IEOFeedVerifier` | Address of the feed verifier contract |
-| `owner`        | `address`         | Owner of the contract                 |
+| Name           | Type      | Description                           |
+| -------------- | --------- | ------------------------------------- |
+| `feedVerifier` | `address` | Address of the feed verifier contract |
+| `owner`        | `address` | Owner of the contract                 |
+
+### setFeedVerifier
+
+Set the feed verifier contract address
+
+```solidity
+function setFeedVerifier(address feedVerifier) external onlyOwner onlyNonZeroAddress(feedVerifier);
+```
+
+**Parameters**
+
+| Name           | Type      | Description                           |
+| -------------- | --------- | ------------------------------------- |
+| `feedVerifier` | `address` | Address of the feed verifier contract |
 
 ### setSupportedFeeds
 
@@ -231,7 +251,7 @@ function getFeedVerifier() external view returns (IEOFeedVerifier);
 ### \_processVerifiedRate
 
 ```solidity
-function _processVerifiedRate(bytes memory data) internal;
+function _processVerifiedRate(bytes memory data, uint256 blockNumber) internal;
 ```
 
 ### \_getLatestPriceFeed

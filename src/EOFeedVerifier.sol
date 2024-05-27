@@ -12,7 +12,8 @@ import {
     VotingPowerIsZero,
     AggVotingPowerIsZero,
     InsufficientVotingPower,
-    SignatureVerficationFailed
+    SignatureVerficationFailed,
+    InvalidValidatorsLength
 } from "./interfaces/Errors.sol";
 import { IBLS } from "./interfaces/IBLS.sol";
 import { IBN256G2 } from "./interfaces/IBN256G2.sol";
@@ -21,18 +22,14 @@ using Merkle for bytes32;
 
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
+    uint256 public constant MAX_VALIDATORS = 256;
 
     uint256 internal _eoracleChainId;
     IBLS internal _bls;
     IBN256G2 internal _bn256G2;
     uint256 internal _currentValidatorSetLength;
     uint256 internal _totalVotingPower;
-    // @audit-info Olympix: Uninitialized State Variables
-    // Using uninitialized state variables may lead to unexpected behavior.
-    // Recommendation: Always ensure that state variables receive proper values in the contract declaration or via the
-    // constructor.
     mapping(uint256 => Validator) internal _currentValidatorSet;
-    // @audit-info Olympix: Uninitialized State Variables
     bytes32 internal _currentValidatorSetHash;
     uint256 internal _lastProcessedBlockNumber;
     bytes32 internal _lastProcessedEventRoot;
@@ -203,6 +200,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner {
         uint256 length = newValidatorSet.length;
+        if (length > MAX_VALIDATORS) revert InvalidValidatorsLength();
         _currentValidatorSetLength = length;
         _currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
         uint256 totalPower = 0;
@@ -210,6 +208,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             uint256 votingPower = newValidatorSet[i].votingPower;
             if (votingPower == 0) revert VotingPowerIsZero();
             totalPower += votingPower;
+            if (newValidatorSet[i]._address == address(0)) revert InvalidAddress();
             _currentValidatorSet[i] = newValidatorSet[i];
         }
         _totalVotingPower = totalPower;
@@ -283,13 +282,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
                     aggPubkey = _currentValidatorSet[i].blsKey;
                 } else {
                     uint256[4] memory blsKey = _currentValidatorSet[i].blsKey;
-                    // @audit-info Olympix: Calls in Loop
-                    // _bn256G2 is external contract and is called in the loop, each external call +5k
-                    // so verifySignature will cost 5k gas * validators amount only for external calls
-                    // options to optimize:
-                    // 1. using a batch call, ecTwistAddBatch
-                    // 2 _bn256G2 can be used as injected library not as external contract instance
-                    // slither-disable-next-line calls-loop
                     (aggPubkey[0], aggPubkey[1], aggPubkey[2], aggPubkey[3]) = _bn256G2.ecTwistAdd({
                         pt1xx: aggPubkey[0],
                         pt1xy: aggPubkey[1],
@@ -354,22 +346,15 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      *              Returns 'true' if the bit is set (1), and 'false' if the bit is not set (0).
      */
     function _getValueFromBitmap(bytes calldata bitmap, uint256 index) private pure returns (bool) {
+        // index is < 256, byteNumber will always be less than 8
         uint256 byteNumber = index / 8;
-        // @audit-info Olympix: Unsafe downcast
-        // Performing a narrowing downcast may result in silent overflow due to bit truncation.
-        // Option to resolve:
-        // the index comes from the loop from 0 to _currentValidatorSetLength
-        // so if we update _currentValidatorSetLength from uint256 to uint8 and restrict max amount of validators to
-        // 256,
-        // there will be no need to downcast, otherwise it is not safe to downcast
+        // safe to downcast as any value % 8 will always be less than 8
         uint8 bitNumber = uint8(index % 8);
 
         if (byteNumber >= bitmap.length) {
             return false;
         }
-
-        // Get the value of the bit at the given 'index' in a byte.
-        // @audit-info Olympix: Unsafe downcast
+        // safe to downcast as bitmap[byteNumber] will always be less than 256
         return uint8(bitmap[byteNumber]) & (1 << bitNumber) > 0;
     }
 

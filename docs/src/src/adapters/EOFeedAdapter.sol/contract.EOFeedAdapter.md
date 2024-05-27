@@ -1,6 +1,6 @@
 # EOFeedAdapter
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/adapters/EOFeedAdapter.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/836becbe8b5ae010bb5578a508ed70676be90884/src/adapters/EOFeedAdapter.sol)
 
 **Inherits:** [IEOFeedAdapter](/src/adapters/interfaces/IEOFeedAdapter.sol/interface.IEOFeedAdapter.md), Initializable
 
@@ -46,25 +46,25 @@ Initialize the contract
 
 ```solidity
 function initialize(
-    IEOFeedManager feedManager,
+    address feedManager,
     uint16 feedId,
     uint8 feedDecimals,
     string memory feedDescription,
     uint256 feedVersion
 )
-    public
+    external
     initializer;
 ```
 
 **Parameters**
 
-| Name              | Type             | Description              |
-| ----------------- | ---------------- | ------------------------ |
-| `feedManager`     | `IEOFeedManager` | The feed manager address |
-| `feedId`          | `uint16`         | Feed id                  |
-| `feedDecimals`    | `uint8`          | The decimals of the rate |
-| `feedDescription` | `string`         | The description of feed  |
-| `feedVersion`     | `uint256`        | The version of feed      |
+| Name              | Type      | Description              |
+| ----------------- | --------- | ------------------------ |
+| `feedManager`     | `address` | The feed manager address |
+| `feedId`          | `uint16`  | Feed id                  |
+| `feedDecimals`    | `uint8`   | The decimals of the rate |
+| `feedDescription` | `string`  | The description of feed  |
+| `feedVersion`     | `uint256` | The version of feed      |
 
 ### getRoundData
 
@@ -237,11 +237,11 @@ function version() external view returns (uint256);
 Get the latest round
 
 ```solidity
-function latestRound() external pure returns (uint256);
+function latestRound() external view returns (uint256);
 ```
 
 **Returns**
 
-| Name     | Type      | Description                                         |
-| -------- | --------- | --------------------------------------------------- |
-| `<none>` | `uint256` | uint256 The round, round is not used, 0 is returned |
+| Name     | Type      | Description                                |
+| -------- | --------- | ------------------------------------------ |
+| `<none>` | `uint256` | uint256 The round id, eoracle block number |

@@ -15,13 +15,12 @@ error SymbolReplay(uint16 feedId);
 error CallerIsNotFeedManager();
 error InvalidProof();
 error InvalidAddress();
-// @audit-info Aderyn: L-8: Unused Custom Error
-error InvalidValidatorSetHash();
 error InvalidEventRoot();
 error VotingPowerIsZero();
 error AggVotingPowerIsZero();
 error InsufficientVotingPower();
 error SignatureVerficationFailed();
+error InvalidValidatorsLength();
 
 /*//////////////////////////////////////////////////////////////////////////
                                 EOFeedRegistryAdapter

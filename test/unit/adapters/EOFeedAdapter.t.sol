@@ -27,7 +27,7 @@ contract EOFeedAdapterTest is Test {
 
         _feedManager = new MockEOFeedManager();
         _feedAdapter = new EOFeedAdapter();
-        _feedAdapter.initialize(_feedManager, FEED_ID, DECIMALS, DESCRIPTION, VERSION);
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
         _lastTimestamp = block.timestamp;
         _lastBlockNumber = block.number;
         _updatePriceFeed(FEED_ID, RATE1, block.timestamp);

@@ -183,6 +183,12 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.setNewValidatorSet(validatorSet);
     }
 
+    function test_RevertWhen_ZeroAddress_SetNewValidatorSet() public {
+        validatorSet[0]._address = address(0);
+        vm.expectRevert(InvalidAddress.selector);
+        feedVerifier.setNewValidatorSet(validatorSet);
+    }
+
     function _getDefaultInput() internal view returns (IEOFeedVerifier.LeafInput memory) {
         return IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
     }
