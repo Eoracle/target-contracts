@@ -30,6 +30,16 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
         assertEq(feedVerifier.eoracleChainId(), eoracleChainId);
         assertEq(feedVerifier.owner(), address(this));
     }
+
+    function test_RevertWhen_Verify_NotInitialized() public {
+        IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
+        IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+
+        vm.expectRevert(CallerIsNotFeedManager.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+    }
 }
 
 contract EOFeedVerifierTest is InitializedFeedVerifier {
@@ -132,6 +142,18 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.verify(input, checkpoint, signature, bitmap);
     }
 
+    function test_RevertWhen_Verify_WithEmptyValidatorSet() public {
+        IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
+        IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+        IEOFeedVerifier.Validator[] memory emptyValidatorSet;
+        feedVerifier.setNewValidatorSet(emptyValidatorSet);
+
+        vm.expectRevert(AggVotingPowerIsZero.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+    }
+
     function test_batchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
@@ -202,19 +224,5 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
         vm.prank(alice);
         feedVerifier.setNewValidatorSet(validatorSet);
-    }
-
-    function _getDefaultInput() internal view returns (IEOFeedVerifier.LeafInput memory) {
-        return IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
-    }
-
-    function _getDefaultCheckpoint() internal view returns (IEOFeedVerifier.Checkpoint memory) {
-        return IEOFeedVerifier.Checkpoint({
-            epoch: 1,
-            blockNumber: 1,
-            eventRoot: hashes[0],
-            blockHash: hashes[1],
-            blockRound: 0
-        });
     }
 }
