@@ -205,10 +205,10 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         _currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
         uint256 totalPower = 0;
         for (uint256 i = 0; i < length; i++) {
+            if (newValidatorSet[i]._address == address(0)) revert InvalidAddress();
             uint256 votingPower = newValidatorSet[i].votingPower;
             if (votingPower == 0) revert VotingPowerIsZero();
             totalPower += votingPower;
-            if (newValidatorSet[i]._address == address(0)) revert InvalidAddress();
             _currentValidatorSet[i] = newValidatorSet[i];
         }
         _totalVotingPower = totalPower;

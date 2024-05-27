@@ -6,9 +6,12 @@ import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
 import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
+
+import { InvalidAddress } from "../../../src/interfaces/Errors.sol";
+
 // solhint-disable ordering
 
-contract EOFeedAdapterTest is Test {
+abstract contract EOFeedAdapterTestUninitialized is Test {
     uint8 public constant DECIMALS = 8;
     string public constant DESCRIPTION = "ETH/USD";
     uint256 public constant VERSION = 1;
@@ -27,9 +30,30 @@ contract EOFeedAdapterTest is Test {
 
         _feedManager = new MockEOFeedManager();
         _feedAdapter = new EOFeedAdapter();
-        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
         _lastTimestamp = block.timestamp;
         _lastBlockNumber = block.number;
+    }
+}
+
+contract EOFeedAdapterInitializationTest is EOFeedAdapterTestUninitialized {
+    function test_Initialize() public {
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
+        assertEq(_feedAdapter.getFeedId(), FEED_ID);
+        assertEq(_feedAdapter.decimals(), DECIMALS);
+        assertEq(_feedAdapter.description(), DESCRIPTION);
+        assertEq(_feedAdapter.version(), VERSION);
+    }
+
+    function test_RevertWhen_ZeroAddress_Initialize() public {
+        vm.expectRevert(InvalidAddress.selector);
+        _feedAdapter.initialize(address(0), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
+    }
+}
+
+contract EOFeedAdapterTest is EOFeedAdapterTestUninitialized {
+    function setUp() public virtual override {
+        super.setUp();
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
         _updatePriceFeed(FEED_ID, RATE1, block.timestamp);
     }
 
