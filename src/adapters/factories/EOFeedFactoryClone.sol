@@ -19,7 +19,6 @@ abstract contract EOFeedFactoryClone is Initializable, EOFeedFactoryBase {
      * @dev Initializes the factory with the feedAdapter implementation.
      */
     function __EOFeedFactory_init(address impl, address) internal override onlyInitializing {
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedImplementation = impl;
     }
 

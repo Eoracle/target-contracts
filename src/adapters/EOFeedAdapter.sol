@@ -5,6 +5,8 @@ import { IEOFeedManager } from "../interfaces/IEOFeedManager.sol";
 import { IEOFeedAdapter } from "./interfaces/IEOFeedAdapter.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+import { InvalidAddress } from "../interfaces/Errors.sol";
+
 /**
  * @title EOFeedAdapter
  * @notice Price feed adapter contract
@@ -27,7 +29,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      * @param feedVersion The version of feed
      */
     function initialize(
-        IEOFeedManager feedManager,
+        address feedManager,
         uint16 feedId,
         uint8 feedDecimals,
         string memory feedDescription,
@@ -36,8 +38,8 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         external
         initializer
     {
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
-        _feedManager = feedManager;
+        if (feedManager == address(0)) revert InvalidAddress();
+        _feedManager = IEOFeedManager(feedManager);
         _feedId = feedId;
         _decimals = feedDecimals;
         _description = feedDescription;

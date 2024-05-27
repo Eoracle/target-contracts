@@ -64,7 +64,7 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
                                         EOFeedManager
         //////////////////////////////////////////////////////////////////////////*/
         feedManagerProxy = deployFeedManager(
-            configStructured.proxyAdminOwner, IEOFeedVerifier(feedVerifierProxy), configStructured.targetContractsOwner
+            configStructured.proxyAdminOwner, feedVerifierProxy, configStructured.targetContractsOwner
         );
         vm.stopBroadcast();
         vm.broadcast(configStructured.targetContractsOwner);

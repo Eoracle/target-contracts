@@ -5,12 +5,11 @@ pragma solidity 0.8.25;
 import { Script } from "forge-std/Script.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { EOFeedManager } from "src/EOFeedManager.sol";
-import { IEOFeedVerifier } from "src/interfaces/IEOFeedVerifier.sol";
 
 abstract contract FeedManagerDeployer is Script {
     function deployFeedManager(
         address proxyAdmin,
-        IEOFeedVerifier feedVerifier,
+        address feedVerifier,
         address owner
     )
         internal
@@ -23,14 +22,7 @@ abstract contract FeedManagerDeployer is Script {
 }
 
 contract DeployFeedManager is FeedManagerDeployer {
-    function run(
-        address proxyAdmin,
-        IEOFeedVerifier feedVerifier,
-        address owner
-    )
-        external
-        returns (address proxyAddr)
-    {
+    function run(address proxyAdmin, address feedVerifier, address owner) external returns (address proxyAddr) {
         return deployFeedManager(proxyAdmin, feedVerifier, owner);
     }
 }
