@@ -90,6 +90,9 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
 
 // solhint-disable max-states-count
 contract IntegrationMultipleCheckpointsTests is IntegrationBaseTests {
+    /**
+     * @notice update the same price feed in different checkpoints
+     */
     function test_updatePriceFeed_SameFeedsMultipleCheckpoints() public {
         vm.prank(_publisher);
         _feedManager.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
@@ -113,6 +116,9 @@ contract IntegrationMultipleCheckpointsTests is IntegrationBaseTests {
         assertEq(_feedRegistryAdapter.getFeedById(_feedIds[0]).latestAnswer(), int256(_rates[0]));
     }
 
+    /**
+     * @notice update different price feeds in different checkpoints
+     */
     function test_updatePriceFeed_DifferentFeedsMultipleCheckpoints() public {
         vm.prank(_publisher);
         _feedManager.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
@@ -140,5 +146,34 @@ contract IntegrationMultipleCheckpointsTests is IntegrationBaseTests {
         // check that first feed was not updated
         assertEq(feedAdapter1.value, feed1Value);
         assertEq(feedAdapter1.eoracleBlockNumber, feed1BlockNumber);
+    }
+
+    /**
+     * @notice update multiple price feeds in different checkpoints
+     */
+    function test_updatePriceFeeds_MultipleCheckpoints() public {
+        IEOFeedManager.PriceFeed memory feedAdapter;
+        vm.prank(_publisher);
+        _feedManager.updatePriceFeeds(input, checkpoints[0], signatures[0], bitmaps[0]);
+        for (uint256 i = 0; i < _feedIds.length; i++) {
+            feedAdapter = _feedManager.getLatestPriceFeed(_feedIds[i]);
+            assertEq(feedAdapter.value, _rates[i]);
+        }
+
+        vm.warp(block.timestamp + 1);
+
+        EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
+        // create new rates
+        _seedfeedsData(configStructured, uint256(99));
+        // create new checkpoint
+        _generatePayload(feedsData);
+        _setValidatorSet(validatorSet);
+
+        vm.prank(_publisher);
+        _feedManager.updatePriceFeeds(input, checkpoints[0], signatures[0], bitmaps[0]);
+        for (uint256 i = 0; i < _feedIds.length; i++) {
+            feedAdapter = _feedManager.getLatestPriceFeed(_feedIds[i]);
+            assertEq(feedAdapter.value, _rates[i]);
+        }
     }
 }
