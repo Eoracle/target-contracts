@@ -20,7 +20,6 @@ abstract contract EOFeedFactoryBeacon is Initializable, EOFeedFactoryBase {
      * @dev Initializes the factory with the feedAdapter implementation.
      */
     function __EOFeedFactory_init(address impl, address initialOwner) internal override onlyInitializing {
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _beacon = address(new UpgradeableBeacon(impl, initialOwner));
     }
 
@@ -28,7 +27,6 @@ abstract contract EOFeedFactoryBeacon is Initializable, EOFeedFactoryBase {
      * @dev Deploys a new feedAdapter instance via Beacon proxy.
      */
     function _deployEOFeedAdapter() internal override returns (address) {
-        // TODO: can be done with predictable address using create2
         return address(new BeaconProxy(_beacon, ""));
     }
 }

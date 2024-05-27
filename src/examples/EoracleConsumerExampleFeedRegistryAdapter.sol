@@ -9,12 +9,10 @@ contract EoracleConsumerExampleFeedRegistryAdapter {
     IEOFeedRegistryAdapter private _feedRegistryAdapter;
 
     constructor(address feedRegistryAdapter) {
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedRegistryAdapter = IEOFeedRegistryAdapter(feedRegistryAdapter);
     }
 
     function setFeedRegistryAdapter(address feedRegistryAdapter) external {
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedRegistryAdapter = IEOFeedRegistryAdapter(feedRegistryAdapter);
     }
 

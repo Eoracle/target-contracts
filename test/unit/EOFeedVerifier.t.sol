@@ -4,6 +4,8 @@ pragma solidity 0.8.25;
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { IBLS } from "../../src/interfaces/IBLS.sol";
 import { UninitializedFeedVerifier, InitializedFeedVerifier } from "./EOFeedVerifierBase.t.sol";
+
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {
     InvalidProof,
     InvalidAddress,
@@ -28,6 +30,16 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
         assertEq(feedVerifier.eoracleChainId(), eoracleChainId);
         assertEq(feedVerifier.owner(), address(this));
     }
+
+    function test_RevertWhen_Verify_NotInitialized() public {
+        IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
+        IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+
+        vm.expectRevert(CallerIsNotFeedManager.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+    }
 }
 
 contract EOFeedVerifierTest is InitializedFeedVerifier {
@@ -37,9 +49,16 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         assertEq(feedVerifier.feedManager(), feedManagerAddr);
     }
 
-    function test_RevertWhen_SetFeedManagerInvalidAddress() public {
+    function test_RevertWhen_InvalidAddress_SetFeedManager() public {
         vm.expectRevert(InvalidAddress.selector);
         feedVerifier.setFeedManager(address(0));
+    }
+
+    function test_RevertWhen_NotOwner_SetFeedManager() public {
+        address feedManagerAddr = makeAddr("feedManager");
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
+        vm.prank(alice);
+        feedVerifier.setFeedManager(feedManagerAddr);
     }
 
     function test_verify() public {
@@ -59,7 +78,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         assertEq(feedVerifier.lastProcessedEventRoot(), eventRoot);
     }
 
-    function test_RevertWhen_Verify_CalledByNotFeedManager() public {
+    function test_RevertWhen_CalledByNotFeedManager_Verify() public {
         IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
 
@@ -71,7 +90,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.verify(input, checkpoint, signature, bitmap);
     }
 
-    function test_RevertWhen_Verify_InvalidEventRoot() public {
+    function test_RevertWhen_InvalidEventRoot_Verify() public {
         IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
 
@@ -123,6 +142,18 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.verify(input, checkpoint, signature, bitmap);
     }
 
+    function test_RevertWhen_Verify_WithEmptyValidatorSet() public {
+        IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
+        IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
+        uint256[2] memory signature = aggMessagePoints[0];
+        bytes memory bitmap = bitmaps[0];
+        IEOFeedVerifier.Validator[] memory emptyValidatorSet;
+        feedVerifier.setNewValidatorSet(emptyValidatorSet);
+
+        vm.expectRevert(AggVotingPowerIsZero.selector);
+        feedVerifier.verify(input, checkpoint, signature, bitmap);
+    }
+
     function test_batchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
@@ -134,7 +165,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
     }
 
-    function test_RevertWhen_BatchVerify_CalledByNotFeedManager() public {
+    function test_RevertWhen_CalledByNotFeedManager_BatchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
         inputs[0] = _getDefaultInput();
@@ -146,7 +177,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
     }
 
-    function test_RevertWhen_BatchVerify_InvalidEventRoot() public {
+    function test_RevertWhen_InvalidEventRoot_BatchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
         inputs[0] = _getDefaultInput();
@@ -183,17 +214,15 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.setNewValidatorSet(validatorSet);
     }
 
-    function _getDefaultInput() internal view returns (IEOFeedVerifier.LeafInput memory) {
-        return IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[0], leafIndex: 0, proof: proves[0] });
+    function test_RevertWhen_ZeroAddress_SetNewValidatorSet() public {
+        validatorSet[0]._address = address(0);
+        vm.expectRevert(InvalidAddress.selector);
+        feedVerifier.setNewValidatorSet(validatorSet);
     }
 
-    function _getDefaultCheckpoint() internal view returns (IEOFeedVerifier.Checkpoint memory) {
-        return IEOFeedVerifier.Checkpoint({
-            epoch: 1,
-            blockNumber: 1,
-            eventRoot: hashes[0],
-            blockHash: hashes[1],
-            blockRound: 0
-        });
+    function test_RevertWhen_NotOwner_SetNewValidatorSet() public {
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
+        vm.prank(alice);
+        feedVerifier.setNewValidatorSet(validatorSet);
     }
 }
