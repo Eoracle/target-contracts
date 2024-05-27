@@ -112,4 +112,33 @@ contract IntegrationMultipleCheckpointsTests is IntegrationBaseTests {
         assertEq(feedAdapter.value, _rates[0]);
         assertEq(_feedRegistryAdapter.getFeedById(_feedIds[0]).latestAnswer(), int256(_rates[0]));
     }
+
+    function test_updatePriceFeed_DifferentFeedsMultipleCheckpoints() public {
+        vm.prank(_publisher);
+        _feedManager.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
+        IEOFeedManager.PriceFeed memory feedAdapter1 = _feedManager.getLatestPriceFeed(_feedIds[0]);
+        uint256 feed1Value = _rates[0];
+        uint256 feed1BlockNumber = block.number;
+        assertEq(feedAdapter1.value, feed1Value);
+        assertEq(feedAdapter1.eoracleBlockNumber, feed1BlockNumber);
+
+        vm.warp(block.timestamp + 1);
+        vm.roll(block.number + 1);
+
+        // create new rates
+        delete feedsData;
+        feedsData.push(abi.encode(_feedIds[1], _rates[1], block.timestamp));
+        // create new checkpoint
+        _generatePayload(feedsData);
+        _setValidatorSet(validatorSet);
+
+        vm.prank(_publisher);
+        _feedManager.updatePriceFeed(input[0], checkpoints[0], signatures[0], bitmaps[0]);
+        IEOFeedManager.PriceFeed memory feedAdapter2 = _feedManager.getLatestPriceFeed(_feedIds[1]);
+        assertEq(feedAdapter2.value, _rates[1]);
+        assertEq(feedAdapter2.eoracleBlockNumber, block.number);
+        // check that first feed was not updated
+        assertEq(feedAdapter1.value, feed1Value);
+        assertEq(feedAdapter1.eoracleBlockNumber, feed1BlockNumber);
+    }
 }
