@@ -4,6 +4,8 @@ pragma solidity 0.8.25;
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { IBLS } from "../../src/interfaces/IBLS.sol";
 import { UninitializedFeedVerifier, InitializedFeedVerifier } from "./EOFeedVerifierBase.t.sol";
+
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {
     InvalidProof,
     InvalidAddress,
@@ -11,7 +13,8 @@ import {
     AggVotingPowerIsZero,
     InsufficientVotingPower,
     CallerIsNotFeedManager,
-    InvalidEventRoot
+    InvalidEventRoot,
+    InvalidValidatorsLength
 } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
@@ -37,9 +40,16 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         assertEq(feedVerifier.feedManager(), feedManagerAddr);
     }
 
-    function test_RevertWhen_SetFeedManagerInvalidAddress() public {
+    function test_RevertWhen_InvalidAddress_SetFeedManager() public {
         vm.expectRevert(InvalidAddress.selector);
         feedVerifier.setFeedManager(address(0));
+    }
+
+    function test_RevertWhen_NotOwner_SetFeedManager() public {
+        address feedManagerAddr = makeAddr("feedManager");
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
+        vm.prank(alice);
+        feedVerifier.setFeedManager(feedManagerAddr);
     }
 
     function test_verify() public {
@@ -59,7 +69,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         assertEq(feedVerifier.lastProcessedEventRoot(), eventRoot);
     }
 
-    function test_RevertWhen_Verify_CalledByNotFeedManager() public {
+    function test_RevertWhen_CalledByNotFeedManager_Verify() public {
         IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
 
@@ -71,7 +81,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.verify(input, checkpoint, signature, bitmap);
     }
 
-    function test_RevertWhen_Verify_InvalidEventRoot() public {
+    function test_RevertWhen_InvalidEventRoot_Verify() public {
         IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
 
@@ -134,7 +144,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
     }
 
-    function test_RevertWhen_BatchVerify_CalledByNotFeedManager() public {
+    function test_RevertWhen_CalledByNotFeedManager_BatchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
         inputs[0] = _getDefaultInput();
@@ -146,7 +156,7 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
     }
 
-    function test_RevertWhen_BatchVerify_InvalidEventRoot() public {
+    function test_RevertWhen_InvalidEventRoot_BatchVerify() public {
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
         IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
         inputs[0] = _getDefaultInput();
@@ -186,6 +196,18 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
     function test_RevertWhen_ZeroAddress_SetNewValidatorSet() public {
         validatorSet[0]._address = address(0);
         vm.expectRevert(InvalidAddress.selector);
+        feedVerifier.setNewValidatorSet(validatorSet);
+    }
+
+    function test_RevertWhen_InvalidValidatorsLength_SetNewValidatorSet() public {
+        IEOFeedVerifier.Validator[] memory validatorSetTmp = new IEOFeedVerifier.Validator[](257);
+        vm.expectRevert(InvalidValidatorsLength.selector);
+        feedVerifier.setNewValidatorSet(validatorSetTmp);
+    }
+
+    function test_RevertWhen_NotOwner_SetNewValidatorSet() public {
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
+        vm.prank(alice);
         feedVerifier.setNewValidatorSet(validatorSet);
     }
 
