@@ -40,7 +40,6 @@
   - [AggVotingPowerIsZero](src/interfaces/Errors.sol/error.AggVotingPowerIsZero.md)
   - [InsufficientVotingPower](src/interfaces/Errors.sol/error.InsufficientVotingPower.md)
   - [SignatureVerficationFailed](src/interfaces/Errors.sol/error.SignatureVerficationFailed.md)
-  - [InvalidValidatorsLength](src/interfaces/Errors.sol/error.InvalidValidatorsLength.md)
   - [FeedAlreadyExists](src/interfaces/Errors.sol/error.FeedAlreadyExists.md)
   - [BaseQuotePairExists](src/interfaces/Errors.sol/error.BaseQuotePairExists.md)
   - [IBLS](src/interfaces/IBLS.sol/interface.IBLS.md)

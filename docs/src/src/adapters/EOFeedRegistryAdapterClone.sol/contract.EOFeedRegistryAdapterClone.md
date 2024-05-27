@@ -1,6 +1,6 @@
 # EOFeedRegistryAdapterClone
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/836becbe8b5ae010bb5578a508ed70676be90884/src/adapters/EOFeedRegistryAdapterClone.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/1999827c161f91e9bc99ac290d34e4d278bf02c5/src/adapters/EOFeedRegistryAdapterClone.sol)
 
 **Inherits:**
 [EOFeedRegistryAdapterBase](/src/adapters/EOFeedRegistryAdapterBase.sol/abstract.EOFeedRegistryAdapterBase.md),

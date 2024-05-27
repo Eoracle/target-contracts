@@ -1,6 +1,6 @@
 # EOFeedVerifier
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/836becbe8b5ae010bb5578a508ed70676be90884/src/EOFeedVerifier.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/1999827c161f91e9bc99ac290d34e4d278bf02c5/src/EOFeedVerifier.sol)
 
 **Inherits:** [IEOFeedVerifier](/src/interfaces/IEOFeedVerifier.sol/interface.IEOFeedVerifier.md), OwnableUpgradeable
 
@@ -10,12 +10,6 @@
 
 ```solidity
 bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
-```
-
-### MAX_VALIDATORS
-
-```solidity
-uint256 public constant MAX_VALIDATORS = 256;
 ```
 
 ### \_eoracleChainId

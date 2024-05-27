@@ -12,8 +12,7 @@ import {
     VotingPowerIsZero,
     AggVotingPowerIsZero,
     InsufficientVotingPower,
-    SignatureVerficationFailed,
-    InvalidValidatorsLength
+    SignatureVerficationFailed
 } from "./interfaces/Errors.sol";
 import { IBLS } from "./interfaces/IBLS.sol";
 import { IBN256G2 } from "./interfaces/IBN256G2.sol";
@@ -22,7 +21,6 @@ using Merkle for bytes32;
 
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
-    uint256 public constant MAX_VALIDATORS = 256;
 
     uint256 internal _eoracleChainId;
     IBLS internal _bls;
@@ -200,7 +198,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner {
         uint256 length = newValidatorSet.length;
-        if (length > MAX_VALIDATORS) revert InvalidValidatorsLength();
         _currentValidatorSetLength = length;
         _currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
         uint256 totalPower = 0;
@@ -346,7 +343,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      *              Returns 'true' if the bit is set (1), and 'false' if the bit is not set (0).
      */
     function _getValueFromBitmap(bytes calldata bitmap, uint256 index) private pure returns (bool) {
-        // index is < 256, byteNumber will always be less than 8
         uint256 byteNumber = index / 8;
         // safe to downcast as any value % 8 will always be less than 8
         uint8 bitNumber = uint8(index % 8);
@@ -354,7 +350,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         if (byteNumber >= bitmap.length) {
             return false;
         }
-        // safe to downcast as bitmap[byteNumber] will always be less than 256
+        // safe to downcast as bitmap[byteNumber] is byte and less than 256
         return uint8(bitmap[byteNumber]) & (1 << bitNumber) > 0;
     }
 

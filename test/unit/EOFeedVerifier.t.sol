@@ -13,8 +13,7 @@ import {
     AggVotingPowerIsZero,
     InsufficientVotingPower,
     CallerIsNotFeedManager,
-    InvalidEventRoot,
-    InvalidValidatorsLength
+    InvalidEventRoot
 } from "../../src/interfaces/Errors.sol";
 
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
@@ -197,12 +196,6 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         validatorSet[0]._address = address(0);
         vm.expectRevert(InvalidAddress.selector);
         feedVerifier.setNewValidatorSet(validatorSet);
-    }
-
-    function test_RevertWhen_InvalidValidatorsLength_SetNewValidatorSet() public {
-        IEOFeedVerifier.Validator[] memory validatorSetTmp = new IEOFeedVerifier.Validator[](257);
-        vm.expectRevert(InvalidValidatorsLength.selector);
-        feedVerifier.setNewValidatorSet(validatorSetTmp);
     }
 
     function test_RevertWhen_NotOwner_SetNewValidatorSet() public {

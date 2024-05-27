@@ -1,6 +1,6 @@
 # BN256G2v1
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/836becbe8b5ae010bb5578a508ed70676be90884/src/common/BN256G2v1.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/1999827c161f91e9bc99ac290d34e4d278bf02c5/src/common/BN256G2v1.sol)
 
 **Inherits:** [IBN256G2](/src/interfaces/IBN256G2.sol/interface.IBN256G2.md)
 
