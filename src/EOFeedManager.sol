@@ -5,17 +5,27 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedManager } from "./interfaces/IEOFeedManager.sol";
-import { CallerIsNotWhitelisted, MissingLeafInputs, FeedNotSupported, SymbolReplay } from "./interfaces/Errors.sol";
+import {
+    InvalidAddress,
+    CallerIsNotWhitelisted,
+    MissingLeafInputs,
+    FeedNotSupported,
+    SymbolReplay
+} from "./interfaces/Errors.sol";
 
 contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     mapping(uint16 => PriceFeed) internal _priceFeeds;
     mapping(address => bool) internal _whitelistedPublishers;
     mapping(uint16 => bool) internal _supportedFeedIds;
-    // TODO: no setter for the _feedVerifier, is it intended?
     IEOFeedVerifier internal _feedVerifier;
 
     modifier onlyWhitelisted() {
         if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
+        _;
+    }
+
+    modifier onlyNonZeroAddress(address addr) {
+        if (addr == address(0)) revert InvalidAddress();
         _;
     }
 
@@ -25,10 +35,16 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      * @param feedVerifier Address of the feed verifier contract
      * @param owner Owner of the contract
      */
-    function initialize(IEOFeedVerifier feedVerifier, address owner) external initializer {
+    function initialize(address feedVerifier, address owner) external onlyNonZeroAddress(feedVerifier) initializer {
         __Ownable_init(owner);
+        _feedVerifier = IEOFeedVerifier(feedVerifier);
+    }
 
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
+    /**
+     * @notice Set the feed verifier contract address
+     * @param feedVerifier Address of the feed verifier contract
+     */
+    function setFeedVerifier(address feedVerifier) external onlyOwner onlyNonZeroAddress(feedVerifier) {
         _feedVerifier = IEOFeedVerifier(feedVerifier);
     }
 
@@ -37,10 +53,8 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      * @param feedIds Array of feed ids
      * @param isSupported Array of booleans indicating whether the feed is supported
      */
-    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     function setSupportedFeeds(uint16[] calldata feedIds, bool[] calldata isSupported) external onlyOwner {
         for (uint256 i = 0; i < feedIds.length; i++) {
-            // TODO: check if it not already the needed value
             _supportedFeedIds[feedIds[i]] = isSupported[i];
         }
     }
@@ -50,12 +64,9 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      * @param publishers Array of publisher addresses
      * @param isWhitelisted Array of booleans indicating whether the publisher is whitelisted
      */
-    // TODO: it's better to use add/remove logic for whitelisted publishers
-    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external onlyOwner {
         for (uint256 i = 0; i < publishers.length; i++) {
-            // TODO: check if it not already the needed value
-            // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
+            if (publishers[i] == address(0)) revert InvalidAddress();
             _whitelistedPublishers[publishers[i]] = isWhitelisted[i];
         }
     }

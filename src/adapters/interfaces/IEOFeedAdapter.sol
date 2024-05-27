@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { IEOFeedManager } from "../../interfaces/IEOFeedManager.sol";
-
 /**
  * @title IEOFeedAdapter
  * @notice Interface for the EOFeedAdapter contract.
@@ -11,7 +9,7 @@ import { IEOFeedManager } from "../../interfaces/IEOFeedManager.sol";
 interface IEOFeedAdapter {
     // slither-disable-next-line missing-inheritance
     function initialize(
-        IEOFeedManager feedManager,
+        address feedManager,
         uint16 feedId,
         uint8 feedDecimals,
         string memory feedDescription,

@@ -8,12 +8,10 @@ contract EoracleConsumerExampleFeedManager {
     IEOFeedManager private _feedManager;
 
     constructor(address feedManager) {
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedManager = IEOFeedManager(feedManager);
     }
 
     function setFeedManager(address feedManager) external {
-        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedManager = IEOFeedManager(feedManager);
     }
 
@@ -28,8 +26,6 @@ contract EoracleConsumerExampleFeedManager {
 
     //Example for using EOFeedManager.getLatestPriceFeeds with a list of feed Ids
     function getPrices(uint16[] calldata feedIds) external view returns (IEOFeedManager.PriceFeed[] memory) {
-        // @audit-info Olimpix: External Call Potential Out Of Gas
-        // may cause execution to run out of gas.
         return _feedManager.getLatestPriceFeeds(feedIds);
     }
 }

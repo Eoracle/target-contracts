@@ -1,6 +1,6 @@
 # CallerIsNotWhitelisted
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/2a1c0c442230a3038c84f19545812da920182a69/src/interfaces/Errors.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/1999827c161f91e9bc99ac290d34e4d278bf02c5/src/interfaces/Errors.sol)
 
 ```solidity
 error CallerIsNotWhitelisted(address caller);
