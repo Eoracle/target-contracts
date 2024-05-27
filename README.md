@@ -86,7 +86,7 @@ Configuration file is located by path `script/config/{targetChainId}/{eoracleCha
 - **supportedFeedsData** - array with data of the feeds
 
   - **base** - address of the base token (erc-20 address or address from [Denominations](src/libraries/Denominations.sol/library.Denominations.md))
-  - **quote** - address of the qoute token (erc-20 address or address from [Denominations](src/libraries/Denominations.sol/library.Denominations.md)
+  - **quote** - address of the quote token (erc-20 address or address from [Denominations](src/libraries/Denominations.sol/library.Denominations.md)
   - **decimals** - rate decimals for the feed
   - **description** - feed description
   - **feedId** - id of the feed

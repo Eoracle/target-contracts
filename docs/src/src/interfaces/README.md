@@ -12,7 +12,7 @@
 - [VotingPowerIsZero](Errors.sol/error.VotingPowerIsZero.md)
 - [AggVotingPowerIsZero](Errors.sol/error.AggVotingPowerIsZero.md)
 - [InsufficientVotingPower](Errors.sol/error.InsufficientVotingPower.md)
-- [SignatureVerficationFailed](Errors.sol/error.SignatureVerficationFailed.md)
+- [SignatureVerificationFailed](Errors.sol/error.SignatureVerificationFailed.md)
 - [FeedAlreadyExists](Errors.sol/error.FeedAlreadyExists.md)
 - [BaseQuotePairExists](Errors.sol/error.BaseQuotePairExists.md)
 - [IBLS](IBLS.sol/interface.IBLS.md)

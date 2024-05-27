@@ -138,7 +138,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
         bitmaps.push(_bitmaps[0]);
     }
 
-    function _seedfeedsData(EOJsonUtils.Config memory configStructured) internal override {
+    function _seedFeedsData(EOJsonUtils.Config memory configStructured) internal override {
         for (uint256 i = 0; i < configStructured.supportedFeedIds.length; i++) {
             _feedIds.push(uint16(configStructured.supportedFeedIds[i]));
             _rates.push(100 + configStructured.supportedFeedIds[i]);

@@ -19,7 +19,7 @@ error InvalidEventRoot();
 error VotingPowerIsZero();
 error AggVotingPowerIsZero();
 error InsufficientVotingPower();
-error SignatureVerficationFailed();
+error SignatureVerificationFailed();
 
 /*//////////////////////////////////////////////////////////////////////////
                                 EOFeedRegistryAdapter
