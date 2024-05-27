@@ -56,10 +56,10 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @param feedVersion The version of the feed
      * @return IEOFeedAdapter The feed adapter
      */
+    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     // This function can reenter through the external call to the deployed EOFeedAdapter, but the external contract is
     // being deployed by this contract, so it is considered safe
     // slither-disable-next-line reentrancy-no-eth,reentrancy-benign,reentrancy-events
-    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     function deployEOFeedAdapter(
         address base,
         address quote,
