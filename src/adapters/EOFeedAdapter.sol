@@ -33,9 +33,10 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         string memory feedDescription,
         uint256 feedVersion
     )
-        public
+        external
         initializer
     {
+        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedManager = feedManager;
         _feedId = feedId;
         _decimals = feedDecimals;
@@ -154,9 +155,10 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
 
     /**
      * @notice Get the latest round
-     * @return uint256 The round, round is not used, 0 is returned
+     * @return uint256 The round id, eoracle block number
      */
-    function latestRound() external pure returns (uint256) {
-        return 0;
+    function latestRound() external view returns (uint256) {
+        IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
+        return priceData.eoracleBlockNumber;
     }
 }

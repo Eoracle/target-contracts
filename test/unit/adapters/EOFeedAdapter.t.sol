@@ -62,7 +62,7 @@ contract EOFeedAdapterTest is Test {
     }
 
     function test_LatestRound() public view {
-        assertEq(_feedAdapter.latestRound(), 0);
+        assertEq(_feedAdapter.latestRound(), _lastBlockNumber);
     }
 
     function test_GetAnswer() public view {
@@ -104,7 +104,7 @@ contract EOFeedAdapterTest is Test {
 
         assertEq(_feedAdapter.latestAnswer(), int256(RATE2));
         assertEq(_feedAdapter.latestTimestamp(), block.timestamp);
-        assertEq(_feedAdapter.latestRound(), 0);
+        assertEq(_feedAdapter.latestRound(), _lastBlockNumber);
         assertEq(_feedAdapter.getAnswer(2), int256(RATE2));
         assertEq(_feedAdapter.getTimestamp(2), block.timestamp);
     }
