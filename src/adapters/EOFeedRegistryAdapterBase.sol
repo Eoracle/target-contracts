@@ -30,6 +30,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
     function initialize(address feedManager, address feedAdapterImplementation, address owner) external initializer {
         __Ownable_init(owner);
         __EOFeedFactory_init(feedAdapterImplementation, owner);
+        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedManager = IEOFeedManager(feedManager);
         emit FeedManagerSet(feedManager);
     }
@@ -38,7 +39,9 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @notice Set the feed manager
      * @param feedManager The feed manager address
      */
+    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     function setFeedManager(address feedManager) external onlyOwner {
+        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedManager = IEOFeedManager(feedManager);
         emit FeedManagerSet(feedManager);
     }
@@ -53,6 +56,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @param feedVersion The version of the feed
      * @return IEOFeedAdapter The feed adapter
      */
+    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     // This function can reenter through the external call to the deployed EOFeedAdapter, but the external contract is
     // being deployed by this contract, so it is considered safe
     // slither-disable-next-line reentrancy-no-eth,reentrancy-benign,reentrancy-events

@@ -27,6 +27,8 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      */
     function initialize(IEOFeedVerifier feedVerifier, address owner) external initializer {
         __Ownable_init(owner);
+
+        // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
         _feedVerifier = IEOFeedVerifier(feedVerifier);
     }
 
@@ -35,6 +37,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      * @param feedIds Array of feed ids
      * @param isSupported Array of booleans indicating whether the feed is supported
      */
+    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     function setSupportedFeeds(uint16[] calldata feedIds, bool[] calldata isSupported) external onlyOwner {
         for (uint256 i = 0; i < feedIds.length; i++) {
             // TODO: check if it not already the needed value
@@ -48,9 +51,11 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      * @param isWhitelisted Array of booleans indicating whether the publisher is whitelisted
      */
     // TODO: it's better to use add/remove logic for whitelisted publishers
+    // @audit-info Aderyn: L-1: Centralization Risk for trusted owners
     function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external onlyOwner {
         for (uint256 i = 0; i < publishers.length; i++) {
             // TODO: check if it not already the needed value
+            // @audit-info Aderyn: L-3: Missing checks for address(0) when assigning values to address state variables
             _whitelistedPublishers[publishers[i]] = isWhitelisted[i];
         }
     }
