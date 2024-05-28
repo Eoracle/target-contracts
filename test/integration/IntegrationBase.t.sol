@@ -67,7 +67,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
         _feedManager = EOFeedManager(feedManagerAddr);
         _feedRegistryAdapter = EOFeedRegistryAdapter(feedRegistryAdapterAddress);
 
-        _seedfeedsData(configStructured, uint256(100));
+        _seedFeedsData(configStructured, uint256(100));
         _generatePayload(feedsData);
 
         _setValidatorSet(validatorSet);
@@ -154,7 +154,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
         bitmaps.push(_bitmaps[0]);
     }
 
-    function _seedfeedsData(EOJsonUtils.Config memory configStructured, uint256 initialRate) internal virtual {
+    function _seedFeedsData(EOJsonUtils.Config memory configStructured, uint256 initialRate) internal virtual {
         delete feedsData;
         delete _rates;
         delete _feedIds;

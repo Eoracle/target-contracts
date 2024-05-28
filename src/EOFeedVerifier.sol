@@ -12,7 +12,7 @@ import {
     VotingPowerIsZero,
     AggVotingPowerIsZero,
     InsufficientVotingPower,
-    SignatureVerficationFailed
+    SignatureVerificationFailed
 } from "./interfaces/Errors.sol";
 import { IBLS } from "./interfaces/IBLS.sol";
 import { IBN256G2 } from "./interfaces/IBN256G2.sol";
@@ -299,7 +299,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
         (bool callSuccess, bool result) = _bls.verifySingle(signature, aggPubkey, message);
 
-        if (!callSuccess || !result) revert SignatureVerficationFailed();
+        if (!callSuccess || !result) revert SignatureVerificationFailed();
     }
 
     /**

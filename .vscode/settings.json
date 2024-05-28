@@ -6,5 +6,22 @@
     "editor.defaultFormatter": "JuanBlanco.solidity"
   },
   "solidity.formatter": "forge",
-  "security.olympix.project.includePath": "src"
+  "security.olympix.project.includePath": "src",
+  "cSpell.enableFiletypes": ["solidity"],
+  "cSpell.words": [
+    "eoracle",
+    "FEEDSDATA",
+    "IBLS",
+    "inheritdoc",
+    "Initializable",
+    "keccak",
+    "lcov",
+    "Merkle",
+    "Modexp",
+    "Reentrancy",
+    "solhint",
+    "struct",
+    "structs",
+    "unhashed"
+  ]
 }
