@@ -73,8 +73,8 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
 
     /**
      * @notice Update the price for a feed
-     * @param input A leaf to prove the price feeds
-     * @param checkpoint Checkpoint data
+     * @param input A merkle leaf containing price data and its merkle proof
+     * @param checkpoint Checkpoint data containing eoracle chain metadata and the data merke root
      * @param signature Aggregated signature of the checkpoint
      * @param bitmap Bitmap of the validators who signed the checkpoint
      */

@@ -5,6 +5,7 @@ pragma solidity 0.8.25;
 library Denominations {
     address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address public constant BTC = 0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB;
+    address public constant DOGE = 0xDDdDddDdDdddDDddDDddDDDDdDdDDdDDdDDDDDDd;
 
     // Fiat currencies follow https://en.wikipedia.org/wiki/ISO_4217
     address public constant USD = address(840);
