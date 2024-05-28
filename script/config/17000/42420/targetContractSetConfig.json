@@ -5,7 +5,7 @@
   "eoracleChainId": 42420,
   "targetChainId": 17000,
   "publishers": ["0x077758247f36a5ec1d11b0A583f717eeD66578bf", "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34"],
-  "supportedFeedIds": [1, 2, 41, 42],
+  "supportedFeedIds": [1, 2, 5, 13, 41, 42],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -20,6 +20,20 @@
       "decimals": 18,
       "description": "ETH/USD",
       "feedId": 2
+    },
+    {
+      "base": "0xDDdDddDdDdddDDddDDddDDDDdDdDDdDDdDDDDDDd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "DOGE/USD",
+      "feedId": 5
+    },
+    {
+      "base": "0x00000000000000000000000000000000000003d2",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "EUR/USD",
+      "feedId": 13
     },
     {
       "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
