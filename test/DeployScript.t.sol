@@ -41,7 +41,7 @@ contract DeployScriptTest is Test {
         config = EOJsonUtils.getConfig();
         targetContractsOwner = config.readAddress(".targetContractsOwner");
 
-        (bls, bn256G2, feedVerifierProxy, feedManagerProxy) = mainDeployer.run(targetContractsOwner);
+        (bls, bn256G2, feedVerifierProxy, feedManagerProxy) = mainDeployer.run(address(this));
         (feedAdapterImplementation, adapterProxy) = adapterDeployer.run();
         coreContractsSetup.run(targetContractsOwner);
         feedsDeployer.run(targetContractsOwner);
