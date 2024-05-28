@@ -17,7 +17,7 @@ contract DeployFeeds is Script {
     error FeedIsNotSupported(uint16 feedId);
 
     function run() external {
-        run(vm.addr(vm.envUint("PRIVATE_KEY")));
+        run(vm.addr(vm.envUint("OWNER_PRIVATE_KEY")));
     }
 
     function run(address broadcastFrom) public {

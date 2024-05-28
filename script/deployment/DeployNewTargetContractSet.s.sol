@@ -3,6 +3,7 @@
 pragma solidity 0.8.25;
 
 import { stdJson } from "forge-std/Script.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { FeedVerifierDeployer } from "./base/DeployFeedVerifier.s.sol";
 import { FeedManagerDeployer } from "./base/DeployFeedManager.s.sol";
@@ -19,8 +20,12 @@ import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer {
     using stdJson for string;
 
-    function run()
-        external
+    function run() external {
+        run(vm.addr(vm.envUint("PRIVATE_KEY")));
+    }
+
+    function run(address broadcastFrom)
+        public
         returns (address bls, address bn256G2, address feedVerifierProxy, address feedManagerProxy)
     {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
@@ -31,7 +36,7 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
             configStructured.eoracleChainId == vm.envUint("EORACLE_CHAIN_ID"), "Wrong EORACLE_CHAIN_ID for this config."
         );
 
-        vm.startBroadcast();
+        vm.startBroadcast(broadcastFrom);
 
         EOJsonUtils.initOutputConfig();
 
@@ -50,7 +55,7 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
         //////////////////////////////////////////////////////////////////////////*/
         feedVerifierProxy = deployFeedVerifier(
             configStructured.proxyAdminOwner,
-            configStructured.targetContractsOwner,
+            broadcastFrom,
             IBLS(bls),
             IBN256G2(bn256G2),
             configStructured.eoracleChainId
@@ -66,11 +71,15 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
         feedManagerProxy = deployFeedManager(
             configStructured.proxyAdminOwner, feedVerifierProxy, configStructured.targetContractsOwner
         );
-        vm.stopBroadcast();
-        vm.broadcast(configStructured.targetContractsOwner);
+
         // set feedManager in feedVerifier
         IEOFeedVerifier(feedVerifierProxy).setFeedManager(feedManagerProxy);
+        // transfer ownership of feedVerifier to targetContractsOwner
+        if (OwnableUpgradeable(feedVerifierProxy).owner() != configStructured.targetContractsOwner) {
+            OwnableUpgradeable(feedVerifierProxy).transferOwnership(configStructured.targetContractsOwner);
+        }
 
+        vm.stopBroadcast();
         EOJsonUtils.OUTPUT_CONFIG.serialize("feedManager", feedManagerProxy);
 
         implementationAddress = Upgrades.getImplementationAddress(feedManagerProxy);
