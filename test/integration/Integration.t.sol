@@ -104,7 +104,7 @@ contract IntegrationMultipleCheckpointsTests is IntegrationBaseTests {
 
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
         // create new rates
-        _seedfeedsData(configStructured, uint256(99));
+        _seedFeedsData(configStructured, uint256(99));
         // create new checkpoint
         _generatePayload(feedsData);
         _setValidatorSet(validatorSet);
@@ -164,7 +164,7 @@ contract IntegrationMultipleCheckpointsTests is IntegrationBaseTests {
 
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
         // create new rates
-        _seedfeedsData(configStructured, uint256(99));
+        _seedFeedsData(configStructured, uint256(99));
         // create new checkpoint
         _generatePayload(feedsData);
         _setValidatorSet(validatorSet);

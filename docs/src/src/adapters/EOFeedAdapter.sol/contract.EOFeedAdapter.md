@@ -1,6 +1,6 @@
 # EOFeedAdapter
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/1999827c161f91e9bc99ac290d34e4d278bf02c5/src/adapters/EOFeedAdapter.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/326365dd645fcf8a14532250ed14441e57e11e4f/src/adapters/EOFeedAdapter.sol)
 
 **Inherits:** [IEOFeedAdapter](/src/adapters/interfaces/IEOFeedAdapter.sol/interface.IEOFeedAdapter.md), Initializable
 
@@ -138,7 +138,7 @@ function latestTimestamp() external view returns (uint256);
 
 ### getAnswer
 
-Get the price for the round (round is not used, the lasest price is returned)
+Get the price for the round (round is not used, the latest price is returned)
 
 ```solidity
 function getAnswer(uint256) external view returns (int256);
@@ -158,7 +158,7 @@ function getAnswer(uint256) external view returns (int256);
 
 ### getTimestamp
 
-Get the timestamp for the round (round is not used, the lasest timestamp is returned)
+Get the timestamp for the round (round is not used, the latest timestamp is returned)
 
 ```solidity
 function getTimestamp(uint256) external view returns (uint256);

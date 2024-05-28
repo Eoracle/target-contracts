@@ -104,7 +104,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     }
 
     /**
-     * @notice Get the price for the round (round is not used, the lasest price is returned)
+     * @notice Get the price for the round (round is not used, the latest price is returned)
      * @param
      * @return int256 The price
      */
@@ -114,7 +114,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     }
 
     /**
-     * @notice Get the timestamp for the round (round is not used, the lasest timestamp is returned)
+     * @notice Get the timestamp for the round (round is not used, the latest timestamp is returned)
      * @param
      * @return uint256 The timestamp
      */
