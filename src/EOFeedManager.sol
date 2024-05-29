@@ -167,6 +167,10 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         return _feedVerifier;
     }
 
+    // @audit-info an it be that one publisher publishes btc/usd and second publisher: eth/usd + btc/usd with the same
+    // checkpoint and same timestamp for btc/usd, it means that transaction from second publisher will be rejected bcs
+    // of this line   if (_priceFeeds[feedId].timestamp >= timestamp) revert SymbolReplay(feedId);
+    // is this scenario we supposed to have as normal?
     function _processVerifiedRate(bytes memory data, uint256 blockNumber) internal {
         (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
         if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);

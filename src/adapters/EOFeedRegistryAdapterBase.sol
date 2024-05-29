@@ -20,6 +20,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
 
     event FeedManagerSet(address indexed feedManager);
     event FeedAdapterDeployed(uint16 indexed feedId, address indexed feedAdapter, address base, address quote);
+    event FeedAdapterSaved(uint16 indexed feedId, address indexed feedAdapter, address base, address quote);
 
     modifier onlyNonZeroAddress(address addr) {
         if (addr == address(0)) revert InvalidAddress();
@@ -87,24 +88,58 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
             revert FeedNotSupported(feedId);
         }
 
-        if (address(_feedAdapters[feedId]) != address(0)) {
-            revert FeedAlreadyExists();
+        _validateNewEOFeedAdapter(feedId, base, quote);
+
+        return _deployAndSaveEOFeedAdapter(base, quote, feedId, feedDescription, feedDecimals, feedVersion);
+    }
+
+    function redeployEOFeedAdapter(
+        address base,
+        address quote,
+        uint16 feedId,
+        string calldata feedDescription,
+        uint8 feedDecimals,
+        uint256 feedVersion
+    )
+        external
+        onlyOwner
+        returns (IEOFeedAdapter)
+    {
+        // check if feedId exists in feedManager contract
+        if (!_feedManager.isSupportedFeed(feedId)) {
+            revert FeedNotSupported(feedId);
         }
-        if (_tokenAddressesToFeedIds[base][quote] != 0) {
-            revert BaseQuotePairExists();
+
+        return _deployAndSaveEOFeedAdapter(base, quote, feedId, feedDescription, feedDecimals, feedVersion);
+    }
+
+    /**
+     * @notice Register EOFeedAdapter
+     * @param feedAdapter The feed adapter address
+     * @param base The base asset address
+     * @param quote The quote asset address
+     */
+    function addEOFeedAdapter(address feedAdapter, address base, address quote) external onlyOwner {
+        uint16 feedId = IEOFeedAdapter(feedAdapter).getFeedId();
+
+        // check if feedId exists in feedManager contract
+        if (!_feedManager.isSupportedFeed(feedId)) {
+            revert FeedNotSupported(feedId);
         }
-        address feedAdapter = _deployEOFeedAdapter();
-        IEOFeedAdapter(feedAdapter).initialize(
-            address(_feedManager), feedId, feedDecimals, feedDescription, feedVersion
-        );
 
-        _feedEnabled[feedAdapter] = true;
-        _feedAdapters[feedId] = IEOFeedAdapter(feedAdapter);
-        _tokenAddressesToFeedIds[base][quote] = feedId;
+        _validateNewEOFeedAdapter(feedId, base, quote);
 
-        emit FeedAdapterDeployed(feedId, feedAdapter, base, quote);
+        _saveEOFeedAdapter(feedAdapter, base, quote, feedId);
+    }
 
-        return IEOFeedAdapter(feedAdapter);
+    function updateEOFeedAdapter(address feedAdapter, address base, address quote) external onlyOwner {
+        uint16 feedId = IEOFeedAdapter(feedAdapter).getFeedId();
+
+        // check if feedId exists in feedManager contract
+        if (!_feedManager.isSupportedFeed(feedId)) {
+            revert FeedNotSupported(feedId);
+        }
+        _saveEOFeedAdapter(feedAdapter, base, quote, feedId);
     }
 
     /**
@@ -307,6 +342,44 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      */
     function latestRound(address base, address quote) external view returns (uint256) {
         return _feedManager.getLatestPriceFeed(_tokenAddressesToFeedIds[base][quote]).eoracleBlockNumber;
+    }
+
+    function _deployAndSaveEOFeedAdapter(
+        address base,
+        address quote,
+        uint16 feedId,
+        string calldata feedDescription,
+        uint8 feedDecimals,
+        uint256 feedVersion
+    )
+        internal
+        returns (IEOFeedAdapter)
+    {
+        address feedAdapter = _deployEOFeedAdapter();
+        IEOFeedAdapter(feedAdapter).initialize(
+            address(_feedManager), feedId, feedDecimals, feedDescription, feedVersion
+        );
+        emit FeedAdapterDeployed(feedId, feedAdapter, base, quote);
+
+        _saveEOFeedAdapter(feedAdapter, base, quote, feedId);
+
+        return IEOFeedAdapter(feedAdapter);
+    }
+
+    function _saveEOFeedAdapter(address feedAdapter, address base, address quote, uint16 feedId) internal {
+        _feedEnabled[feedAdapter] = true;
+        _feedAdapters[feedId] = IEOFeedAdapter(feedAdapter);
+        _tokenAddressesToFeedIds[base][quote] = feedId;
+        emit FeedAdapterSaved(feedId, feedAdapter, base, quote);
+    }
+
+    function _validateNewEOFeedAdapter(uint16 feedId, address base, address quote) internal view {
+        if (address(_feedAdapters[feedId]) != address(0)) {
+            revert FeedAlreadyExists();
+        }
+        if (_tokenAddressesToFeedIds[base][quote] != 0) {
+            revert BaseQuotePairExists();
+        }
     }
 
     /**
