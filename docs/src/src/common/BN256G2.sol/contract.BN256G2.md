@@ -1,6 +1,6 @@
 # BN256G2
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/326365dd645fcf8a14532250ed14441e57e11e4f/src/common/BN256G2.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/8a773595146b344dc5abd94aaf5ddfa445eed3c5/src/common/BN256G2.sol)
 
 **Inherits:** [IBN256G2](/src/interfaces/IBN256G2.sol/interface.IBN256G2.md)
 
@@ -321,30 +321,6 @@ function _isOnCurve(uint256 xx, uint256 xy, uint256 yx, uint256 yy) internal pur
 | Name     | Type   | Description              |
 | -------- | ------ | ------------------------ |
 | `<none>` | `bool` | True if the FQ2 is on G2 |
-
-### \_modInv
-
-Calculates the modular inverse of a over n
-
-_The same as the modular exponentiation with the exponent n-2. For EVM chains that don't support the Modexp precompile.
-Temporarily implemented in solidity, should be replaced with precompiled as soon as it is available._
-
-```solidity
-function _modInv(uint256 a, uint256 n) internal pure returns (uint256);
-```
-
-**Parameters**
-
-| Name | Type      | Description                             |
-| ---- | --------- | --------------------------------------- |
-| `a`  | `uint256` | The operand to calculate the inverse of |
-| `n`  | `uint256` | The modulus                             |
-
-**Returns**
-
-| Name     | Type      | Description |
-| -------- | --------- | ----------- |
-| `<none>` | `uint256` | Inv(a)modn  |
 
 ### \_fromJacobian
 

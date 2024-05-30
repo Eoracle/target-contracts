@@ -2,6 +2,7 @@
 pragma solidity 0.8.25;
 
 import { IBN256G2 } from "../interfaces/IBN256G2.sol";
+import { ModexpInverse } from "./BLS.sol";
 // solhint-disable func-named-parameters
 
 // File lib/core-contracts/contracts/common/BN256G2.sol
@@ -208,8 +209,8 @@ contract BN256G2 is IBN256G2 {
      */
     // solhint-disable-next-line ordering
     function _fq2inv(uint256 x, uint256 y) internal pure returns (uint256, uint256) {
-        uint256 inv =
-            _modInv(addmod(mulmod(y, y, FIELD_MODULUS), mulmod(x, x, FIELD_MODULUS), FIELD_MODULUS), FIELD_MODULUS);
+        uint256 inv = ModexpInverse.run(addmod(mulmod(y, y, FIELD_MODULUS), mulmod(x, x, FIELD_MODULUS), FIELD_MODULUS));
+
         return (mulmod(x, inv, FIELD_MODULUS), FIELD_MODULUS - mulmod(y, inv, FIELD_MODULUS));
     }
 
@@ -232,36 +233,6 @@ contract BN256G2 is IBN256G2 {
         (yyx, yyy) = _fq2sub(yyx, yyy, xxxx, xxxy);
         (yyx, yyy) = _fq2sub(yyx, yyy, TWISTBX, TWISTBY);
         return yyx == 0 && yyy == 0;
-    }
-
-    /**
-     * @notice Calculates the modular inverse of a over n
-     *  @dev The same as the modular exponentiation with the exponent n-2.
-     *         For EVM chains that don't support the Modexp precompile.
-     *         Temporarily implemented in solidity,
-     *         should be replaced with precompiled as soon as it is available.
-     * @param a The operand to calculate the inverse of
-     * @param n The modulus
-     * @return Inv(a)modn
-     */
-    function _modInv(uint256 a, uint256 n) internal pure returns (uint256) {
-        // modular exponentiation in solidity expmod(a, n - 2, n), where a is base, n-2 is exponent, n is modulus
-        uint256 e = n - 2;
-
-        if (n == 0) return 0;
-        if (e == 0) return 1;
-
-        uint256 result = 1;
-        a %= n;
-
-        while (e > 0) {
-            if (e % 2 == 1) {
-                result = mulmod(result, a, n); // Use mulmod to prevent overflow
-            }
-            a = mulmod(a, a, n); // Use mulmod to prevent overflow
-            e /= 2;
-        }
-        return result;
     }
 
     /**
