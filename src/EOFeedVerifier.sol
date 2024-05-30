@@ -25,10 +25,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     uint256 internal _eoracleChainId;
     IBLS internal _bls;
     IBN256G2 internal _bn256G2;
-    // @audit-info no need to keep _currentValidatorSetLength.
-    // If we change the method setNewValidatorSet to proper implementation with slots cleaning, the
-    // _currentValidatorSet.length will return correct actual length and no need of additional variable
-    // _currentValidatorSetLength
     uint256 internal _currentValidatorSetLength;
     uint256 internal _totalVotingPower;
     mapping(uint256 => Validator) internal _currentValidatorSet;
@@ -200,10 +196,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @notice Function to set a new validator set for the CheckpointManager
      * @param newValidatorSet The new validator set to store
      */
-    // @audit-info: doesn't reset validators slots, when passing the new array with smaller length
-    // _currentValidatorSet.length can store different length than _currentValidatorSetLength,
-    // it is not big issue since_currentValidatorSet.length is not used now in the code,
-    // but it is inconsistency and complicates readability
     function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner {
         uint256 length = newValidatorSet.length;
         _currentValidatorSetLength = length;
