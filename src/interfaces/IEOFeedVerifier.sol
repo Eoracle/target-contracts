@@ -3,7 +3,6 @@ pragma solidity 0.8.25;
 
 /**
  * @title EOFeedManager
- * @author Lightblocks
  * @notice Helper contract to process state syncs from EOracle chain
  */
 interface IEOFeedVerifier {
