@@ -1,8 +1,6 @@
 {
   "bls": "0xdC40fA06D4709EBBffA2Ace34b61753B9c7957D1",
   "bn256G2": "0x1AD8c590A3e875A9D977E46db5F6b132fB11afFC",
-  "checkpointManager": "0x7315E5a9f1583350bc4a21d1a14255Ff7e0Ed7C2",
-  "checkpointManagerImplementation": "0x6b7783000c0c9f32181435e1385E213bD6dF3B02",
   "feedAdapterImplementation": "0xC80d1dc76b677828bDa7dd80795E620A9C6AA25e",
   "feedManager": "0x27AD7d16709d629570CdB9c252424Dd5fCB5c87B",
   "feedRegistryAdapter": "0x384a6B4b040934CbE85154D879ddE642c737bD19",

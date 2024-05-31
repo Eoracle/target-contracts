@@ -1,6 +1,6 @@
 # EOFeedVerifier
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/8a773595146b344dc5abd94aaf5ddfa445eed3c5/src/EOFeedVerifier.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/43a12f31d557c3daa45b17902f804f27abdd6da8/src/EOFeedVerifier.sol)
 
 **Inherits:** [IEOFeedVerifier](/src/interfaces/IEOFeedVerifier.sol/interface.IEOFeedVerifier.md), OwnableUpgradeable
 
@@ -14,11 +14,15 @@ bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
 
 ### \_eoracleChainId
 
+_ID of eoracle chain_
+
 ```solidity
 uint256 internal _eoracleChainId;
 ```
 
 ### \_bls
+
+_BLS library contract_
 
 ```solidity
 IBLS internal _bls;
@@ -26,11 +30,15 @@ IBLS internal _bls;
 
 ### \_bn256G2
 
+_BN256G2 library contract_
+
 ```solidity
 IBN256G2 internal _bn256G2;
 ```
 
 ### \_currentValidatorSetLength
+
+_length of validators set_
 
 ```solidity
 uint256 internal _currentValidatorSetLength;
@@ -38,11 +46,15 @@ uint256 internal _currentValidatorSetLength;
 
 ### \_totalVotingPower
 
+_total voting power of the current validators set_
+
 ```solidity
 uint256 internal _totalVotingPower;
 ```
 
 ### \_currentValidatorSet
+
+_current validators set (index => Validator)_
 
 ```solidity
 mapping(uint256 => Validator) internal _currentValidatorSet;
@@ -50,11 +62,15 @@ mapping(uint256 => Validator) internal _currentValidatorSet;
 
 ### \_currentValidatorSetHash
 
+_hash (keccak256) of the current validator set_
+
 ```solidity
 bytes32 internal _currentValidatorSetHash;
 ```
 
 ### \_lastProcessedBlockNumber
+
+_block number of the last processed block_
 
 ```solidity
 uint256 internal _lastProcessedBlockNumber;
@@ -62,11 +78,15 @@ uint256 internal _lastProcessedBlockNumber;
 
 ### \_lastProcessedEventRoot
 
+_event root of the last processed block_
+
 ```solidity
 bytes32 internal _lastProcessedEventRoot;
 ```
 
 ### \_feedManager
+
+_address of the feed manager_
 
 ```solidity
 address internal _feedManager;
@@ -81,6 +101,8 @@ uint256[50] private __gap;
 ## Functions
 
 ### onlyFeedManager
+
+_Allows only the feed manager to call the function_
 
 ```solidity
 modifier onlyFeedManager();
@@ -103,7 +125,8 @@ function initialize(address owner, IBLS bls_, IBN256G2 bn256G2_, uint256 eoracle
 
 ### verify
 
-Verifies leaf
+Verifies leaf, processes checkpoint, returns leaf data in case if checkpoint is valid and leaf is part of the merkle
+tree
 
 ```solidity
 function verify(
@@ -121,14 +144,21 @@ function verify(
 
 | Name         | Type         | Description                                        |
 | ------------ | ------------ | -------------------------------------------------- |
-| `input`      | `LeafInput`  | Exit leaf input                                    |
-| `checkpoint` | `Checkpoint` | Checkpoint data                                    |
+| `input`      | `LeafInput`  | leaf input data and proof (LeafInput)              |
+| `checkpoint` | `Checkpoint` | Checkpoint data (Checkpoint)                       |
 | `signature`  | `uint256[2]` | Aggregated signature of the checkpoint             |
 | `bitmap`     | `bytes`      | Bitmap of the validators who signed the checkpoint |
 
+**Returns**
+
+| Name     | Type    | Description                                                                      |
+| -------- | ------- | -------------------------------------------------------------------------------- |
+| `<none>` | `bytes` | leafData Leaf data, abi encoded (uint16 feedId, uint256 rate, uint256 timestamp) |
+
 ### batchVerify
 
-Verifies multiple leaves
+Verifies multiple leaves, processes checkpoint, returns leaf data in case if checkpoint is valid and leaves are part of
+the merkle tree
 
 ```solidity
 function batchVerify(
@@ -146,16 +176,24 @@ function batchVerify(
 
 | Name         | Type          | Description                                        |
 | ------------ | ------------- | -------------------------------------------------- |
-| `inputs`     | `LeafInput[]` | Batch exit inputs for multiple event leaves        |
+| `inputs`     | `LeafInput[]` | Exit leaves inputs                                 |
 | `checkpoint` | `Checkpoint`  | Checkpoint data                                    |
 | `signature`  | `uint256[2]`  | Aggregated signature of the checkpoint             |
 | `bitmap`     | `bytes`       | Bitmap of the validators who signed the checkpoint |
 
-**Returns**
+### setNewValidatorSet
 
-| Name     | Type      | Description                                           |
-| -------- | --------- | ----------------------------------------------------- |
-| `<none>` | `bytes[]` | Array of the leaf data fields of all submitted leaves |
+Function to set a new validator set
+
+```solidity
+function setNewValidatorSet(Validator[] calldata newValidatorSet) external override onlyOwner;
+```
+
+**Parameters**
+
+| Name              | Type          | Description                    |
+| ----------------- | ------------- | ------------------------------ |
+| `newValidatorSet` | `Validator[]` | The new validator set to store |
 
 ### setFeedManager
 
@@ -316,20 +354,6 @@ function feedManager() external view returns (address);
 | Name     | Type      | Description                      |
 | -------- | --------- | -------------------------------- |
 | `<none>` | `address` | The address of the feed manager. |
-
-### setNewValidatorSet
-
-Function to set a new validator set for the CheckpointManager
-
-```solidity
-function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner;
-```
-
-**Parameters**
-
-| Name              | Type          | Description                    |
-| ----------------- | ------------- | ------------------------------ |
-| `newValidatorSet` | `Validator[]` | The new validator set to store |
 
 ### \_processCheckpoint
 

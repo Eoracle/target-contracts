@@ -1,6 +1,6 @@
 # EOFeedManager
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/8a773595146b344dc5abd94aaf5ddfa445eed3c5/src/EOFeedManager.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/43a12f31d557c3daa45b17902f804f27abdd6da8/src/EOFeedManager.sol)
 
 **Inherits:** Initializable, OwnableUpgradeable,
 [IEOFeedManager](/src/interfaces/IEOFeedManager.sol/interface.IEOFeedManager.md)
@@ -9,11 +9,15 @@
 
 ### \_priceFeeds
 
+_Set of price feeds, (feed id => PriceFeed)_
+
 ```solidity
 mapping(uint16 => PriceFeed) internal _priceFeeds;
 ```
 
 ### \_whitelistedPublishers
+
+_Set of whitelisted publishers (publisher => is whitelisted)_
 
 ```solidity
 mapping(address => bool) internal _whitelistedPublishers;
@@ -21,11 +25,15 @@ mapping(address => bool) internal _whitelistedPublishers;
 
 ### \_supportedFeedIds
 
+_Set of supported feeds, (feed id => is supported)_
+
 ```solidity
 mapping(uint16 => bool) internal _supportedFeedIds;
 ```
 
 ### \_feedVerifier
+
+_feed verifier contract_
 
 ```solidity
 IEOFeedVerifier internal _feedVerifier;
@@ -35,11 +43,15 @@ IEOFeedVerifier internal _feedVerifier;
 
 ### onlyWhitelisted
 
+_Allows only whitelisted publishers to call the function_
+
 ```solidity
 modifier onlyWhitelisted();
 ```
 
 ### onlyNonZeroAddress
+
+_Allows only non-zero addresses_
 
 ```solidity
 modifier onlyNonZeroAddress(address addr);
@@ -123,12 +135,12 @@ function updatePriceFeed(
 
 **Parameters**
 
-| Name         | Type                         | Description                                        |
-| ------------ | ---------------------------- | -------------------------------------------------- |
-| `input`      | `IEOFeedVerifier.LeafInput`  | A leaf to prove the price feeds                    |
-| `checkpoint` | `IEOFeedVerifier.Checkpoint` | Checkpoint data                                    |
-| `signature`  | `uint256[2]`                 | Aggregated signature of the checkpoint             |
-| `bitmap`     | `bytes`                      | Bitmap of the validators who signed the checkpoint |
+| Name         | Type                         | Description                                                                |
+| ------------ | ---------------------------- | -------------------------------------------------------------------------- |
+| `input`      | `IEOFeedVerifier.LeafInput`  | A merkle leaf containing price data and its merkle proof                   |
+| `checkpoint` | `IEOFeedVerifier.Checkpoint` | Checkpoint data containing eoracle chain metadata and the data merkle root |
+| `signature`  | `uint256[2]`                 | Aggregated signature of the checkpoint                                     |
+| `bitmap`     | `bytes`                      | Bitmap of the validators who signed the checkpoint                         |
 
 ### updatePriceFeeds
 
@@ -190,9 +202,9 @@ function getLatestPriceFeeds(uint16[] calldata feedIds) external view returns (P
 
 **Returns**
 
-| Name     | Type          | Description                 |
-| -------- | ------------- | --------------------------- |
-| `<none>` | `PriceFeed[]` | Array of price feed structs |
+| Name     | Type          | Description                |
+| -------- | ------------- | -------------------------- |
+| `<none>` | `PriceFeed[]` | Array of PriceFeed structs |
 
 ### isWhitelistedPublisher
 
@@ -250,12 +262,35 @@ function getFeedVerifier() external view returns (IEOFeedVerifier);
 
 ### \_processVerifiedRate
 
+Process the verified rate, check and save it
+
 ```solidity
 function _processVerifiedRate(bytes memory data, uint256 blockNumber) internal;
 ```
 
+**Parameters**
+
+| Name          | Type      | Description                                                                      |
+| ------------- | --------- | -------------------------------------------------------------------------------- |
+| `data`        | `bytes`   | Verified rate data, abi encoded (uint16 feedId, uint256 rate, uint256 timestamp) |
+| `blockNumber` | `uint256` | Block number                                                                     |
+
 ### \_getLatestPriceFeed
+
+Get the latest price feed
 
 ```solidity
 function _getLatestPriceFeed(uint16 feedId) internal view returns (PriceFeed memory);
 ```
+
+**Parameters**
+
+| Name     | Type     | Description |
+| -------- | -------- | ----------- |
+| `feedId` | `uint16` | Feed id     |
+
+**Returns**
+
+| Name     | Type        | Description      |
+| -------- | ----------- | ---------------- |
+| `<none>` | `PriceFeed` | PriceFeed struct |

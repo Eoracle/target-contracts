@@ -1,6 +1,6 @@
 # IEOFeedVerifier
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/8a773595146b344dc5abd94aaf5ddfa445eed3c5/src/interfaces/IEOFeedVerifier.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/43a12f31d557c3daa45b17902f804f27abdd6da8/src/interfaces/IEOFeedVerifier.sol)
 
 **Author:** Lightblocks
 
@@ -10,7 +10,8 @@ Helper contract to process state syncs from EOracle chain
 
 ### verify
 
-Verifies leaf
+Verifies leaf, processes checkpoint, returns leaf data in case if checkpoint is valid and leaf is part of the merkle
+tree
 
 ```solidity
 function verify(
@@ -27,14 +28,21 @@ function verify(
 
 | Name         | Type         | Description                                        |
 | ------------ | ------------ | -------------------------------------------------- |
-| `input`      | `LeafInput`  | Exit leaf input                                    |
-| `checkpoint` | `Checkpoint` | Checkpoint data                                    |
+| `input`      | `LeafInput`  | leaf input data and proof (LeafInput)              |
+| `checkpoint` | `Checkpoint` | Checkpoint data (Checkpoint)                       |
 | `signature`  | `uint256[2]` | Aggregated signature of the checkpoint             |
 | `bitmap`     | `bytes`      | Bitmap of the validators who signed the checkpoint |
 
+**Returns**
+
+| Name       | Type    | Description                                                             |
+| ---------- | ------- | ----------------------------------------------------------------------- |
+| `leafData` | `bytes` | Leaf data, abi encoded (uint16 feedId, uint256 rate, uint256 timestamp) |
+
 ### batchVerify
 
-Verifies multiple leaves
+Verifies multiple leaves, processes checkpoint, returns leaf data in case if checkpoint is valid and leaves are part of
+the merkle tree
 
 ```solidity
 function batchVerify(
@@ -58,7 +66,7 @@ function batchVerify(
 
 ### setNewValidatorSet
 
-Function to set a new validator set for the CheckpointManager
+Function to set a new validator set
 
 ```solidity
 function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
@@ -75,32 +83,52 @@ function setNewValidatorSet(Validator[] calldata newValidatorSet) external;
 Sets the address of the feed manager.
 
 ```solidity
-function setFeedManager(address feedManager) external;
+function setFeedManager(address feedManager_) external;
 ```
 
 **Parameters**
 
-| Name          | Type      | Description                          |
-| ------------- | --------- | ------------------------------------ |
-| `feedManager` | `address` | The address of the new feed manager. |
+| Name           | Type      | Description                          |
+| -------------- | --------- | ------------------------------------ |
+| `feedManager_` | `address` | The address of the new feed manager. |
 
 ## Events
 
 ### ValidatorSetUpdated
 
+_Event emitted when the validator set is updated_
+
 ```solidity
 event ValidatorSetUpdated(uint256 currentValidatorSetLength, bytes32 currentValidatorSetHash, uint256 totalVotingPower);
 ```
 
+**Parameters**
+
+| Name                        | Type      | Description                                     |
+| --------------------------- | --------- | ----------------------------------------------- |
+| `currentValidatorSetLength` | `uint256` | Length of the current validator set             |
+| `currentValidatorSetHash`   | `bytes32` | Hash of the current validator set               |
+| `totalVotingPower`          | `uint256` | Total voting power of the current validator set |
+
 ### FeedManagerSet
+
+_Event emitted when the feed manager is set_
 
 ```solidity
 event FeedManagerSet(address feedManager);
 ```
 
+**Parameters**
+
+| Name          | Type      | Description                 |
+| ------------- | --------- | --------------------------- |
+| `feedManager` | `address` | Address of the feed manager |
+
 ## Structs
 
 ### LeafInput
+
+_Leaf input structure_
 
 ```solidity
 struct LeafInput {
@@ -110,7 +138,17 @@ struct LeafInput {
 }
 ```
 
+**Properties**
+
+| Name           | Type        | Description                                                                                                                                                                             |
+| -------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `leafIndex`    | `uint256`   | Index of the leaf                                                                                                                                                                       |
+| `unhashedLeaf` | `bytes`     | Unhashed leaf data abi encoded (uint256 id, address sender, address receiver, bytes memory data) where bytes memory data = abi encoded (uint16 feedId, uint256 rate, uint256 timestamp) |
+| `proof`        | `bytes32[]` | Merkle proof of the leaf                                                                                                                                                                |
+
 ### Checkpoint
+
+_Checkpoint structure_
 
 ```solidity
 struct Checkpoint {
@@ -122,7 +160,19 @@ struct Checkpoint {
 }
 ```
 
+**Properties**
+
+| Name          | Type      | Description                   |
+| ------------- | --------- | ----------------------------- |
+| `epoch`       | `uint256` | Epoch number                  |
+| `blockNumber` | `uint256` | Block number                  |
+| `eventRoot`   | `bytes32` | Event root of the merkle tree |
+| `blockHash`   | `bytes32` | Block hash                    |
+| `blockRound`  | `uint256` | Block round                   |
+
 ### Validator
+
+_Validator structure_
 
 ```solidity
 struct Validator {
@@ -131,3 +181,11 @@ struct Validator {
     uint256 votingPower;
 }
 ```
+
+**Properties**
+
+| Name          | Type         | Description            |
+| ------------- | ------------ | ---------------------- |
+| `_address`    | `address`    | Validator address      |
+| `blsKey`      | `uint256[4]` | Validator BLS key      |
+| `votingPower` | `uint256`    | Validator voting power |

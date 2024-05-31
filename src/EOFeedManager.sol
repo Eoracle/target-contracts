@@ -14,16 +14,25 @@ import {
 } from "./interfaces/Errors.sol";
 
 contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
+    /// @dev Set of price feeds, (feed id => PriceFeed)
     mapping(uint16 => PriceFeed) internal _priceFeeds;
+
+    /// @dev Set of whitelisted publishers (publisher => is whitelisted)
     mapping(address => bool) internal _whitelistedPublishers;
+
+    /// @dev Set of supported feeds, (feed id => is supported)
     mapping(uint16 => bool) internal _supportedFeedIds;
+
+    /// @dev feed verifier contract
     IEOFeedVerifier internal _feedVerifier;
 
+    /// @dev Allows only whitelisted publishers to call the function
     modifier onlyWhitelisted() {
         if (!_whitelistedPublishers[msg.sender]) revert CallerIsNotWhitelisted(msg.sender);
         _;
     }
 
+    /// @dev Allows only non-zero addresses
     modifier onlyNonZeroAddress(address addr) {
         if (addr == address(0)) revert InvalidAddress();
         _;
@@ -60,9 +69,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     }
 
     /**
-     * @notice Set the whitelisted publishers
-     * @param publishers Array of publisher addresses
-     * @param isWhitelisted Array of booleans indicating whether the publisher is whitelisted
+     * @inheritdoc IEOFeedManager
      */
     function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external onlyOwner {
         for (uint256 i = 0; i < publishers.length; i++) {
@@ -72,11 +79,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     }
 
     /**
-     * @notice Update the price for a feed
-     * @param input A merkle leaf containing price data and its merkle proof
-     * @param checkpoint Checkpoint data containing eoracle chain metadata and the data merke root
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
+     * @inheritdoc IEOFeedManager
      */
     // Reentrancy is not an issue because _feedVerifier is set by the owner
     // slither-disable-next-line reentrancy-benign,reentrancy-events
@@ -94,11 +97,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     }
 
     /**
-     * @notice Update the price for multiple feeds
-     * @param inputs Array of leafs to prove the price feeds
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
+     * @inheritdoc IEOFeedManager
      */
     // Reentrancy is not an issue because _feedVerifier is set by the owner
     // slither-disable-next-line reentrancy-benign,reentrancy-events
@@ -120,18 +119,14 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     }
 
     /**
-     * @notice Get the latest price for a feed
-     * @param feedId Feed id
-     * @return PriceFeed struct
+     * @inheritdoc IEOFeedManager
      */
     function getLatestPriceFeed(uint16 feedId) external view returns (PriceFeed memory) {
         return _getLatestPriceFeed(feedId);
     }
 
     /**
-     * @notice Get the latest price feeds for multiple feeds
-     * @param feedIds Array of feed ids
-     * @return Array of price feed structs
+     * @inheritdoc IEOFeedManager
      */
     function getLatestPriceFeeds(uint16[] calldata feedIds) external view returns (PriceFeed[] memory) {
         PriceFeed[] memory retVal = new PriceFeed[](feedIds.length);
@@ -142,18 +137,14 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     }
 
     /**
-     * @notice Check if a publisher is whitelisted
-     * @param publisher Address of the publisher
-     * @return Boolean indicating whether the publisher is whitelisted
+     * @inheritdoc IEOFeedManager
      */
     function isWhitelistedPublisher(address publisher) external view returns (bool) {
         return _whitelistedPublishers[publisher];
     }
 
     /**
-     * @notice Check if a feed is supported
-     * @param feedId feed Id to check
-     * @return Boolean indicating whether the feed is supported
+     * @inheritdoc IEOFeedManager
      */
     function isSupportedFeed(uint16 feedId) external view returns (bool) {
         return _supportedFeedIds[feedId];
@@ -167,6 +158,11 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         return _feedVerifier;
     }
 
+    /**
+     * @notice Process the verified rate, check and save it
+     * @param data Verified rate data, abi encoded (uint16 feedId, uint256 rate, uint256 timestamp)
+     * @param blockNumber Block number
+     */
     function _processVerifiedRate(bytes memory data, uint256 blockNumber) internal {
         (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
         if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);
@@ -175,6 +171,11 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         emit RateUpdated(feedId, rate, timestamp);
     }
 
+    /**
+     * @notice Get the latest price feed
+     * @param feedId Feed id
+     * @return PriceFeed struct
+     */
     function _getLatestPriceFeed(uint16 feedId) internal view returns (PriceFeed memory) {
         if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);
         return _priceFeeds[feedId];
