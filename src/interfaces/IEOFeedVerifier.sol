@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-/**
- * @title EOFeedManager
- * @notice Helper contract to process state syncs from EOracle chain
- */
 interface IEOFeedVerifier {
     /**
      * @dev Leaf input structure

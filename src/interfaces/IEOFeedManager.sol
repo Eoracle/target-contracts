@@ -7,8 +7,8 @@ interface IEOFeedManager {
     /**
      * @dev Price feed structure
      * @param value Price feed value
-     * @param timestamp Price feed timestamp (block timestamp in eOracle chain when price feed rate is aggregated)
-     * @param eoracleBlockNumber eOracle block number
+     * @param timestamp Price feed timestamp (block timestamp in eoracle chain when price feed rate is aggregated)
+     * @param eoracleBlockNumber eoracle block number
      */
     struct PriceFeed {
         uint256 value;

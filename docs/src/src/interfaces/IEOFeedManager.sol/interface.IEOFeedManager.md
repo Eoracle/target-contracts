@@ -1,6 +1,6 @@
 # IEOFeedManager
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/43a12f31d557c3daa45b17902f804f27abdd6da8/src/interfaces/IEOFeedManager.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/6bb0b8b006e19f44d4eb44f1e9a8043f769d4816/src/interfaces/IEOFeedManager.sol)
 
 ## Functions
 
@@ -182,5 +182,5 @@ struct PriceFeed {
 | Name                 | Type      | Description                                                                                |
 | -------------------- | --------- | ------------------------------------------------------------------------------------------ |
 | `value`              | `uint256` | Price feed value                                                                           |
-| `timestamp`          | `uint256` | Price feed timestamp (block timestamp in eOracle chain when price feed rate is aggregated) |
-| `eoracleBlockNumber` | `uint256` | eOracle block number                                                                       |
+| `timestamp`          | `uint256` | Price feed timestamp (block timestamp in eoracle chain when price feed rate is aggregated) |
+| `eoracleBlockNumber` | `uint256` | eoracle block number                                                                       |

@@ -13,14 +13,21 @@ import {
     SymbolReplay
 } from "./interfaces/Errors.sol";
 
+/**
+ * @title EOFeedManager
+ * @notice The EOFeedManager contract is responsible for receiving feed updates from whitelisted publishers. These
+ * updates are verified using the logic in the EOFeedVerifier. Upon successful verification, the feed data is stored in
+ * the EOFeedManager and made available for other smart contracts to read. Only supported feed IDs can be published to
+ * the feed manager.
+ */
 contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
-    /// @dev Set of price feeds, (feed id => PriceFeed)
+    /// @dev Map of feed id to price feed (feed id => PriceFeed)
     mapping(uint16 => PriceFeed) internal _priceFeeds;
 
-    /// @dev Set of whitelisted publishers (publisher => is whitelisted)
+    /// @dev Map of whitelisted publishers (publisher => is whitelisted)
     mapping(address => bool) internal _whitelistedPublishers;
 
-    /// @dev Set of supported feeds, (feed id => is supported)
+    /// @dev Map of supported feeds, (feed id => is supported)
     mapping(uint16 => bool) internal _supportedFeedIds;
 
     /// @dev feed verifier contract
@@ -161,7 +168,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     /**
      * @notice Process the verified rate, check and save it
      * @param data Verified rate data, abi encoded (uint16 feedId, uint256 rate, uint256 timestamp)
-     * @param blockNumber Block number
+     * @param blockNumber eoracle chain block number
      */
     function _processVerifiedRate(bytes memory data, uint256 blockNumber) internal {
         (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(data, (uint16, uint256, uint256));
@@ -171,6 +178,8 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         emit RateUpdated(feedId, rate, timestamp);
     }
 
+    //1716948831 / 41/ sc
+    //1717425992
     /**
      * @notice Get the latest price feed
      * @param feedId Feed id

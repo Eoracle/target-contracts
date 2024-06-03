@@ -1,15 +1,20 @@
 # EOFeedManager
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/43a12f31d557c3daa45b17902f804f27abdd6da8/src/EOFeedManager.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/6bb0b8b006e19f44d4eb44f1e9a8043f769d4816/src/EOFeedManager.sol)
 
 **Inherits:** Initializable, OwnableUpgradeable,
 [IEOFeedManager](/src/interfaces/IEOFeedManager.sol/interface.IEOFeedManager.md)
+
+The EOFeedManager contract is responsible for receiving feed updates from whitelisted publishers. These updates are
+verified using the logic in the EOFeedVerifier. Upon successful verification, the feed data is stored in the
+EOFeedManager and made available for other smart contracts to read. Only supported feed IDs can be published to the feed
+manager.
 
 ## State Variables
 
 ### \_priceFeeds
 
-_Set of price feeds, (feed id => PriceFeed)_
+_Map of feed id to price feed (feed id => PriceFeed)_
 
 ```solidity
 mapping(uint16 => PriceFeed) internal _priceFeeds;
@@ -17,7 +22,7 @@ mapping(uint16 => PriceFeed) internal _priceFeeds;
 
 ### \_whitelistedPublishers
 
-_Set of whitelisted publishers (publisher => is whitelisted)_
+_Map of whitelisted publishers (publisher => is whitelisted)_
 
 ```solidity
 mapping(address => bool) internal _whitelistedPublishers;
@@ -25,7 +30,7 @@ mapping(address => bool) internal _whitelistedPublishers;
 
 ### \_supportedFeedIds
 
-_Set of supported feeds, (feed id => is supported)_
+_Map of supported feeds, (feed id => is supported)_
 
 ```solidity
 mapping(uint16 => bool) internal _supportedFeedIds;
@@ -273,7 +278,7 @@ function _processVerifiedRate(bytes memory data, uint256 blockNumber) internal;
 | Name          | Type      | Description                                                                      |
 | ------------- | --------- | -------------------------------------------------------------------------------- |
 | `data`        | `bytes`   | Verified rate data, abi encoded (uint16 feedId, uint256 rate, uint256 timestamp) |
-| `blockNumber` | `uint256` | Block number                                                                     |
+| `blockNumber` | `uint256` | eoracle chain block number                                                       |
 
 ### \_getLatestPriceFeed
 
