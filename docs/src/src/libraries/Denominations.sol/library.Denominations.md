@@ -1,6 +1,6 @@
 # Denominations
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/8a773595146b344dc5abd94aaf5ddfa445eed3c5/src/libraries/Denominations.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/de89fc9e9bc7c046937883aa064d90812f1542cc/src/libraries/Denominations.sol)
 
 ## State Variables
 
@@ -14,6 +14,12 @@ address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
 ```solidity
 address public constant BTC = 0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB;
+```
+
+### DOGE
+
+```solidity
+address public constant DOGE = 0xDDdDddDdDdddDDddDDddDDDDdDdDDdDDdDDDDDDd;
 ```
 
 ### USD

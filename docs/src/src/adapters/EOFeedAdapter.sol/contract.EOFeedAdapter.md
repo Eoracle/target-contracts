@@ -1,6 +1,6 @@
 # EOFeedAdapter
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/8a773595146b344dc5abd94aaf5ddfa445eed3c5/src/adapters/EOFeedAdapter.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/de89fc9e9bc7c046937883aa064d90812f1542cc/src/adapters/EOFeedAdapter.sol)
 
 **Inherits:** [IEOFeedAdapter](/src/adapters/interfaces/IEOFeedAdapter.sol/interface.IEOFeedAdapter.md), Initializable
 
@@ -10,11 +10,15 @@ Price feed adapter contract
 
 ### \_feedManager
 
+_Feed manager contract_
+
 ```solidity
 IEOFeedManager private _feedManager;
 ```
 
 ### \_version
+
+_Feed version_
 
 ```solidity
 uint256 private _version;
@@ -22,17 +26,23 @@ uint256 private _version;
 
 ### \_description
 
+_Feed description_
+
 ```solidity
 string private _description;
 ```
 
 ### \_feedId
 
+_Feed id_
+
 ```solidity
 uint16 private _feedId;
 ```
 
 ### \_decimals
+
+_Decimals of the rate_
 
 ```solidity
 uint8 private _decimals;

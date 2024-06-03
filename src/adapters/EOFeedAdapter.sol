@@ -12,12 +12,20 @@ import { InvalidAddress } from "../interfaces/Errors.sol";
  * @notice Price feed adapter contract
  */
 contract EOFeedAdapter is IEOFeedAdapter, Initializable {
+    /// @dev Feed manager contract
     IEOFeedManager private _feedManager;
 
+    /// @dev Feed version
     uint256 private _version;
+
+    /// @dev Feed description
     string private _description;
+
     // next 2 variables will be packed in 1 slot
+    /// @dev Feed id
     uint16 private _feedId;
+
+    /// @dev Decimals of the rate
     uint8 private _decimals;
 
     /**

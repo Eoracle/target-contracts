@@ -19,20 +19,49 @@ import { IBN256G2 } from "./interfaces/IBN256G2.sol";
 
 using Merkle for bytes32;
 
+/**
+ * @title EOFeedManager
+ * @notice The EOFeedVerifier contract handles the verification of update payloads. The payload includes a Merkle root
+ * signed by eoracle validators and a Merkle path to the leaf containing the data. The verifier stores the current
+ * validator set in its storage and ensures that the Merkle root is signed by a subset of this validator set with
+ * sufficient voting power.
+ */
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
 
+    /// @dev ID of eoracle chain
     uint256 internal _eoracleChainId;
+
+    /// @dev BLS library contract
     IBLS internal _bls;
+
+    /// @dev BN256G2 library contract
     IBN256G2 internal _bn256G2;
+
+    /// @dev length of validators set
     uint256 internal _currentValidatorSetLength;
+
+    /// @dev total voting power of the current validators set
     uint256 internal _totalVotingPower;
+
+    /// @dev current validators set (index => Validator)
     mapping(uint256 => Validator) internal _currentValidatorSet;
+
+    /// @dev hash (keccak256) of the current validator set
     bytes32 internal _currentValidatorSetHash;
+
+    /// @dev block number of the last processed block
     uint256 internal _lastProcessedBlockNumber;
+
+    /// @dev event root of the last processed block
     bytes32 internal _lastProcessedEventRoot;
+
+    /// @dev address of the feed manager
     address internal _feedManager;
 
+    /**
+     * @dev Allows only the feed manager to call the function
+     */
     modifier onlyFeedManager() {
         if (msg.sender != _feedManager) revert CallerIsNotFeedManager();
         _;
@@ -59,9 +88,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     /**
      * @inheritdoc IEOFeedVerifier
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
      */
     function verify(
         LeafInput calldata input,
@@ -79,12 +105,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Verifies multiple leaves
-     * @param inputs Batch exit inputs for multiple event leaves
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
-     * @return Array of the leaf data fields of all submitted leaves
+     * @inheritdoc IEOFeedVerifier
      */
     function batchVerify(
         LeafInput[] calldata inputs,
@@ -101,8 +122,26 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
-     * @notice Sets the address of the feed manager.
-     * @param feedManager_ The address of the new feed manager.
+     * @inheritdoc IEOFeedVerifier
+     */
+    function setNewValidatorSet(Validator[] calldata newValidatorSet) external override onlyOwner {
+        uint256 length = newValidatorSet.length;
+        _currentValidatorSetLength = length;
+        _currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
+        uint256 totalPower = 0;
+        for (uint256 i = 0; i < length; i++) {
+            if (newValidatorSet[i]._address == address(0)) revert InvalidAddress();
+            uint256 votingPower = newValidatorSet[i].votingPower;
+            if (votingPower == 0) revert VotingPowerIsZero();
+            totalPower += votingPower;
+            _currentValidatorSet[i] = newValidatorSet[i];
+        }
+        _totalVotingPower = totalPower;
+        emit ValidatorSetUpdated(_currentValidatorSetLength, _currentValidatorSetHash, _totalVotingPower);
+    }
+
+    /**
+     * @inheritdoc IEOFeedVerifier
      */
     function setFeedManager(address feedManager_) external onlyOwner {
         if (feedManager_ == address(0)) revert InvalidAddress();
@@ -189,27 +228,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function feedManager() external view returns (address) {
         return _feedManager;
-    }
-
-    /**
-     * @inheritdoc IEOFeedVerifier
-     * @notice Function to set a new validator set for the CheckpointManager
-     * @param newValidatorSet The new validator set to store
-     */
-    function setNewValidatorSet(Validator[] calldata newValidatorSet) public override onlyOwner {
-        uint256 length = newValidatorSet.length;
-        _currentValidatorSetLength = length;
-        _currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
-        uint256 totalPower = 0;
-        for (uint256 i = 0; i < length; i++) {
-            if (newValidatorSet[i]._address == address(0)) revert InvalidAddress();
-            uint256 votingPower = newValidatorSet[i].votingPower;
-            if (votingPower == 0) revert VotingPowerIsZero();
-            totalPower += votingPower;
-            _currentValidatorSet[i] = newValidatorSet[i];
-        }
-        _totalVotingPower = totalPower;
-        emit ValidatorSetUpdated(_currentValidatorSetLength, _currentValidatorSetHash, _totalVotingPower);
     }
 
     /**
