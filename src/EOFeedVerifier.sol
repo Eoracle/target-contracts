@@ -22,7 +22,7 @@ using Merkle for bytes32;
 /**
  * @title EOFeedManager
  * @notice The EOFeedVerifier contract handles the verification of update payloads. The payload includes a Merkle root
- * signed by Eoracle validators and a Merkle path to the leaf containing the data. The verifier stores the current
+ * signed by eoracle validators and a Merkle path to the leaf containing the data. The verifier stores the current
  * validator set in its storage and ensures that the Merkle root is signed by a subset of this validator set with
  * sufficient voting power.
  */

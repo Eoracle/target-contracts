@@ -1,11 +1,11 @@
 # EOFeedVerifier
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/6bb0b8b006e19f44d4eb44f1e9a8043f769d4816/src/EOFeedVerifier.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/de89fc9e9bc7c046937883aa064d90812f1542cc/src/EOFeedVerifier.sol)
 
 **Inherits:** [IEOFeedVerifier](/src/interfaces/IEOFeedVerifier.sol/interface.IEOFeedVerifier.md), OwnableUpgradeable
 
 The EOFeedVerifier contract handles the verification of update payloads. The payload includes a Merkle root signed by
-Eoracle validators and a Merkle path to the leaf containing the data. The verifier stores the current validator set in
+eoracle validators and a Merkle path to the leaf containing the data. The verifier stores the current validator set in
 its storage and ensures that the Merkle root is signed by a subset of this validator set with sufficient voting power.
 
 ## State Variables

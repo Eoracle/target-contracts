@@ -1,6 +1,6 @@
 # IBN256G2
 
-[Git Source](https://github.com/Eoracle/target-contracts/blob/6bb0b8b006e19f44d4eb44f1e9a8043f769d4816/src/interfaces/IBN256G2.sol)
+[Git Source](https://github.com/Eoracle/target-contracts/blob/de89fc9e9bc7c046937883aa064d90812f1542cc/src/interfaces/IBN256G2.sol)
 
 ## Functions
 
