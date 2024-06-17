@@ -35,11 +35,14 @@ let bitmaps: any[] = [];
 let unhashedLeaves: any[] = [];
 let proves: any[] = [];
 let leavesArray: any[] = [];
+let sender: any;
 
 async function generateMsg() {
   const input = process.argv[2];
   const data = ethers.utils.defaultAbiCoder.decode(["bytes32"], input);
   domain = data[0];
+
+  sender = process.argv[3];
 
   await mcl.init();
 
@@ -92,7 +95,6 @@ async function generateMsg() {
 
 function generateSignature0() {
   const id = 0;
-  const sender = accounts[0];
   const receiver = accounts[1];
   const data = ethers.utils.hexlify(ethers.utils.randomBytes(32));
   const unhashedLeaf = ethers.utils.defaultAbiCoder.encode(
@@ -181,7 +183,6 @@ function generateSignature0() {
 
 function generateSignature1() {
   const id = 1;
-  const sender = accounts[0];
   const receiver = accounts[1];
   const data = ethers.utils.hexlify(ethers.utils.randomBytes(32));
   const unhashedLeaf1 = ethers.utils.defaultAbiCoder.encode(

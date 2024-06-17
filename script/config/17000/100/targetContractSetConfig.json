@@ -5,6 +5,7 @@
   "childChainId": 100,
   "targetChainId": 17000,
   "publishers": ["0xeA96Fa8F6a185D6B97eCDeb9805178F6C2829eeE"],
+  "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
   "supportedFeedIds": [1, 2, 41, 42],
   "supportedFeedsData": [
     {
