@@ -2,24 +2,293 @@
   "usePrecompiledModexp": true,
   "proxyAdminOwner": "0xeA96Fa8F6a185D6B97eCDeb9805178F6C2829eeE",
   "targetContractsOwner": "0xeA96Fa8F6a185D6B97eCDeb9805178F6C2829eeE",
-  "childChainId": 100,
+  "eoracleChainId": 100,
   "targetChainId": 17000,
-  "publishers": ["0xeA96Fa8F6a185D6B97eCDeb9805178F6C2829eeE"],
-  "supportedFeedIds": [1, 2, 41, 42],
+  "publishers": ["0xeA96Fa8F6a185D6B97eCDeb9805178F6C2829eeE", "0x0345aD0e8F46d04c5aC8645f9B6a70075962c7D0"],
+  "supportedFeedIds": [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+    32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42
+  ],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
       "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 1,
       "decimals": 18,
-      "description": "BTC/USD",
-      "feedId": 1
+      "description": "BTC/USD"
     },
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 2,
       "decimals": 18,
-      "description": "ETH/USD",
-      "feedId": 2
+      "description": "ETH/USD"
+    },
+    {
+      "base": "0xa3FCD2041abc7fd3ac76aF9DEfCe42ea241b2a5f",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 3,
+      "decimals": 18,
+      "description": "XRP/USD"
+    },
+    {
+      "base": "0xadADADadAdADAdadADADADadadADAdAdadaDAdAD",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 4,
+      "decimals": 18,
+      "description": "ADA/USD"
+    },
+    {
+      "base": "0xDDdDddDdDdddDDddDDddDDDDdDdDDdDDdDDDDDDd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 5,
+      "decimals": 18,
+      "description": "DOGE/USD"
+    },
+    {
+      "base": "0xd4094e4ffa89985583E52D491251619a4C5b0BE9",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 6,
+      "decimals": 18,
+      "description": "SOL/USD"
+    },
+    {
+      "base": "0x50327c6c5a14DCaDE707ABad2E27eB517df87AB5",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 7,
+      "decimals": 18,
+      "description": "TRX/USD"
+    },
+    {
+      "base": "0xE4A74E85E85957B0A7A52D9c566C0a3C8d6133d0",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 8,
+      "decimals": 18,
+      "description": "DOT/USD"
+    },
+    {
+      "base": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 9,
+      "decimals": 18,
+      "description": "MATIC/USD"
+    },
+    {
+      "base": "0x2793E9D561c2235A0bcfAaA496b3e98f57eCA249",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 10,
+      "decimals": 18,
+      "description": "LTC/USD"
+    },
+    {
+      "base": "0x7D800a2559b7e3A9b50a1865Ac45C22D168Ce900",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 11,
+      "decimals": 18,
+      "description": "XAU/USD"
+    },
+    {
+      "base": "0x8cF4C1D3d5EBaFBEC6ed782A10b4D71762c2Acb3",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 12,
+      "decimals": 18,
+      "description": "XAG/USD"
+    },
+    {
+      "base": "0x00000000000000000000000000000000000003d2",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 13,
+      "decimals": 18,
+      "description": "EUR/USD"
+    },
+    {
+      "base": "0x0000000000000000000000000000000000000024",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 14,
+      "decimals": 18,
+      "description": "AUD/USD"
+    },
+    {
+      "base": "0x0000000000000000000000000000000000000188",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 15,
+      "decimals": 18,
+      "description": "JPY/USD"
+    },
+    {
+      "base": "0x000000000000000000000000000000000000033A",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 16,
+      "decimals": 18,
+      "description": "GBP/USD"
+    },
+    {
+      "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 17,
+      "decimals": 18,
+      "description": "USDT/USD"
+    },
+    {
+      "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 18,
+      "decimals": 18,
+      "description": "LINK/USD"
+    },
+    {
+      "base": "0x582d872A1B094FC48F5DE31D3B73F2D9bE47def1",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 19,
+      "decimals": 18,
+      "description": "TON/USD"
+    },
+    {
+      "base": "0xF8ca0D1a85B62ad87D7dbD440494CAC05B7309F1",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 20,
+      "decimals": 18,
+      "description": "ICP/USD"
+    },
+    {
+      "base": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 21,
+      "decimals": 18,
+      "description": "SHIB/USD"
+    },
+    {
+      "base": "0x7540EF9ea0Ff4f8adb9d7dbD7f6C26EFb3F696aB",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 22,
+      "decimals": 18,
+      "description": "BCH/USD"
+    },
+    {
+      "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 23,
+      "decimals": 18,
+      "description": "UNI/USD"
+    },
+    {
+      "base": "0xad2c4d032800AfeEbC71119928BDf1505EcA31B0",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 24,
+      "decimals": 18,
+      "description": "EOS/USD"
+    },
+    {
+      "base": "0x3c935fc39419a40E0244c47D5F613a5b703BF6c2",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 25,
+      "decimals": 18,
+      "description": "ATOM/USD"
+    },
+    {
+      "base": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 26,
+      "decimals": 18,
+      "description": "LEO/USD"
+    },
+    {
+      "base": "0x876F5868355879efD89A87f2a6D06BB0b228b3a3",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 27,
+      "decimals": 18,
+      "description": "OP/USD"
+    },
+    {
+      "base": "0xEaF1557dc24F862709890F3Be1683794DDD487E9",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 28,
+      "decimals": 18,
+      "description": "NEAR/USD"
+    },
+    {
+      "base": "0x126f3AE16F30C8A98e5319C31dac3D5355dA1772",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 29,
+      "decimals": 18,
+      "description": "APT/USD"
+    },
+    {
+      "base": "0x89bEB026A4A9A5a80906Ad56A318911E045FC4Af",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 30,
+      "decimals": 18,
+      "description": "NEO/USD"
+    },
+    {
+      "base": "0x6d681E3E45aAeBfC6131e887B55f28b179BB2f37",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 31,
+      "decimals": 18,
+      "description": "STX/USD"
+    },
+    {
+      "base": "0xaB2DB0E7b4EEC02d491777c3381b61A8Fc0308aA",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 32,
+      "decimals": 18,
+      "description": "KAS/USD"
+    },
+    {
+      "base": "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 33,
+      "decimals": 18,
+      "description": "LDO/USD"
+    },
+    {
+      "base": "0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 34,
+      "decimals": 18,
+      "description": "FIL/USD"
+    },
+    {
+      "base": "0xd6fAA45f5180A36CE1925ba9b4C9683CCaA3D117",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 35,
+      "decimals": 18,
+      "description": "BNB/USD"
+    },
+    {
+      "base": "0xDB9f97165657aeE56ce412966FD68b8715b04815",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 36,
+      "decimals": 18,
+      "description": "AVAX/USD"
+    },
+    {
+      "base": "0x000000000000000000000000000000000000007C",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 37,
+      "decimals": 18,
+      "description": "CAD/USD"
+    },
+    {
+      "base": "0x0000000000000000000000000000000000000164",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 38,
+      "decimals": 18,
+      "description": "INR/USD"
+    },
+    {
+      "base": "0x000000000000000000000000000000000000019A",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 39,
+      "decimals": 18,
+      "description": "KRW/USD"
+    },
+    {
+      "base": "0x00000000000000000000000000000000000003DA",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 40,
+      "decimals": 18,
+      "description": "BRL/USD"
     },
     {
       "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
