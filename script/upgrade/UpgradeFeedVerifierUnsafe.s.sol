@@ -2,8 +2,7 @@
 
 pragma solidity 0.8.25;
 
-import { Script } from "forge-std/Script.sol";
-import { stdJson } from "forge-std/Script.sol";
+import { Script, stdJson } from "forge-std/Script.sol";
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 import { UpgradeableProxyUtils } from "../utils/UpgradeableProxyUtils.sol";
 

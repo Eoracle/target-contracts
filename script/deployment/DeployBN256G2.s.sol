@@ -9,8 +9,6 @@ import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { BN256G2v1 } from "../../src/common/BN256G2v1.sol";
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
 
-// Deployment command: FOUNDRY_PROFILE="deployment" forge script script/deployment/DeployNewTargetContractSet.s.sol
-// --rpc-url $RPC_URL --private-key $PRIVATE_KEY -vvv --slow --verify --broadcast
 contract DeployBN256G2 is Script {
     using stdJson for string;
 
