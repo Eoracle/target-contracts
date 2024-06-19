@@ -58,7 +58,8 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
             broadcastFrom,
             IBLS(bls),
             IBN256G2(bn256G2),
-            configStructured.eoracleChainId
+            configStructured.eoracleChainId,
+            configStructured.allowedSenders
         );
         EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifier", feedVerifierProxy);
 

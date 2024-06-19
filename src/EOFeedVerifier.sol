@@ -12,7 +12,10 @@ import {
     VotingPowerIsZero,
     AggVotingPowerIsZero,
     InsufficientVotingPower,
-    SignatureVerificationFailed
+    SignatureVerificationFailed,
+    ValidatorIndexOutOfBounds,
+    SenderNotAllowed,
+    ValidatorSetTooSmall
 } from "./interfaces/Errors.sol";
 import { IBLS } from "./interfaces/IBLS.sol";
 import { IBN256G2 } from "./interfaces/IBN256G2.sol";
@@ -28,7 +31,7 @@ using Merkle for bytes32;
  */
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
-
+    uint256 public constant MIN_VALIDATORS = 3;
     /// @dev ID of eoracle chain
     uint256 internal _eoracleChainId;
 
@@ -59,6 +62,9 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     /// @dev address of the feed manager
     address internal _feedManager;
 
+    /// @dev mapping of allowed senders
+    mapping(address => bool) internal _allowedSenders;
+
     /**
      * @dev Allows only the feed manager to call the function
      */
@@ -72,8 +78,18 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param bls_ Address of the BLS library contract
      * @param bn256G2_ Address of the Bn256G2 library contract
      * @param eoracleChainId_ Chain ID of the eoracle chain
+     * @param allowedSenders List of allowed senders
      */
-    function initialize(address owner, IBLS bls_, IBN256G2 bn256G2_, uint256 eoracleChainId_) external initializer {
+    function initialize(
+        address owner,
+        IBLS bls_,
+        IBN256G2 bn256G2_,
+        uint256 eoracleChainId_,
+        address[] calldata allowedSenders
+    )
+        external
+        initializer
+    {
         if (
             address(bls_) == address(0) || address(bls_).code.length == 0 || address(bn256G2_) == address(0)
                 || address(bn256G2_).code.length == 0
@@ -83,6 +99,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         _eoracleChainId = eoracleChainId_;
         _bls = bls_;
         _bn256G2 = bn256G2_;
+        _setAllowedSenders(allowedSenders, true);
         __Ownable_init(owner);
     }
 
@@ -126,6 +143,13 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function setNewValidatorSet(Validator[] calldata newValidatorSet) external override onlyOwner {
         uint256 length = newValidatorSet.length;
+        if (length < MIN_VALIDATORS) revert ValidatorSetTooSmall();
+        // delete the slots of the old validators
+        if (length < _currentValidatorSetLength) {
+            for (uint256 i = length; i < _currentValidatorSetLength; i++) {
+                delete _currentValidatorSet[i];
+            }
+        }
         _currentValidatorSetLength = length;
         _currentValidatorSetHash = keccak256(abi.encode(newValidatorSet));
         uint256 totalPower = 0;
@@ -138,6 +162,13 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         }
         _totalVotingPower = totalPower;
         emit ValidatorSetUpdated(_currentValidatorSetLength, _currentValidatorSetHash, _totalVotingPower);
+    }
+
+    /**
+     * @inheritdoc IEOFeedVerifier
+     */
+    function setAllowedSenders(address[] calldata senders, bool allowed) external onlyOwner {
+        _setAllowedSenders(senders, allowed);
     }
 
     /**
@@ -217,6 +248,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @return The validator at the given index.
      */
     function currentValidatorSet(uint256 index) external view returns (Validator memory) {
+        if (index >= _currentValidatorSetLength) revert ValidatorIndexOutOfBounds();
         return _currentValidatorSet[index];
     }
 
@@ -253,6 +285,14 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
+     * @notice Returns whether the sender is allowed to submit leaves.
+     * @param sender The address of the sender.
+     */
+    function isSenderAllowed(address sender) external view returns (bool) {
+        return _allowedSenders[sender];
+    }
+
+    /**
      * @notice Function to verify the checkpoint signature
      * @param checkpoint Checkpoint data
      * @param signature Aggregated signature of the checkpoint
@@ -273,6 +313,12 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
             _lastProcessedBlockNumber = checkpoint.blockNumber;
             _lastProcessedEventRoot = checkpoint.eventRoot;
+        }
+    }
+
+    function _setAllowedSenders(address[] calldata senders, bool allowed) internal {
+        for (uint256 i; i < senders.length; i++) {
+            _allowedSenders[senders[i]] = allowed;
         }
     }
 
@@ -348,7 +394,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param eventRoot the root this event should belong to
      * @return Array of the leaf data fields of all submitted leaves
      */
-    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal pure returns (bytes[] memory) {
+    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal view returns (bytes[] memory) {
         uint256 length = inputs.length;
         bytes[] memory returnData = new bytes[](length);
         for (uint256 i = 0; i < length; i++) {
@@ -363,14 +409,17 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param eventRoot event root the leaf should belong to
      * @return The leaf data field
      */
-    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal pure returns (bytes memory) {
+    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal view returns (bytes memory) {
         bytes32 leaf = keccak256(input.unhashedLeaf);
         if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
             revert InvalidProof();
         }
 
-        ( /* uint256 id */ , /* address sender */, /* address receiver */, bytes memory data) =
+        ( /* uint256 id */ , address sender, /* address receiver */, bytes memory data) =
             abi.decode(input.unhashedLeaf, (uint256, address, address, bytes));
+        if (!_allowedSenders[sender]) {
+            revert SenderNotAllowed(sender);
+        }
 
         return data;
     }

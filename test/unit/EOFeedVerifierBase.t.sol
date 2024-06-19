@@ -37,6 +37,7 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     address public alice;
     address public bob;
     bytes32 public constant DOMAIN = keccak256("DOMAIN_CHECKPOINT_MANAGER");
+    address public constant EOCHAIN_SENDER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     bytes32[] public hashes;
     bytes32[] public proof;
     bytes[] public bitmaps;
@@ -57,11 +58,12 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
         alice = makeAddr("Alice");
         bob = makeAddr("Bob");
 
-        string[] memory cmd = new string[](4);
+        string[] memory cmd = new string[](5);
         cmd[0] = "npx";
         cmd[1] = "ts-node";
         cmd[2] = "test/utils/ts/generateMsgProof.ts";
         cmd[3] = vm.toString(abi.encode(DOMAIN));
+        cmd[4] = vm.toString(EOCHAIN_SENDER);
         bytes memory out = vm.ffi(cmd);
 
         IEOFeedVerifier.Validator[] memory validatorSetTmp;
@@ -99,7 +101,9 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
 abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
     function setUp() public virtual override {
         super.setUp();
-        address proxyAddress = deployer.run(admin, address(this), bls, bn256G2, eoracleChainId);
+        address[] memory allowedSenders = new address[](1);
+        allowedSenders[0] = EOCHAIN_SENDER;
+        address proxyAddress = deployer.run(admin, address(this), bls, bn256G2, eoracleChainId, allowedSenders);
         feedVerifier = EOFeedVerifier(proxyAddress);
         feedVerifier.setNewValidatorSet(validatorSet);
         feedVerifier.setFeedManager(address(this));
