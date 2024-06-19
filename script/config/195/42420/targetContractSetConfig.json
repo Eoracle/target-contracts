@@ -1,5 +1,5 @@
 {
-  "usePrecompiledModexp": true,
+  "usePrecompiledModexp": false,
   "proxyAdminOwner": "0x47e2D9547f326389f8e098a01D4E1651aDBeFB7a",
   "targetContractsOwner": "0x47e2D9547f326389f8e098a01D4E1651aDBeFB7a",
   "eoracleChainId": 42420,

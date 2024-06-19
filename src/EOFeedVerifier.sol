@@ -150,6 +150,28 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     }
 
     /**
+     * @notice Set the bn256G2 contract
+     * @param bn256G2_ Address of the BN256G2 contract
+     */
+    function setBN256G2(IBN256G2 bn256G2_) external onlyOwner {
+        if (address(bn256G2_) == address(0) || address(bn256G2_).code.length == 0) {
+            revert InvalidAddress();
+        }
+        _bn256G2 = bn256G2_;
+    }
+
+    /**
+     * @notice Set the BLS contract
+     * @param bls_ Address of the BLS contract
+     */
+    function setBLS(IBLS bls_) external onlyOwner {
+        if (address(bls_) == address(0) || address(bls_).code.length == 0) {
+            revert InvalidAddress();
+        }
+        _bls = bls_;
+    }
+
+    /**
      * @notice Returns the ID of the eoracle chain.
      * @return The eoracle chain ID.
      */
