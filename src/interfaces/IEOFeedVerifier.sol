@@ -106,4 +106,11 @@ interface IEOFeedVerifier {
      * @param feedManager_ The address of the new feed manager.
      */
     function setFeedManager(address feedManager_) external;
+
+    /**
+     * @notice Sets allowed sender for exit events
+     * @param senders Addresses of the allowed senders
+     * @param allowed Boolean value to set the sender as allowed or not
+     */
+    function setAllowedSenders(address[] calldata senders, bool allowed) external;
 }

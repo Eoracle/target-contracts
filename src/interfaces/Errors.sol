@@ -20,6 +20,9 @@ error VotingPowerIsZero();
 error AggVotingPowerIsZero();
 error InsufficientVotingPower();
 error SignatureVerificationFailed();
+error ValidatorIndexOutOfBounds();
+error ValidatorSetTooSmall();
+error SenderNotAllowed(address sender);
 
 /*//////////////////////////////////////////////////////////////////////////
                                 EOFeedRegistryAdapter
