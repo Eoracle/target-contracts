@@ -5,6 +5,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Test } from "forge-std/Test.sol";
 import { Utils } from "../utils/Utils.sol";
 import { IEOFeedManager } from "../../src/interfaces/IEOFeedManager.sol";
+import { DeployFeedManager } from "../../script/deployment/base/DeployFeedManager.s.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { MockFeedVerifier } from "../mock/MockFeedVerifier.sol";
@@ -19,8 +20,11 @@ import {
 contract EOFeedManagerTest is Test, Utils {
     EOFeedManager private registry;
     IEOFeedVerifier private verifier;
+    DeployFeedManager private deployer;
+    address private feedManagerProxy;
     address private publisher = makeAddr("publisher");
     address private owner = makeAddr("owner");
+    address private proxyAdmin = makeAddr("proxyAdmin");
     address private notOwner = makeAddr("notOwner");
     uint16 private feedId = 1;
     uint256 private rate = 1_000_000;
@@ -36,10 +40,8 @@ contract EOFeedManagerTest is Test, Utils {
 
     function setUp() public {
         verifier = new MockFeedVerifier();
-        registry = new EOFeedManager();
-        vm.startPrank(owner);
-        registry.initialize(address(verifier), owner);
-        vm.stopPrank();
+        deployer = new DeployFeedManager();
+        registry = EOFeedManager(deployer.run(proxyAdmin, address(verifier), owner));
     }
 
     function test_RevertWhen_NotOwner_SetFeedVerifier() public {

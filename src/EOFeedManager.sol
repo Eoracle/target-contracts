@@ -10,7 +10,8 @@ import {
     CallerIsNotWhitelisted,
     MissingLeafInputs,
     FeedNotSupported,
-    SymbolReplay
+    SymbolReplay,
+    InvalidInput
 } from "./interfaces/Errors.sol";
 
 /**
@@ -20,7 +21,7 @@ import {
  * the EOFeedManager and made available for other smart contracts to read. Only supported feed IDs can be published to
  * the feed manager.
  */
-contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
+contract EOFeedManager is IEOFeedManager, OwnableUpgradeable {
     /// @dev Map of feed id to price feed (feed id => PriceFeed)
     mapping(uint16 => PriceFeed) internal _priceFeeds;
 
@@ -43,6 +44,11 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
     modifier onlyNonZeroAddress(address addr) {
         if (addr == address(0)) revert InvalidAddress();
         _;
+    }
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
     }
 
     /**
@@ -70,6 +76,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      * @param isSupported Array of booleans indicating whether the feed is supported
      */
     function setSupportedFeeds(uint16[] calldata feedIds, bool[] calldata isSupported) external onlyOwner {
+        if (feedIds.length != isSupported.length) revert InvalidInput();
         for (uint256 i = 0; i < feedIds.length; i++) {
             _supportedFeedIds[feedIds[i]] = isSupported[i];
         }
@@ -79,6 +86,7 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
      * @inheritdoc IEOFeedManager
      */
     function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external onlyOwner {
+        if (publishers.length != isWhitelisted.length) revert InvalidInput();
         for (uint256 i = 0; i < publishers.length; i++) {
             if (publishers[i] == address(0)) revert InvalidAddress();
             _whitelistedPublishers[publishers[i]] = isWhitelisted[i];
@@ -178,8 +186,6 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         emit RateUpdated(feedId, rate, timestamp);
     }
 
-    //1716948831 / 41/ sc
-    //1717425992
     /**
      * @notice Get the latest price feed
      * @param feedId Feed id
@@ -189,4 +195,8 @@ contract EOFeedManager is Initializable, OwnableUpgradeable, IEOFeedManager {
         if (!_supportedFeedIds[feedId]) revert FeedNotSupported(feedId);
         return _priceFeeds[feedId];
     }
+
+    // slither-disable-next-line unused-state,naming-convention
+    // solhint-disable-next-line ordering
+    uint256[50] private __gap;
 }

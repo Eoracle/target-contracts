@@ -28,6 +28,11 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     /// @dev Decimals of the rate
     uint8 private _decimals;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /**
      * @notice Initialize the contract
      * @param feedManager The feed manager address
@@ -171,4 +176,8 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return priceData.eoracleBlockNumber;
     }
+
+    // slither-disable-next-line unused-state,naming-convention
+    // solhint-disable-next-line ordering
+    uint256[50] private __gap;
 }

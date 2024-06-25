@@ -73,6 +73,11 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /**
      * @param owner Owner of the contract
      * @param bls_ Address of the BLS library contract
@@ -141,7 +146,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     /**
      * @inheritdoc IEOFeedVerifier
      */
-    function setNewValidatorSet(Validator[] calldata newValidatorSet) external override onlyOwner {
+    function setNewValidatorSet(Validator[] calldata newValidatorSet) external onlyOwner {
         uint256 length = newValidatorSet.length;
         if (length < MIN_VALIDATORS) revert ValidatorSetTooSmall();
         // delete the slots of the old validators
@@ -443,8 +448,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         return uint8(bitmap[byteNumber]) & (1 << bitNumber) > 0;
     }
 
-    // slither-disable-start unused-state
+    // slither-disable-next-line unused-state,naming-convention
     // solhint-disable-next-line ordering
     uint256[50] private __gap;
-    // slither-disable-end unused-state
 }
