@@ -27,11 +27,11 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     uint8 public constant DECIMALS = 8;
     uint256 public constant VERSION = 1;
 
-    address public proxyAdmin = makeAddr("proxyAdmin");
     IEOFeedManager internal _feedManager;
     EOFeedRegistryAdapterBase internal _feedRegistryAdapter;
     EOFeedAdapter internal _feedAdapterImplementation;
-    address internal _notOwner;
+    address internal _proxyAdmin = makeAddr("proxyAdmin");
+    address internal _notOwner = makeAddr("_notOwner");
     address internal _base1Address;
     address internal _quote1Address;
     address internal _base2Address;
@@ -43,18 +43,12 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     event FeedAdapterDeployed(uint16 indexed feedId, address indexed feedAdapter, address base, address quote);
 
     function setUp() public virtual {
-        _notOwner = makeAddr("_notOwner");
-
         _feedManager = new MockEOFeedManager();
         Options memory opts;
         _feedAdapterImplementation = EOFeedAdapter(Upgrades.deployImplementation("EOFeedAdapter.sol", opts));
 
-        bytes memory initData = abi.encodeCall(
-            EOFeedRegistryAdapterBase.initialize,
-            (address(_feedManager), address(_feedAdapterImplementation), address(this))
-        );
-
-        _feedRegistryAdapter = _deployAdapter(initData);
+        _feedRegistryAdapter = _deployAdapter();
+        _feedRegistryAdapter.initialize(address(_feedManager), address(_feedAdapterImplementation), address(this));
 
         _base1Address = makeAddr("base");
         _quote1Address = makeAddr("quote");
@@ -268,5 +262,5 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         return feedAdapter;
     }
 
-    function _deployAdapter(bytes memory initData) internal virtual returns (EOFeedRegistryAdapterBase) { }
+    function _deployAdapter() internal virtual returns (EOFeedRegistryAdapterBase) { }
 }

@@ -9,10 +9,8 @@ import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 // solhint-disable ordering
 contract EOFeedRegistryAdapterTest is EOFeedRegistryAdapterBaseTest {
-    function _deployAdapter(bytes memory initData) internal override returns (EOFeedRegistryAdapterBase) {
-        return EOFeedRegistryAdapterBase(
-            Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdmin, initData)
-        );
+    function _deployAdapter() internal override returns (EOFeedRegistryAdapterBase) {
+        return EOFeedRegistryAdapterBase(Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", _proxyAdmin, ""));
     }
 
     function test_FactoryInitialized() public view override {

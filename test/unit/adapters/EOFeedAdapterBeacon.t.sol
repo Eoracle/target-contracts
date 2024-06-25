@@ -24,12 +24,9 @@ contract EOFeedAdapterBeaconTest is EOFeedAdapterTest {
         IEOFeedAdapter feedAdapterImplementation =
             EOFeedAdapter(Upgrades.deployImplementation("EOFeedAdapter.sol", opts));
 
-        bytes memory initData = abi.encodeCall(
-            EOFeedRegistryAdapterBase.initialize,
-            (address(_feedManager), address(feedAdapterImplementation), address(this))
-        );
         EOFeedRegistryAdapter feedRegistryAdapter =
-            EOFeedRegistryAdapter(Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdmin, initData));
+            EOFeedRegistryAdapter(Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdmin, ""));
+        feedRegistryAdapter.initialize(address(_feedManager), address(feedAdapterImplementation), address(this));
 
         _feedAdapter = EOFeedAdapter(
             address(

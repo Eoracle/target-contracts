@@ -25,13 +25,10 @@ contract EOFeedAdapterCloneTest is EOFeedAdapterTest {
         IEOFeedAdapter feedAdapterImplementation =
             EOFeedAdapter(Upgrades.deployImplementation("EOFeedAdapter.sol", opts));
 
-        bytes memory initData = abi.encodeCall(
-            EOFeedRegistryAdapterBase.initialize,
-            (address(_feedManager), address(feedAdapterImplementation), address(this))
-        );
         EOFeedRegistryAdapterClone feedRegistryAdapter = EOFeedRegistryAdapterClone(
-            Upgrades.deployTransparentProxy("EOFeedRegistryAdapterClone.sol", proxyAdmin, initData)
+            Upgrades.deployTransparentProxy("EOFeedRegistryAdapterClone.sol", proxyAdmin, "")
         );
+        feedRegistryAdapter.initialize(address(_feedManager), address(feedAdapterImplementation), address(this));
 
         _feedAdapter = EOFeedAdapter(
             address(
