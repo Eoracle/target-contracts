@@ -7,7 +7,6 @@ import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { IBN256G2 } from "../../src/interfaces/IBN256G2.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { DeployFeedVerifier } from "../../script/deployment/base/DeployFeedVerifier.s.sol";
 import { Utils } from "../utils/Utils.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
@@ -27,7 +26,6 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     EOFeedVerifier public feedVerifier;
     BLS public bls;
     IBN256G2 public bn256G2;
-    DeployFeedVerifier public deployer;
 
     uint256 public eoracleChainId = 1;
     uint256 public validatorSetSize;
