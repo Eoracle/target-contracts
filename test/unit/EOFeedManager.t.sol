@@ -10,6 +10,7 @@ import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { MockFeedVerifier } from "../mock/MockFeedVerifier.sol";
 import {
+    InvalidInput,
     InvalidAddress,
     CallerIsNotWhitelisted,
     FeedNotSupported,
@@ -17,6 +18,7 @@ import {
     SymbolReplay
 } from "../../src/interfaces/Errors.sol";
 
+// solhint-disable max-states-count
 contract EOFeedManagerTest is Test, Utils {
     EOFeedManager private registry;
     IEOFeedVerifier private verifier;
@@ -69,6 +71,14 @@ contract EOFeedManagerTest is Test, Utils {
         _whitelistPublisher(notOwner, publisher);
     }
 
+    function test_RevertWhen_InvalidInput_WhitelistPublishers() public {
+        address[] memory publishers = new address[](2);
+        bool[] memory isWhitelisted = new bool[](1);
+        vm.expectRevert(abi.encodeWithSelector(InvalidInput.selector));
+        vm.prank(owner);
+        registry.whitelistPublishers(publishers, isWhitelisted);
+    }
+
     function test_RevertWhen_ZeroAddress_WhitelistPublishers() public {
         address[] memory publishers = new address[](1);
         bool[] memory isWhitelisted = new bool[](1);
@@ -97,6 +107,14 @@ contract EOFeedManagerTest is Test, Utils {
     function test_RevertWhen_SetSupportedFeedsNotOwner() public {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _setSupportedFeed(notOwner, feedId);
+    }
+
+    function test_RevertWhen_SetSupportedFeedsInvalidInput() public {
+        uint16[] memory feedIds = new uint16[](5);
+        bool[] memory isSupported = new bool[](4);
+        vm.expectRevert(abi.encodeWithSelector(InvalidInput.selector));
+        vm.prank(owner);
+        registry.setSupportedFeeds(feedIds, isSupported);
     }
 
     function test_setSupportedFeeds() public {
