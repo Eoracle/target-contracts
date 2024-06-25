@@ -5,7 +5,6 @@ import { Test } from "forge-std/Test.sol";
 import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
 import { IEOFeedAdapter } from "../../../src/adapters/interfaces/IEOFeedAdapter.sol";
 import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
-import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapter.sol";
 import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
 import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";

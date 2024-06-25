@@ -2,7 +2,6 @@
 pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { IEOFeedManager } from "./interfaces/IEOFeedManager.sol";
 import {
