@@ -10,6 +10,7 @@ import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 import { IEOFeedAdapter } from "../../../src/adapters/interfaces/IEOFeedAdapter.sol";
 // solhint-disable ordering
 import { Denominations } from "../../../src/libraries/Denominations.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 contract EoracleConsumerExampleFeedAdapterTest is Test {
     uint16 public constant FEED_ID = 1;
@@ -18,6 +19,7 @@ contract EoracleConsumerExampleFeedAdapterTest is Test {
     uint256 public constant RATE1 = 100_000_000;
     uint256 public constant RATE2 = 200_000_000;
     uint8 public constant DECIMALS = 8;
+    address public proxyAdmin = makeAddr("proxyAdmin");
 
     EOFeedAdapter internal _feedAdapterImplementation;
     MockEOFeedManager internal _feedManager;
@@ -30,7 +32,8 @@ contract EoracleConsumerExampleFeedAdapterTest is Test {
 
         _feedManager = new MockEOFeedManager();
         _feedAdapterImplementation = new EOFeedAdapter();
-        _feedRegistryAdapter = new EOFeedRegistryAdapter();
+        _feedRegistryAdapter =
+            EOFeedRegistryAdapter(Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdmin, ""));
 
         _feedRegistryAdapter.initialize(address(_feedManager), address(_feedAdapterImplementation), _owner);
 

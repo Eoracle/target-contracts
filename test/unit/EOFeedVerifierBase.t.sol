@@ -51,7 +51,6 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     function setUp() public virtual {
         bls = new BLS();
         _setBN256G2();
-        feedVerifier = new EOFeedVerifier();
         deployer = new DeployFeedVerifier();
 
         admin = makeAddr("admin");

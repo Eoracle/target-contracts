@@ -6,6 +6,8 @@ import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
 import { IEOFeedAdapter } from "../../../src/adapters/interfaces/IEOFeedAdapter.sol";
 import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapter.sol";
+import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 // solhint-disable ordering
 // solhint-disable func-named-parameters
@@ -16,13 +18,19 @@ contract EOFeedAdapterBeaconTest is EOFeedAdapterTest {
     function setUp() public override {
         _baseAddress = makeAddr("base");
         _quoteAddress = makeAddr("quote");
-        _owner = makeAddr("_owner");
 
         _feedManager = new MockEOFeedManager();
-        IEOFeedAdapter feedAdapterImplementation = new EOFeedAdapter();
 
-        EOFeedRegistryAdapter feedRegistryAdapter = new EOFeedRegistryAdapter();
-        feedRegistryAdapter.initialize(address(_feedManager), address(feedAdapterImplementation), address(this));
+        IEOFeedAdapter feedAdapterImplementation =
+            EOFeedAdapter(Upgrades.deployImplementation("EOFeedAdapter.sol", opts));
+
+        bytes memory initData = abi.encodeCall(
+            EOFeedRegistryAdapterBase.initialize,
+            (address(_feedManager), address(feedAdapterImplementation), address(this))
+        );
+        EOFeedRegistryAdapter feedRegistryAdapter =
+            EOFeedRegistryAdapter(Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", proxyAdmin, initData));
+
         _feedAdapter = EOFeedAdapter(
             address(
                 feedRegistryAdapter.deployEOFeedAdapter(

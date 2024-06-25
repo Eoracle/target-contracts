@@ -4,13 +4,16 @@ pragma solidity 0.8.25;
 import { Test } from "forge-std/Test.sol";
 import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
 import { IEOFeedAdapter } from "../../../src/adapters/interfaces/IEOFeedAdapter.sol";
+import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
+import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapter.sol";
 import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
 import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
-//beacon
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 import { FeedAlreadyExists, BaseQuotePairExists, FeedNotSupported } from "../../../src/interfaces/Errors.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
+import { Options } from "openzeppelin-foundry-upgrades/Options.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
@@ -24,6 +27,7 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     uint8 public constant DECIMALS = 8;
     uint256 public constant VERSION = 1;
 
+    address public proxyAdmin = makeAddr("proxyAdmin");
     IEOFeedManager internal _feedManager;
     EOFeedRegistryAdapterBase internal _feedRegistryAdapter;
     EOFeedAdapter internal _feedAdapterImplementation;
@@ -42,9 +46,15 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         _notOwner = makeAddr("_notOwner");
 
         _feedManager = new MockEOFeedManager();
-        _feedAdapterImplementation = new EOFeedAdapter();
-        _feedRegistryAdapter = _deployAdapter();
-        _feedRegistryAdapter.initialize(address(_feedManager), address(_feedAdapterImplementation), address(this));
+        Options memory opts;
+        _feedAdapterImplementation = EOFeedAdapter(Upgrades.deployImplementation("EOFeedAdapter.sol", opts));
+
+        bytes memory initData = abi.encodeCall(
+            EOFeedRegistryAdapterBase.initialize,
+            (address(_feedManager), address(_feedAdapterImplementation), address(this))
+        );
+
+        _feedRegistryAdapter = _deployAdapter(initData);
 
         _base1Address = makeAddr("base");
         _quote1Address = makeAddr("quote");
@@ -258,5 +268,5 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
         return feedAdapter;
     }
 
-    function _deployAdapter() internal virtual returns (EOFeedRegistryAdapterBase) { }
+    function _deployAdapter(bytes memory initData) internal virtual returns (EOFeedRegistryAdapterBase) { }
 }
