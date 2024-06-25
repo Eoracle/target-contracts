@@ -4,13 +4,15 @@ pragma solidity 0.8.25;
 import { Test } from "forge-std/Test.sol";
 import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
 import { IEOFeedAdapter } from "../../../src/adapters/interfaces/IEOFeedAdapter.sol";
+import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
 import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
 import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
-//beacon
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 import { FeedAlreadyExists, BaseQuotePairExists, FeedNotSupported } from "../../../src/interfaces/Errors.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
+import { Options } from "openzeppelin-foundry-upgrades/Options.sol";
 
 // solhint-disable ordering
 // solhint-disable no-empty-blocks
@@ -27,7 +29,8 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     IEOFeedManager internal _feedManager;
     EOFeedRegistryAdapterBase internal _feedRegistryAdapter;
     EOFeedAdapter internal _feedAdapterImplementation;
-    address internal _notOwner;
+    address internal _proxyAdmin = makeAddr("proxyAdmin");
+    address internal _notOwner = makeAddr("_notOwner");
     address internal _base1Address;
     address internal _quote1Address;
     address internal _base2Address;
@@ -39,10 +42,10 @@ abstract contract EOFeedRegistryAdapterBaseTest is Test {
     event FeedAdapterDeployed(uint16 indexed feedId, address indexed feedAdapter, address base, address quote);
 
     function setUp() public virtual {
-        _notOwner = makeAddr("_notOwner");
-
         _feedManager = new MockEOFeedManager();
-        _feedAdapterImplementation = new EOFeedAdapter();
+        Options memory opts;
+        _feedAdapterImplementation = EOFeedAdapter(Upgrades.deployImplementation("EOFeedAdapter.sol", opts));
+
         _feedRegistryAdapter = _deployAdapter();
         _feedRegistryAdapter.initialize(address(_feedManager), address(_feedAdapterImplementation), address(this));
 

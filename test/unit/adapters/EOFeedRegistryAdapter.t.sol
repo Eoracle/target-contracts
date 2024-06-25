@@ -5,11 +5,12 @@ import { EOFeedRegistryAdapterBaseTest } from "./EOFeedRegistryAdapterBase.t.sol
 import { EOFeedRegistryAdapterBase } from "../../../src/adapters/EOFeedRegistryAdapterBase.sol";
 import { EOFeedRegistryAdapter } from "../../../src/adapters/EOFeedRegistryAdapter.sol";
 import { UpgradeableBeacon } from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 // solhint-disable ordering
 contract EOFeedRegistryAdapterTest is EOFeedRegistryAdapterBaseTest {
     function _deployAdapter() internal override returns (EOFeedRegistryAdapterBase) {
-        return EOFeedRegistryAdapterBase(new EOFeedRegistryAdapter());
+        return EOFeedRegistryAdapterBase(Upgrades.deployTransparentProxy("EOFeedRegistryAdapter.sol", _proxyAdmin, ""));
     }
 
     function test_FactoryInitialized() public view override {

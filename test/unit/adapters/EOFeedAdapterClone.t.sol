@@ -6,6 +6,7 @@ import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { EOFeedAdapter } from "../../../src/adapters/EOFeedAdapter.sol";
 import { IEOFeedAdapter } from "../../../src/adapters/interfaces/IEOFeedAdapter.sol";
 import { EOFeedRegistryAdapterClone } from "../../../src/adapters/EOFeedRegistryAdapterClone.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 // solhint-disable ordering
 // solhint-disable func-named-parameters
@@ -19,10 +20,15 @@ contract EOFeedAdapterCloneTest is EOFeedAdapterTest {
         _owner = makeAddr("_owner");
 
         _feedManager = new MockEOFeedManager();
-        IEOFeedAdapter feedAdapterImplementation = new EOFeedAdapter();
 
-        EOFeedRegistryAdapterClone feedRegistryAdapter = new EOFeedRegistryAdapterClone();
+        IEOFeedAdapter feedAdapterImplementation =
+            EOFeedAdapter(Upgrades.deployImplementation("EOFeedAdapter.sol", opts));
+
+        EOFeedRegistryAdapterClone feedRegistryAdapter = EOFeedRegistryAdapterClone(
+            Upgrades.deployTransparentProxy("EOFeedRegistryAdapterClone.sol", proxyAdmin, "")
+        );
         feedRegistryAdapter.initialize(address(_feedManager), address(feedAdapterImplementation), address(this));
+
         _feedAdapter = EOFeedAdapter(
             address(
                 feedRegistryAdapter.deployEOFeedAdapter(

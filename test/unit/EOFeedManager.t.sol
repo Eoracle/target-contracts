@@ -5,10 +5,12 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Test } from "forge-std/Test.sol";
 import { Utils } from "../utils/Utils.sol";
 import { IEOFeedManager } from "../../src/interfaces/IEOFeedManager.sol";
+import { DeployFeedManager } from "../../script/deployment/base/DeployFeedManager.s.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { MockFeedVerifier } from "../mock/MockFeedVerifier.sol";
 import {
+    InvalidInput,
     InvalidAddress,
     CallerIsNotWhitelisted,
     FeedNotSupported,
@@ -16,11 +18,15 @@ import {
     SymbolReplay
 } from "../../src/interfaces/Errors.sol";
 
+// solhint-disable max-states-count
 contract EOFeedManagerTest is Test, Utils {
     EOFeedManager private registry;
     IEOFeedVerifier private verifier;
+    DeployFeedManager private deployer;
+    address private feedManagerProxy;
     address private publisher = makeAddr("publisher");
     address private owner = makeAddr("owner");
+    address private proxyAdmin = makeAddr("proxyAdmin");
     address private notOwner = makeAddr("notOwner");
     uint16 private feedId = 1;
     uint256 private rate = 1_000_000;
@@ -36,10 +42,8 @@ contract EOFeedManagerTest is Test, Utils {
 
     function setUp() public {
         verifier = new MockFeedVerifier();
-        registry = new EOFeedManager();
-        vm.startPrank(owner);
-        registry.initialize(address(verifier), owner);
-        vm.stopPrank();
+        deployer = new DeployFeedManager();
+        registry = EOFeedManager(deployer.run(proxyAdmin, address(verifier), owner));
     }
 
     function test_RevertWhen_NotOwner_SetFeedVerifier() public {
@@ -65,6 +69,14 @@ contract EOFeedManagerTest is Test, Utils {
     function test_RevertWhen_NotOwner_WhitelistPublishers() public {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _whitelistPublisher(notOwner, publisher);
+    }
+
+    function test_RevertWhen_InvalidInput_WhitelistPublishers() public {
+        address[] memory publishers = new address[](2);
+        bool[] memory isWhitelisted = new bool[](1);
+        vm.expectRevert(abi.encodeWithSelector(InvalidInput.selector));
+        vm.prank(owner);
+        registry.whitelistPublishers(publishers, isWhitelisted);
     }
 
     function test_RevertWhen_ZeroAddress_WhitelistPublishers() public {
@@ -95,6 +107,14 @@ contract EOFeedManagerTest is Test, Utils {
     function test_RevertWhen_SetSupportedFeedsNotOwner() public {
         vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, notOwner));
         _setSupportedFeed(notOwner, feedId);
+    }
+
+    function test_RevertWhen_SetSupportedFeedsInvalidInput() public {
+        uint16[] memory feedIds = new uint16[](5);
+        bool[] memory isSupported = new bool[](4);
+        vm.expectRevert(abi.encodeWithSelector(InvalidInput.selector));
+        vm.prank(owner);
+        registry.setSupportedFeeds(feedIds, isSupported);
     }
 
     function test_setSupportedFeeds() public {

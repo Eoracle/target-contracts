@@ -8,16 +8,20 @@ import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 
 import { InvalidAddress } from "../../../src/interfaces/Errors.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
+import { Options } from "openzeppelin-foundry-upgrades/Options.sol";
 
 // solhint-disable ordering
 
 abstract contract EOFeedAdapterTestUninitialized is Test {
+    Options public opts;
     uint8 public constant DECIMALS = 8;
     string public constant DESCRIPTION = "ETH/USD";
     uint256 public constant VERSION = 1;
     uint16 public constant FEED_ID = 1;
     uint256 public constant RATE1 = 100_000_000;
     uint256 public constant RATE2 = 200_000_000;
+    address public proxyAdmin = makeAddr("proxyAdmin");
 
     EOFeedAdapter internal _feedAdapter;
     IEOFeedManager internal _feedManager;
@@ -29,7 +33,8 @@ abstract contract EOFeedAdapterTestUninitialized is Test {
         _owner = makeAddr("_owner");
 
         _feedManager = new MockEOFeedManager();
-        _feedAdapter = new EOFeedAdapter();
+        _feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+
         _lastTimestamp = block.timestamp;
         _lastBlockNumber = block.number;
     }

@@ -7,8 +7,8 @@ import { BLS } from "../../src/common/BLS.sol";
 import { BN256G2 } from "../../src/common/BN256G2.sol";
 import { IBN256G2 } from "../../src/interfaces/IBN256G2.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
-import { DeployFeedVerifier } from "../../script/deployment/base/DeployFeedVerifier.s.sol";
 import { Utils } from "../utils/Utils.sol";
+import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 // solhint-disable max-states-count
 abstract contract UninitializedFeedVerifier is Test, Utils {
@@ -26,7 +26,6 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     EOFeedVerifier public feedVerifier;
     BLS public bls;
     IBN256G2 public bn256G2;
-    DeployFeedVerifier public deployer;
 
     uint256 public eoracleChainId = 1;
     uint256 public validatorSetSize;
@@ -51,12 +50,11 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     function setUp() public virtual {
         bls = new BLS();
         _setBN256G2();
-        feedVerifier = new EOFeedVerifier();
-        deployer = new DeployFeedVerifier();
-
         admin = makeAddr("admin");
         alice = makeAddr("Alice");
         bob = makeAddr("Bob");
+
+        feedVerifier = EOFeedVerifier(Upgrades.deployTransparentProxy("EOFeedVerifier.sol", admin, ""));
 
         string[] memory cmd = new string[](5);
         cmd[0] = "npx";
@@ -103,8 +101,8 @@ abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
         super.setUp();
         address[] memory allowedSenders = new address[](1);
         allowedSenders[0] = EOCHAIN_SENDER;
-        address proxyAddress = deployer.run(admin, address(this), bls, bn256G2, eoracleChainId, allowedSenders);
-        feedVerifier = EOFeedVerifier(proxyAddress);
+
+        feedVerifier.initialize(address(this), bls, bn256G2, eoracleChainId, allowedSenders);
         feedVerifier.setNewValidatorSet(validatorSet);
         feedVerifier.setFeedManager(address(this));
     }

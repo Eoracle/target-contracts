@@ -13,6 +13,7 @@ error SymbolReplay(uint16 feedId);
                                 EOFeedVerifier
 //////////////////////////////////////////////////////////////////////////*/
 error CallerIsNotFeedManager();
+error InvalidInput();
 error InvalidProof();
 error InvalidAddress();
 error InvalidEventRoot();
