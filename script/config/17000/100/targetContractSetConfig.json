@@ -381,6 +381,6 @@
       "decimals": 18,
       "description": "mETH/ETH",
       "feedId": 53
-    },
+    }
   ]
 }
