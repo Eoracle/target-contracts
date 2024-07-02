@@ -304,6 +304,83 @@
       "decimals": 18,
       "description": "sfrxETH/frxETH",
       "feedId": 42
-    }
+    },
+    {
+      "base": "0x93c4b944D05dfe6df7645A86cd2206016c51564D",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "stETH/ETH",
+      "feedId": 43
+    },
+    {
+      "base": "0xae78736Cd615f374D3085123A210448E74Fc6393",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "rETH/ETH",
+      "feedId": 44
+    },
+    {
+      "base": "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "cbETH/ETH",
+      "feedId": 45
+    },
+    {
+      "base": "0xF64bAe65f6f2a5277571143A24FaaFDFC0C2a737",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "ETHx/ETH",
+      "feedId": 46
+    },
+    {
+      "base": "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "ankrETH/ETH",
+      "feedId": 47
+    },
+    {
+      "base": "0xa4C637e0F704745D182e4D38cAb7E7485321d059",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "oETH/ETH",
+      "feedId": 48
+    },
+    {
+      "base": "0x8023518b2192FB5384DAdc596765B3dD1cdFe471",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "osETH/ETH",
+      "feedId": 49
+    },
+    {
+      "base": "0xf951E335afb289353dc249e82926178EaC7DEd78",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "swETH/ETH",
+      "feedId": 50
+    },
+    {
+      "base": "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "wBETH/ETH",
+      "feedId": 51
+    },
+    {
+      "base": "0x8c1BEd5b9a0928467c9B1341Da1D7BD5e10b6549",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "lsETH/ETH",
+      "feedId": 52
+    },
+    {
+      "base": "0xe3cBd06D7dadB3F4e6557bAb7EdD924CD1489E8f",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "mETH/ETH",
+      "feedId": 53
+    },
   ]
 }
