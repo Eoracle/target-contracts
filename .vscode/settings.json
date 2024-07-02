@@ -5,5 +5,23 @@
   "[solidity]": {
     "editor.defaultFormatter": "JuanBlanco.solidity"
   },
-  "solidity.formatter": "forge"
+  "solidity.formatter": "forge",
+  "security.olympix.project.includePath": "src",
+  "cSpell.enableFiletypes": ["solidity"],
+  "cSpell.words": [
+    "eoracle",
+    "FEEDSDATA",
+    "IBLS",
+    "inheritdoc",
+    "Initializable",
+    "keccak",
+    "lcov",
+    "Merkle",
+    "Modexp",
+    "Reentrancy",
+    "solhint",
+    "struct",
+    "structs",
+    "unhashed"
+  ]
 }

@@ -1,0 +1,4 @@
+{
+  "detectors_to_exclude": "naming-convention|solc-version|pragma|assembly|similar-names",
+  "filter_paths": "node_modules|test|lib|src/examples"
+}

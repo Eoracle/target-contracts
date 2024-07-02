@@ -1,23 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.20;
+pragma solidity 0.8.25;
 
+import { IBN256G2 } from "../interfaces/IBN256G2.sol";
+import { ModexpInverse } from "./BLS.sol";
 // solhint-disable func-named-parameters
-
-interface IBN256G2 {
-    function ecTwistAdd(
-        uint256 pt1xx,
-        uint256 pt1xy,
-        uint256 pt1yx,
-        uint256 pt1yy,
-        uint256 pt2xx,
-        uint256 pt2xy,
-        uint256 pt2yx,
-        uint256 pt2yy
-    )
-        external
-        view
-        returns (uint256, uint256, uint256, uint256);
-}
 
 // File lib/core-contracts/contracts/common/BN256G2.sol
 
@@ -68,7 +54,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt2yy
     )
         external
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         if (pt1xx == 0 && pt1xy == 0 && pt1yx == 0 && pt1yy == 0) {
@@ -107,7 +93,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1yy
     )
         external
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         uint256 pt1zx = 1;
@@ -222,9 +208,9 @@ contract BN256G2 is IBN256G2 {
      * @return Inv([xx, xy])
      */
     // solhint-disable-next-line ordering
-    function _fq2inv(uint256 x, uint256 y) internal view returns (uint256, uint256) {
-        uint256 inv =
-            _modInv(addmod(mulmod(y, y, FIELD_MODULUS), mulmod(x, x, FIELD_MODULUS), FIELD_MODULUS), FIELD_MODULUS);
+    function _fq2inv(uint256 x, uint256 y) internal pure returns (uint256, uint256) {
+        uint256 inv = ModexpInverse.run(addmod(mulmod(y, y, FIELD_MODULUS), mulmod(x, x, FIELD_MODULUS), FIELD_MODULUS));
+
         return (mulmod(x, inv, FIELD_MODULUS), FIELD_MODULUS - mulmod(y, inv, FIELD_MODULUS));
     }
 
@@ -250,32 +236,6 @@ contract BN256G2 is IBN256G2 {
     }
 
     /**
-     * @notice Calculates the modular inverse of a over n
-     * @param a The operand to calculate the inverse of
-     * @param n The modulus
-     * @return result Inv(a)modn
-     *
-     */
-    function _modInv(uint256 a, uint256 n) internal view returns (uint256 result) {
-        bool success;
-        // prettier-ignore
-        // slither-disable-next-line assembly
-        assembly {
-            // solhint-disable-line no-inline-assembly
-            let freemem := mload(0x40)
-            mstore(freemem, 0x20)
-            mstore(add(freemem, 0x20), 0x20)
-            mstore(add(freemem, 0x40), 0x20)
-            mstore(add(freemem, 0x60), a)
-            mstore(add(freemem, 0x80), sub(n, 2))
-            mstore(add(freemem, 0xA0), n)
-            success := staticcall(sub(gas(), 2000), 5, freemem, 0xC0, freemem, 0x20)
-            result := mload(freemem)
-        }
-        require(success, "error with modular inverse");
-    }
-
-    /**
      * @notice Converts a point from jacobian to affine
      * @param pt1xx First point x real coordinate
      * @param pt1xy First point x imaginary coordinate
@@ -298,7 +258,7 @@ contract BN256G2 is IBN256G2 {
         uint256 pt1zy
     )
         internal
-        view
+        pure
         returns (uint256, uint256, uint256, uint256)
     {
         uint256 invzx;
@@ -386,7 +346,8 @@ contract BN256G2 is IBN256G2 {
         (pt1yx, pt1yy) = _fq2sub(pt2yx, pt2yy, pt2xx, pt2xy); // V_squared_times_V2 - A
         (pt1yx, pt1yy) = _fq2mul(pt1xx, pt1xy, pt1yx, pt1yy); // U * (V_squared_times_V2 - A)
         (pt1xx, pt1xy) = _fq2mul(pt1zx, pt1zy, pt3[PTYX], pt3[PTYY]); // V_cubed * U2
-        (pt3[PTYX], pt3[PTYY]) = _fq2sub(pt1yx, pt1yy, pt1xx, pt1xy); // newy = U * (V_squared_times_V2 - A) - V_cubed *
+        (pt3[PTYX], pt3[PTYY]) = _fq2sub(pt1yx, pt1yy, pt1xx, pt1xy); // newy = U * (V_squared_times_V2 - A) - V_cubed
+            // *
             // U2
     }
 

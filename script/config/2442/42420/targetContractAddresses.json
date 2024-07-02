@@ -1,0 +1,18 @@
+{
+  "bls": "0xA47F016c41403F77b21f9e307EdbdbF0bbCb16Ac",
+  "bn256G2": "0x67b335FC747Dbe30F3deF29c16fB655dCAa478f3",
+  "feedAdapterImplementation": "0xB6B569942c1D779bB20BC56BF7684D9ADC6bA4b1",
+  "feedManager": "0x8AF367b161FA897FA7e89262c9b4ECB8BC0D7d56",
+  "feedManagerImplementation": "0xBF59B2A5836f853cECbE0fd0bB7fe2379cdAa83C",
+  "feedRegistryAdapter": "0x29Ca84c8AcCE40c6b2d3eea64a71Ad4164c27862",
+  "feedRegistryAdapterImplementation": "0x33A09f5Ef0863D7530B9681cd4cBce4FB8926035",
+  "feedVerifier": "0x457091Cf8d8AA126Ee8DCe82baB2e782aECa3d15",
+  "feedVerifierImplementation": "0x36Ee6Ab9fb172aa52d97B0ce08e07B0201663492",
+  "feeds": {
+    "BTC/USD": "0x21653aD2FEc37d87d3ff041fbfa5070CE6dd8fc2",
+    "ETH/USD": "0x5e387cA04d4A52fbeCa458f0C0677184Cae212A1",
+    "sFRAX/FRAX": "0x742a8DE9a639A509A8dC1eD818A42A0D84E3Ff9c",
+    "sfrxETH/frxETH": "0x8Ec3f0Dc9662c018CACaEC9D4d3E93bf1545CFCE"
+  },
+  "proxyAdmin": ""
+}
