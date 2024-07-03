@@ -1,4 +1,4 @@
-## EOFeedManager Deployments 
+## EOFeedManager Deployments
 
 | Network              | Address                                    | Supported Symbols                                                                                                                                                                     |
 | -------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -10,8 +10,6 @@
 | Berachain            | 0xD6BbDE9174b1CdAa358d2Cf4D57D1a9F7178FBfF | BTC,ETH                                                                                                                                                                               |
 | Base Sepolia Testnet | 0xE195541C2F7553e0c515ddf41D5c06a6930aCF15 | BTC,ETH,sFRAX,sfrxETH                                                                                                                                                                 |
 | Sepolia              | 0x538DF563cc3A3b551d8d77d8a37a1F7E23644461 | ADA,APT,ATOM,AUD,AVAX,BCH,BNB,BRL,BTC,CAD,DOGE,DOT,EOS,ETH,EUR,FIL,GBP,ICP,INR,JPY,KAS,KRW,LDO,LEO,LINK,LTC,MATIC,NEAR,NEO,OP,SHIB,SOL,STX,TON,TRX,UNI,USDT,XAG,XAU,XRP,sFRAX,sfrxETH |
-
-
 
 ## EOFeedRegistryAdapter Deployments
 
