@@ -6,7 +6,7 @@
   "targetChainId": 17000,
   "publishers": ["0x077758247f36a5ec1d11b0A583f717eeD66578bf", "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 5, 13, 41, 42],
+  "supportedFeedIds": [1, 2, 5, 13, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -49,6 +49,83 @@
       "decimals": 18,
       "description": "sfrxETH/frxETH",
       "feedId": 42
+    },
+    {
+      "base": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "stETH/ETH",
+      "feedId": 43
+    },
+    {
+      "base": "0xae78736Cd615f374D3085123A210448E74Fc6393",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "rETH/ETH",
+      "feedId": 44
+    },
+    {
+      "base": "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "cbETH/ETH",
+      "feedId": 45
+    },
+    {
+      "base": "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "ETHx/ETH",
+      "feedId": 46
+    },
+    {
+      "base": "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "ankerETH/ETH",
+      "feedId": 47
+    },
+    {
+      "base": "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "oETH/ETH",
+      "feedId": 48
+    },
+    {
+      "base": "0xf1C9acDc66974dFB6dEcB12aA385b9cD01190E38",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "osETH/ETH",
+      "feedId": 49
+    },
+    {
+      "base": "0xf951E335afb289353dc249e82926178EaC7DEd78",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "swETH/ETH",
+      "feedId": 50
+    },
+    {
+      "base": "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "wBETH/ETH",
+      "feedId": 51
+    },
+    {
+      "base": "0x8c1BEd5b9a0928467c9B1341Da1D7BD5e10b6549",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "lsETH/ETH",
+      "feedId": 52
+    },
+    {
+      "base": "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "mETH/ETH",
+      "feedId": 53
     }
   ]
 }
