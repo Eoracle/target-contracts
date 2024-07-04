@@ -29,6 +29,14 @@
 | Polygon zkEVM         | ETH     | 0xDa2F54B9ed722CCd846240bd21D6e121851AA18c |
 | Polygon zkEVM         | sFRAX   | 0x36816D4eC751424ef010D75a11205bCdC59d669E |
 | Polygon zkEVM         | sfrxETH | 0x7f9362ee89ca2c4d31d3Ce7aBA6aa6B2406E0A54 |
+| Mode Testnet          | BTC     | 0x59f659eC8e50453A27841cC1AE14f2c2c11B8Ca2 |
+| Mode Testnet          | ETH     | 0x9fd3E3121427E829c14321f8CD2Bdd6c63711CC2 |
+| Mode Testnet          | sFRAX   | 0xAEE07Ea15a16b4Ed24383a1DC7fFa75e01C21457 |
+| Mode Testnet          | sfrxETH | 0x76F9f31E6823A066BFDa87ddCe15e8054d1614e2 |
+| Berachain bArtio      | BTC     | 0x3bbe4a795CBe6de5297db5cb2e1142e1130A2D51 |
+| Berachain bArtio      | ETH     | 0x42324DA2cB327D9DDE198d10A7A68870d761C390 |
+| Berachain bArtio      | sFRAX   | 0x667D90d2CC8b4b0CD4CC103874178f0b7DEA7048 |
+| Berachain bArtio      | sfrxETH | 0x673E8d6a47fB85bd49D3aC78bfB410A0dDC49620 |
 | Sepolia Base          | BTC     | 0x10Cd3Ee16501d7b754311107555AFE1eBd38CC1e |
 | Sepolia Base          | ETH     | 0x0022087BD6fdcb4133203a078FcEC79D95e23f9b |
 | Sepolia Base          | sFRAX   | 0x7488C5447CaCBAa1EC4Dc1E87a75E97a6bCA4bE7 |
