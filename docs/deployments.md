@@ -11,7 +11,7 @@
 | Base Sepolia Testnet | 0xE195541C2F7553e0c515ddf41D5c06a6930aCF15 | BTC,ETH,sFRAX,sfrxETH                                                                                                                                                                 |
 | Sepolia              | 0x538DF563cc3A3b551d8d77d8a37a1F7E23644461 | ADA,APT,ATOM,AUD,AVAX,BCH,BNB,BRL,BTC,CAD,DOGE,DOT,EOS,ETH,EUR,FIL,GBP,ICP,INR,JPY,KAS,KRW,LDO,LEO,LINK,LTC,MATIC,NEAR,NEO,OP,SHIB,SOL,STX,TON,TRX,UNI,USDT,XAG,XAU,XRP,sFRAX,sfrxETH |
 
-## EOFeedRegistryAdapter Deployments
+## EOFeedAdapter Deployments
 
 | Network        | Symbol  | Address                                    |
 | -------------- | ------- | ------------------------------------------ |
@@ -37,3 +37,45 @@
 | XLayer Testnet | ETH     | 0x21d3BC521C68801f5fC4fb1c88C305b24ab85835 |
 | XLayer Testnet | sFRAX   | 0x4CD5EBde6F1509492F919c38E33740D0862afab0 |
 | XLayer Testnet | sfrxETH | 0xBe639791b56078FECa44AF6bBc9AF1A2C0E02155 |
+| Sepolia        | ADA     | 0x26493089bd490fcf8Be310fF4E1532a650C7cCae |
+| Sepolia        | APT     | 0xAA58A21aB58Beb6E0A0c41f5Ac9D68DfaAc53ebb |
+| Sepolia        | ATOM    | 0x9633cA75c28445c95A26F7A1bB207bFFAA51e733 |
+| Sepolia        | AUD     | 0xd3e372756C328Dd157Bf844f75CB2246cD92E22a |
+| Sepolia        | AVAX    | 0xbC0BC9Bd93E60bD01F358D56Fa6497D59be259B2 |
+| Sepolia        | BCH     | 0xf1551b01db85907831f56523Dc3E22E77F85c8EC |
+| Sepolia        | BNB     | 0x402e414b4a340Cc354B88326374E0Cb34e42de52 |
+| Sepolia        | BRL     | 0xD0F595643Bc58D6d5153415f58c798Cd16835b7c |
+| Sepolia        | BTC     | 0x06Bfb53CBD1cfCC9952079D1ce499FF3B6162132 |
+| Sepolia        | CAD     | 0xCbF714CC00EAd82Df10F56aabe879338bD848C29 |
+| Sepolia        | DOGE    | 0x2BDC37fF5a03b947024B5229e23e44A14C02eA8f |
+| Sepolia        | DOT     | 0x01E5c92B68336ea1311B0Ae2E6947f2FD56f0f6E |
+| Sepolia        | EOS     | 0x3c0C0A447526855aE4C7c6DD86C9fE0562B2eFce |
+| Sepolia        | ETH     | 0x37F80C79dA8d278D3f3c8D5Ba7be55578498dE6c |
+| Sepolia        | EUR     | 0x51d2DbeAe983E57D3f6f6AbDb3eA638A70E4889F |
+| Sepolia        | FIL     | 0x6492FA075F75c88a89DbcdC4BEA1068B5459faf3 |
+| Sepolia        | GBP     | 0xe987c8EEb6403Bc6a4A2E9af69e918B4d5aBB0d3 |
+| Sepolia        | ICP     | 0x2709048b8bc475e76837665392ac4dd40206CE60 |
+| Sepolia        | INR     | 0xc33d7E909F7eAE316ea2101a849E05602a1e18ba |
+| Sepolia        | JPY     | 0x735bC565Ab5fc6dea83780FfA29f61A4c8Ea2bc9 |
+| Sepolia        | KAS     | 0xfF63dDeDe4fa2A720b861b4f33886f57eE88B7e0 |
+| Sepolia        | KRW     | 0xF6B8Fc356F91749C64dF2e1AAdCf652BCa64b494 |
+| Sepolia        | LDO     | 0xfdDc8f86A70CEFD831b38696286613c03aE292e0 |
+| Sepolia        | LEO     | 0xC517cb844175CF0Dc49117e529DDE04b35d0be3B |
+| Sepolia        | LINK    | 0x4Ea9428fEB858c57EcE7C95b31083A4eCe2730fF |
+| Sepolia        | LTC     | 0xFfE016516AB34d9FEcf17ab8a61Bbf2875E494C3 |
+| Sepolia        | MATIC   | 0x1EF2E451fB566E1FB23442688Bb39850e4E0487a |
+| Sepolia        | NEAR    | 0x2E9eB8F361E65b41Aa5fAeF094107eEef1e6fda0 |
+| Sepolia        | NEO     | 0xF959b95D76a3f2bEaFcf198842F2dBa6baE593E3 |
+| Sepolia        | OP      | 0x0821ff66Af192C450EFB45BB40737752BDA02B66 |
+| Sepolia        | SHIB    | 0xd1EF6EcA7814F558CFE5FB482fAC3886BB992d9B |
+| Sepolia        | SOL     | 0xfd25Fb525119Bc3F22e9b1fE4DfdEB2B54603B2e |
+| Sepolia        | STX     | 0x7Cc47eF1D89aE37Fcfa39Fa3f72b9BBcF083efA9 |
+| Sepolia        | TON     | 0x065643692224BaB03B3d8d15290c22F6b16B294b |
+| Sepolia        | TRX     | 0xB09221b2c2A0BC2188e218cAc1564E023fc237d1 |
+| Sepolia        | UNI     | 0x9da0Fa6c2218B503a5849bEe22AEa9BF7EDea568 |
+| Sepolia        | USDT    | 0xeA74D66E255da58b9ddD906d926544e5cF993eD3 |
+| Sepolia        | XAG     | 0x5D10eEA20459D9b727b7911F589D5c3F60E5B2C4 |
+| Sepolia        | XAU     | 0xfe7FD9e2f853F9Ebe6BF117629033fF57F6AE5C7 |
+| Sepolia        | XRP     | 0xc87B76c74572BE53466591A63895585ae101ff19 |
+| Sepolia        | sFRAX   | 0xD7850A2ab5dB36Eb1E63aC11358BF98fC1EaCC5D |
+| Sepolia        | sfrxETH | 0xe2A37B2E89f32289D3915e49aAF65B240611b119 |
