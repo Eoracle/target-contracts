@@ -4,6 +4,7 @@
 | --------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | XLayer Testnet        | 0xb3235B80A00c3Df19EE2C308738a7039f7605dd4 | BTC,ETH,sFRAX,sfrxETH                                                                                                                                                                                                                                  |
 | Mode Testnet          | 0x8c227A18C51a0437C6e57F495573a59638ac35E9 | BTC,ETH,sFRAX,sfrxETH                                                                                                                                                                                                                                  |
+| Polygon Amoy Testnet  | 0x990AF36cc908B673dFCddB3484A6149D9Ec52706 | ADA,APT,ATOM,AUD,AVAX,BCH,BNB,BRL,BTC,CAD,DOGE,DOT,EOS,ETH,EUR,FIL,GBP,ICP,INR,JPY,KAS,KRW,LDO,LEO,LINK,LTC,MATIC,NEAR,NEO,OP,SHIB,SOL,STX,TON,TRX,UNI,USDT,XAG,XAU,XRP,sFRAX,sfrxETH,ETHx,ankerETH,cbETH,lsETH,mETH,oETH,osETH,rETH,stETH,swETH,wBETH |
 | Polygon zkEVM Cardona | 0x8AF367b161FA897FA7e89262c9b4ECB8BC0D7d56 | BTC,ETH,sFRAX,sfrxETH                                                                                                                                                                                                                                  |
 | Polygon zkEVM         | 0x89e830972C7B453D4715ba1d3894aA096F219f02 | BTC,ETH,sFRAX,sfrxETH                                                                                                                                                                                                                                  |
 | Holesky Testnet       | 0x723BD409703EF60d6fB9F8d986eb90099A170fd0 | ADA,APT,ATOM,AUD,AVAX,BCH,BNB,BRL,BTC,CAD,DOGE,DOT,EOS,ETH,EUR,FIL,GBP,ICP,INR,JPY,KAS,KRW,LDO,LEO,LINK,LTC,MATIC,NEAR,NEO,OP,SHIB,SOL,STX,TON,TRX,UNI,USDT,XAG,XAU,XRP,sFRAX,sfrxETH,ETHx,ankerETH,cbETH,lsETH,mETH,oETH,osETH,rETH,stETH,swETH,wBETH |
@@ -138,3 +139,56 @@
 | Holesky               | stETH/ETH      | 0xa3C243a7Ec02b800BaC6839B03a1C46FCf06c61e |
 | Holesky               | swETH/ETH      | 0x9D6dae537A5211f973f414b1ca7BFABB1DFa1B7b |
 | Holesky               | wBETH/ETH      | 0x0E07EA967f8eB7553805f77B919211B5ced8c661 |
+| Polygon Amoy Testnet  | ADA/USD        | 0x4b841bE456dA135CCb2e666C2a60471cf1B1A3fb |
+| Polygon Amoy Testnet  | APT/USD        | 0x4bD274CE1374AC7eAAB6246DC2a7B0dDb823182e |
+| Polygon Amoy Testnet  | ATOM/USD       | 0xbC871398b465b001c489563369110146B0539A90 |
+| Polygon Amoy Testnet  | AUD/USD        | 0x906aEF0B7F5EbC1933a16a5b0cDC6A27da3B9eEA |
+| Polygon Amoy Testnet  | AVAX/USD       | 0xc52294A635ac9B5Af9Af2Cd48C7182b9540664f3 |
+| Polygon Amoy Testnet  | BCH/USD        | 0x80C1E9a3c9A1A4Dc4781AcEC44407AF6EE32faaB |
+| Polygon Amoy Testnet  | BNB/USD        | 0x2C48470038A1D24Ab73C9b283Fa2C507fF331DcB |
+| Polygon Amoy Testnet  | BRL/USD        | 0x6A71af754544C485AbF9ED04E170FE0730e3B163 |
+| Polygon Amoy Testnet  | BTC/USD        | 0xEff9941e2F83A39ac37d5b79089C7d6eb7CA4FD7 |
+| Polygon Amoy Testnet  | CAD/USD        | 0xCDb8aA24FB348D7f6eD03a2417207d1Ad20b8c26 |
+| Polygon Amoy Testnet  | DOGE/USD       | 0x03377811aB5627A4810C26B285a020335f914b3c |
+| Polygon Amoy Testnet  | DOT/USD        | 0xE31C4707eF2cAE3F333943C1ebEC4d540f5EFf10 |
+| Polygon Amoy Testnet  | EOS/USD        | 0xE00a9835EB0B1c4908203c33642bf802DB61396B |
+| Polygon Amoy Testnet  | ETH/USD        | 0x7D706B4D623e981E2AD04769274037E2B90990EA |
+| Polygon Amoy Testnet  | ETHx/ETH       | 0x5E19e58DC5E0b7e1b50F76294055e71f78926456 |
+| Polygon Amoy Testnet  | EUR/USD        | 0xA05aED7e4A876DFD6086057a91DA89e0F09FFdE6 |
+| Polygon Amoy Testnet  | FIL/USD        | 0x171C05aAC9db916d8BE2a0B29881CD05F04c67bF |
+| Polygon Amoy Testnet  | GBP/USD        | 0xb0E8e08260ac9482706BE62A04f88f1eA44EeEbc |
+| Polygon Amoy Testnet  | ICP/USD        | 0x38Cc357896D6714849F4b01c6772ee1514a36F24 |
+| Polygon Amoy Testnet  | INR/USD        | 0xeDcD07BCc24378f3a895b915A363476E12B120Dd |
+| Polygon Amoy Testnet  | JPY/USD        | 0xa1764Fc5F1A47cF99375e0e26841C48d25083A11 |
+| Polygon Amoy Testnet  | KAS/USD        | 0x157afE9543958e630bc9E279eAB9c9Aa3e6157d2 |
+| Polygon Amoy Testnet  | KRW/USD        | 0x7C0A96351e3b5C48B3Af22e6a98d3a95D727ba23 |
+| Polygon Amoy Testnet  | LDO/USD        | 0x4d078e9ab9F966fe759631235371fa3fcE06e2BB |
+| Polygon Amoy Testnet  | LEO/USD        | 0xf9763B3502B4657210fc964791F70aaa38CEAefa |
+| Polygon Amoy Testnet  | LINK/USD       | 0xFd4C3D545332C16dE431F051F2a42329A9F64D88 |
+| Polygon Amoy Testnet  | LTC/USD        | 0xa2dCD1c4836450EAfb0F0695CacB2f6484504be4 |
+| Polygon Amoy Testnet  | MATIC/USD      | 0x873E8709F757a1f89a22893ff40583A7747508ca |
+| Polygon Amoy Testnet  | NEAR/USD       | 0xB6e70900D0fC23d26eAc04fCC4AaFE642218E1e6 |
+| Polygon Amoy Testnet  | NEO/USD        | 0xb9646fc57d750F3c19C1aB417f5Fe835045be1BF |
+| Polygon Amoy Testnet  | OP/USD         | 0x059DFE0ddcf3062135dcB14618E31944B6CdE4e2 |
+| Polygon Amoy Testnet  | SHIB/USD       | 0x52678E7e0D287F44cC45c2384Da2cF8D3eF83e87 |
+| Polygon Amoy Testnet  | SOL/USD        | 0xd546fC0a4406c13FD326D9c0d817C9016851C978 |
+| Polygon Amoy Testnet  | STX/USD        | 0x4f83992B05037A7EdEdeB5C1665Aa2BF61ab2644 |
+| Polygon Amoy Testnet  | TON/USD        | 0xDF324e348C9393FA5cBdB1a0a1a11e1E73799018 |
+| Polygon Amoy Testnet  | TRX/USD        | 0x34A425FD96eF51DBC2c7cE794B77662dEf3dAFdE |
+| Polygon Amoy Testnet  | UNI/USD        | 0x6253e8B5b132B785d5c2178e021F02dcD12213C4 |
+| Polygon Amoy Testnet  | USDT/USD       | 0x08221fdE81bA6a8986d58Deeb1C0165792D77Ccd |
+| Polygon Amoy Testnet  | XAG/USD        | 0xbBa3419aa4F15832FCC877eDA92a64Bd7166b3d4 |
+| Polygon Amoy Testnet  | XAU/USD        | 0x92201636AAeeAdC7E30A34574D9E3b388617d45f |
+| Polygon Amoy Testnet  | XRP/USD        | 0x2B2C51F1d46124cF8702fDF637d08CB6C217FAea |
+| Polygon Amoy Testnet  | ankerETH/ETH   | 0xe86B0e17eC01aF61c0ed3534dC20a63D01980AFE |
+| Polygon Amoy Testnet  | cbETH/ETH      | 0x03aD3111515f9EDd4CA651e247E832c53D4D81ee |
+| Polygon Amoy Testnet  | lsETH/ETH      | 0xF5716D630541B063912e665325563E024b94aeAf |
+| Polygon Amoy Testnet  | mETH/ETH       | 0xec79f7c81a4e0c9e86Ce1C46328a2701fB047fE3 |
+| Polygon Amoy Testnet  | oETH/ETH       | 0xc224F67974067c4694742aAb98e363a0dd174D17 |
+| Polygon Amoy Testnet  | osETH/ETH      | 0xa5501a943476E44C823B574d3Fff87CD1B025488 |
+| Polygon Amoy Testnet  | rETH/ETH       | 0xec0726d976b608A64c0DAAf17A853429AA37dd2f |
+| Polygon Amoy Testnet  | sFRAX/FRAX     | 0xaa74EdC555e81C9Bc218Ce03e5fb46657D9eeF94 |
+| Polygon Amoy Testnet  | sfrxETH/frxETH | 0xBa05475e3A6E21256e3e19339EF4E721E5AE37FA |
+| Polygon Amoy Testnet  | stETH/ETH      | 0xFeD4b84878853E9ff4C164c49054135b2d8a1e50 |
+| Polygon Amoy Testnet  | swETH/ETH      | 0x6dEe41f7CE9714D794Df29c6e1a295F46c0e0E44 |
+| Polygon Amoy Testnet  | wBETH/ETH      | 0x291158361f15a59Bda20366CA6747D01ABb01Ade |
