@@ -50,6 +50,7 @@
     "deploy:local:consumer:feedManager": "source .env && forge clean && forge script script/deployment/examples/DeployConsumerExampleFeedManager.s.sol:DeployConsumerExampleFeedManager --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY",
     "deploy:local:consumer:feedRegistryAdapter": "source .env && forge clean && forge script script/deployment/examples/DeployConsumerExampleFeedRegistryAdapter.s.sol:DeployConsumerExampleFeedRegistryAdapter --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY",
     "deploy:local:consumer:feedAdapter": "source .env && forge clean && forge script script/deployment/examples/DeployConsumerExampleFeedAdapter.s.sol:DeployConsumerExampleFeedAdapter --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY",
+    "deploy:generate-markdown": "sh script/utils/generate_feed_addresses.sh > docs/deployments.md",
     "lint": "npm run lint:sol && npm run prettier:check",
     "lint:sol": "forge fmt --check && solhint {script,src,test}/**/*.sol",
     "prettier:check": "prettier --check \"**/*.{json,md,yml}\" --ignore-path \".prettierignore\"",
