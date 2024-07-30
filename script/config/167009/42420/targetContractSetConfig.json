@@ -6,9 +6,7 @@
   "targetChainId": 167009,
   "publishers": ["0xbEce836368CcaC20e814c57236F2B6cfA37e46CB"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [
-    1, 2, 6, 11, 13, 14, 16, 17, 18, 41, 42, 43 ]
-  ,
+  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 41, 42, 43],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -86,7 +84,7 @@
       "decimals": 18,
       "description": "sfrxETH/frxETH",
       "feedId": 42
-    }, 
+    },
     {
       "base": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
       "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
