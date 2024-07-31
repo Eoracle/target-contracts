@@ -6,7 +6,7 @@
   "targetChainId": 80084,
   "publishers": ["0xCC243bcFf9718d559A434f4124EC257cEd1A0776"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 41, 42],
+  "supportedFeedIds": [1, 2, 17, 41, 42],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -21,6 +21,13 @@
       "decimals": 18,
       "description": "ETH/USD",
       "feedId": 2
+    },
+    {
+      "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 17,
+      "decimals": 18,
+      "description": "USDT/USD"
     },
     {
       "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
