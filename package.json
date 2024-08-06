@@ -2,7 +2,6 @@
   "name": "eoracle",
   "description": "eoracle target solidity smart contracts",
   "version": "1.0.0",
-  "type": "module",
   "dependencies": {
     "keccak256": "^1.0.6",
     "mcl-wasm": "^1.3.0",
