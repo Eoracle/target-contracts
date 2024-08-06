@@ -1,0 +1,24 @@
+name: Enforce Pull Request Name
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  enforce_pr_name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce PR name
+        run: |
+          pr_title="${{ github.event.pull_request.title }}"
+          echo "Pull Request Title: $pr_title"
+
+          # Define a regex pattern for the expected PR title format
+          regular_branch_pattern='^(DEV|Dev)-([0-9]{3,}|nojira).*$'
+          hotfix_branch_pattern='^HF.*$'
+
+          if [[ ! "$pr_title" =~ $regular_branch_pattern && ! "$pr_title" =~ $hotfix_branch_pattern ]]; then
+            echo "Error: PR title does not match the required format 'DEV-[ddd|nojira]' or 'HF'."
+            exit 1
+          fi
+          echo "PR title is correct."
