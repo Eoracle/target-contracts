@@ -1,25 +1,96 @@
 {
-  "bls": "0x2B89a2742c1F7DB3630Ab9e1E4fdBD9da90135F8",
-  "bn256G2": "0xC831937194Fc317B039cB3D0C7D9589b90c4c941",
-  "feedAdapterImplementation": "0xbeC4046902AF0ddaAa3a12ccAdF5D2436270F89E",
-  "feedManager": "0xB8531fdf2DEE5b8402a5dB7b78C70104417C4e0B",
-  "feedManagerImplementation": "0x88067CAcD9b89c5dcA30afd0A574C773EaaEF277",
-  "feedRegistryAdapter": "0xcCEC91F412727bE078cf4A3EdC7Dc03450083C29",
-  "feedRegistryAdapterImplementation": "0xB4D66a5b68851501Ec525C38b666FFbF925b06E9",
-  "feedVerifier": "0x43075b751Cc0A932246Fc0c4A03d195F1CaD2440",
-  "feedVerifierImplementation": "0x8352Ec9529bA999447Dd2E68ff54c34956a67734",
-  "feeds": {
-    "AUD/USD": "0x5c88272E9bD04F061ff25cF506b4d4b2994fb3EE",
-    "BTC/USD": "0x60Ed1721633ecd7498279Ebbc1D5b0ED303e75a9",
-    "ETH/USD": "0x697f1f0a6287E8ac91da2472F81032D54a780669",
-    "EUR/USD": "0x8c4b2FBBb747B61BbBF101D0BD85A1Da820D94dc",
-    "GBP/USD": "0x9A32A7fA4c834c92914341f15c50BaEB85A7235e",
-    "LINK/USD": "0x633DD1B64Ec0b6E9CFC3E7D269FBdC71041100E2",
-    "SOL/USD": "0xd1011F34621Ed5a0673a8654cfc8780a5C7A6080",
-    "USDT/USD": "0xa33173cd7657100517F45cE5EA564D0D5a3236f6",
-    "XAU/USD": "0x48AAF90cb8745d0b85e97D379480e1aFd06a89dF",
-    "sFRAX/FRAX": "0x5cd1390364F2dABE7d29dA8D7c059915BBAc3F99",
-    "sfrxETH/frxETH": "0x273E3a9F45413357314310e565bfa8eB1158400F",
-    "stETH/ETH": "0x8abca1f1C00341B77Ca544c9819b992B2c5A554D"
-  }
+  "usePrecompiledModexp": false,
+  "proxyAdminOwner": "0xDA3B0c9d69170eBB58E81AD01e86E43329807631",
+  "targetContractsOwner": "0xDA3B0c9d69170eBB58E81AD01e86E43329807631",
+  "eoracleChainId": 42420,
+  "targetChainId": 30732,
+  "publishers": ["0x7D83eF6F7fD29e443d4147817F1ffd55A8745BfE"],
+  "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
+  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 41, 42, 43],
+  "supportedFeedsData": [
+    {
+      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 1,
+      "decimals": 18,
+      "description": "BTC/USD"
+    },
+    {
+      "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 2,
+      "decimals": 18,
+      "description": "ETH/USD"
+    },
+    {
+      "base": "0xd4094e4ffa89985583E52D491251619a4C5b0BE9",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 6,
+      "decimals": 18,
+      "description": "SOL/USD"
+    },
+    {
+      "base": "0x7D800a2559b7e3A9b50a1865Ac45C22D168Ce900",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 11,
+      "decimals": 18,
+      "description": "XAU/USD"
+    },
+    {
+      "base": "0x00000000000000000000000000000000000003d2",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 13,
+      "decimals": 18,
+      "description": "EUR/USD"
+    },
+    {
+      "base": "0x0000000000000000000000000000000000000024",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 14,
+      "decimals": 18,
+      "description": "AUD/USD"
+    },
+    {
+      "base": "0x000000000000000000000000000000000000033A",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 16,
+      "decimals": 18,
+      "description": "GBP/USD"
+    },
+    {
+      "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 17,
+      "decimals": 18,
+      "description": "USDT/USD"
+    },
+    {
+      "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 18,
+      "decimals": 18,
+      "description": "LINK/USD"
+    },
+    {
+      "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
+      "quote": "0x853d955acef822db058eb8505911ed77f175b99e",
+      "decimals": 18,
+      "description": "sFRAX/FRAX",
+      "feedId": 41
+    },
+    {
+      "base": "0xac3e018457b222d93114458476f3e3416abbe38f",
+      "quote": "0xcf7ecee185f19e2e970a301ee37f93536ed66179",
+      "decimals": 18,
+      "description": "sfrxETH/frxETH",
+      "feedId": 42
+    },
+    {
+      "base": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "stETH/ETH",
+      "feedId": 43
+    }
+  ]
 }
