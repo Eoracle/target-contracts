@@ -6,7 +6,7 @@
   "targetChainId": 80084,
   "publishers": ["0xCC243bcFf9718d559A434f4124EC257cEd1A0776"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 17, 41, 42],
+  "supportedFeedIds": [1, 2, 41, 42, 54, 55],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -23,13 +23,6 @@
       "feedId": 2
     },
     {
-      "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 17,
-      "decimals": 18,
-      "description": "USDT/USD"
-    },
-    {
       "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
       "quote": "0x853d955acef822db058eb8505911ed77f175b99e",
       "decimals": 18,
@@ -42,6 +35,29 @@
       "decimals": 18,
       "description": "sfrxETH/frxETH",
       "feedId": 42
+    }, 
+    {
+      "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 17,
+      "decimals": 18,
+      "description": "USDT/USD"
+    }, 
+    {
+      "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 54,
+      "decimals": 6,
+      "description": "USDC/USD"
+    }, 
+    {
+      "base": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 55,
+      "decimals": 18,
+      "description": "DAI/USD"
     }
+
+
   ]
 }
