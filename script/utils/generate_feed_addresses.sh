@@ -1,4 +1,9 @@
 #!/bin/bash
+# This script processes JSON files within a specified directory structure to extract and display information about EOFeedManager and EOFeedAdapter deployments in the documentation.
+#
+# Example usage:
+# 1. From repo's root directory, run `sh script/utils/generate_feed_addresses.sh > docs/deployments.md`
+# 2. Copy content docs/deployments.md to documentation
 
 # Define the base directory
 base_dir="script/config/"
