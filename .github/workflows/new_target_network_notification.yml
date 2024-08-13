@@ -13,22 +13,23 @@ jobs:
     name: New Target network Slack Notification
     runs-on: ubuntu-latest
     if:
-      ${{ github.base_ref == 'deployment' || 'DEV-nojira-test-merge-workflow' && github.event.pull_request.merged ==
-      true }}
+      ${{ github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'develop' ||
+      github.event.pull_request.base.ref == 'DEV-nojira-test-merge-workflow') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install jq
-        run: sudo apt-get install -y jq
+        with:
+          fetch-depth: 2
 
       - name: Check that new expected files where added in this PR
         id: check_files
         run: |
           echo "Checking for new files in this PR"
-          git diff --diff-filter=A --name-only ${{ github.event.before }} ${{ github.sha }} grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
+
+          echo "running git diff --diff-filter=A --name-only HEAD^ HEAD"
+          git --no-pager diff --diff-filter=A --name-only "HEAD^" "HEAD"
+          git --no-pager diff --diff-filter=A --name-only "HEAD^" "HEAD" | grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
           cat new_files.txt
-          # if new_files.txt has exactly 2 lines, then get from the file targetContractAddresses.json the value of feedManager and from targetContractSetConfig.json the value of targetChainId
           if [ $(wc -l < new_files.txt) -eq 2 ]; then
             # Get the path to targetContractAddresses.json
             addresses_file=$(grep "targetContractAddresses.json" new_files.txt)
