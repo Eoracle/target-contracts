@@ -21,25 +21,14 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
       - name: Check that new expected files where added in this PR
         id: check_files
         run: |
           echo "Checking for new files in this PR"
-          # echo "running git diff --diff-filter=A --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}"
-          # git diff --diff-filter=A --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}"
 
-          echo  "running git fetch origin ${{ github.event.pull_request.base.ref }} --depth=2"
-          git fetch origin "${{ github.event.pull_request.base.ref }}" --depth=2
-
-          echo "running git rev-parse HEAD~1"
-          before_sha=$(git rev-parse HEAD~1)
-          echo "before_sha: $before_sha"
-
-          echo "running git diff --diff-filter=A --name-only $before_sha ${{ github.sha }}"
-          git --no-pager diff --diff-filter=A --name-only "${before_sha}" "${{ github.sha }}" | grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
+          echo "running git diff --diff-filter=A --name-only HEAD^ HEAD"
+          git --no-pager diff --diff-filter=A --name-only "HEAD^" "HEAD"
+          git --no-pager diff --diff-filter=A --name-only "HEAD^" "HEAD" | grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
           cat new_files.txt
           if [ $(wc -l < new_files.txt) -eq 2 ]; then
             # Get the path to targetContractAddresses.json
