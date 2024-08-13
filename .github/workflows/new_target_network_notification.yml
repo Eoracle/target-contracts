@@ -13,8 +13,8 @@ jobs:
     name: New Target network Slack Notification
     runs-on: ubuntu-latest
     if:
-      ${{ github.base_ref == 'deployment' || 'DEV-nojira-test-merge-workflow' && github.event.pull_request.merged ==
-      true }}
+      ${{ github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'develop' ||
+      github.event.pull_request.base.ref == 'DEV-nojira-test-merge-workflow') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,9 +26,18 @@ jobs:
         id: check_files
         run: |
           echo "Checking for new files in this PR"
-          echo "running git diff --diff-filter=A --name-only ${{ github.event.before }} ${{ github.sha }}"
-          git diff --diff-filter=A --name-only "${{ github.event.before }}" "${{ github.sha }}"
-          git diff --diff-filter=A --name-only "${{ github.event.before }}" "${{ github.sha }}" | grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
+          # echo "running git diff --diff-filter=A --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }}"
+          # git diff --diff-filter=A --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}"
+
+          echo  "running git fetch origin ${{ github.event.pull_request.base.ref }} --depth=2"
+          git fetch origin "${{ github.event.pull_request.base.ref }}" --depth=2
+
+          echo "running git rev-parse HEAD~1"
+          before_sha=$(git rev-parse HEAD~1)
+          echo "before_sha: $before_sha"
+
+          echo "running git diff --diff-filter=A --name-only $before_sha ${{ github.sha }}"
+          git diff --diff-filter=A --name-only "${before_sha}" "${{ github.sha }}" | grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
           cat new_files.txt
           if [ $(wc -l < new_files.txt) -eq 2 ]; then
             # Get the path to targetContractAddresses.json
