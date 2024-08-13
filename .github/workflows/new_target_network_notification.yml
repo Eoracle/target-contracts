@@ -26,7 +26,7 @@ jobs:
         id: check_files
         run: |
           echo "Checking for new files in this PR"
-          git diff --diff-filter=A --name-only ${{ github.event.before }} ${{ github.sha }} grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
+          git diff --diff-filter=A --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
           cat new_files.txt
           # if new_files.txt has exactly 2 lines, then get from the file targetContractAddresses.json the value of feedManager and from targetContractSetConfig.json the value of targetChainId
           if [ $(wc -l < new_files.txt) -eq 2 ]; then
