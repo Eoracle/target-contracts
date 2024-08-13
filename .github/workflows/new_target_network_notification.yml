@@ -56,5 +56,5 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE:
-            ":tada: new chain deployment :tada: \nFollowing the PR <PR name> we are now working on chain ID ${{
-            env.targetChainId }}. \nContract addresses: ${{ env.feedManager }}."
+            ":tada: new chain deployment :tada: \nFollowing the PR ${{ github.event.pull_request.title }} we are now
+            working on chain ID ${{ env.targetChainId }}. \nContract addresses: ${{ env.feedManager }}."
