@@ -5,7 +5,7 @@ on:
     types:
       - closed
     branches:
-      - "deployment"
+      - "develop"
       - "DEV-nojira-test-merge-workflow"
 
 jobs:
