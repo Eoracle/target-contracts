@@ -51,11 +51,13 @@ jobs:
             echo "::set-output name=files_found::false"
           fi
 
-      - name: Slack Notification
-        if: steps.check_files.outputs.files_found == 'true'
-        uses: rtCamp/action-slack-notify@v2
+      - name: Send custom JSON data to Slack workflow
+        id: slack
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "body": ":tada: new chain deployment :tada: \nFollowing the PR ${{ github.event.pull_request.title }} we are now working on chain ID ${{ env.targetChainId }}. \nContract addresses: ${{ env.feedManager }}."
+            }
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE:
-            ":tada: new chain deployment :tada: \nFollowing the PR ${{ github.event.pull_request.title }} we are now
-            working on chain ID ${{ env.targetChainId }}. \nContract addresses: ${{ env.feedManager }}."
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
