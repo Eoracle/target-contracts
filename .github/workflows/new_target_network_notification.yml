@@ -1,0 +1,60 @@
+name: New Target network Slack Notification
+on:
+  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - "deployment"
+      - "DEV-nojira-test-merge-workflow"
+
+jobs:
+  notify_merged_pull_request:
+    name: New Target network Slack Notification
+    runs-on: ubuntu-latest
+    if:
+      ${{ github.base_ref == 'deployment' || 'DEV-nojira-test-merge-workflow' && github.event.pull_request.merged ==
+      true }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Check that new expected files where added in this PR
+        id: check_files
+        run: |
+          echo "Checking for new files in this PR"
+          git diff --diff-filter=A --name-only ${{ github.event.before }} ${{ github.sha }} grep -E 'targetContractAddresses.json|targetContractSetConfig.json' > new_files.txt
+          cat new_files.txt
+          # if new_files.txt has exactly 2 lines, then get from the file targetContractAddresses.json the value of feedManager and from targetContractSetConfig.json the value of targetChainId
+          if [ $(wc -l < new_files.txt) -eq 2 ]; then
+            # Get the path to targetContractAddresses.json
+            addresses_file=$(grep "targetContractAddresses.json" new_files.txt)
+            # Get the path to targetContractSetConfig.json
+            config_file=$(grep "targetContractSetConfig.json" new_files.txt)
+
+            # Extract the values using jq
+            feedManager=$(jq -r '.feedManager' "$addresses_file")
+            echo "feedManager: $feedManager"
+            targetChainId=$(jq -r '.targetChainId' "$config_file")
+            echo "targetChainId: $targetChainId"
+
+            # Export the values as GitHub Actions output variables
+            echo "feedManager=$feedManager" >> $GITHUB_ENV
+            echo "targetChainId=$targetChainId" >> $GITHUB_ENV
+            echo "::set-output name=files_found::true"
+          else
+            echo "No new files found in this PR"
+            echo "::set-output name=files_found::false"
+          fi
+
+      - name: Slack Notification
+        if: steps.check_files.outputs.files_found == 'true'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE:
+            ":tada: new chain deployment :tada: \nFollowing the PR <PR name> we are now working on chain ID ${{
+            env.targetChainId }}. \nContract addresses: ${{ env.feedManager }}."
