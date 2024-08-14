@@ -54,7 +54,9 @@ jobs:
         with:
           payload: |
             {
-              "body": ":tada: new chain deployment :tada: \nFollowing the PR "${{ github.event.pull_request.title }}" we are now working on chain ID ${{ env.targetChainId }}. \nContract addresses: ${{ env.feedManager }}."
+              "pr_title": ${{ github.event.pull_request.title }},
+              "target_chain_id": ${{ env.targetChainId }},
+              "feed_manager_address": ${{ env.feedManager }}
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
