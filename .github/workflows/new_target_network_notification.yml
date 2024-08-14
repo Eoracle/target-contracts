@@ -6,15 +6,12 @@ on:
       - closed
     branches:
       - "develop"
-      - "DEV-nojira-test-merge-workflow"
 
 jobs:
   notify_merged_pull_request:
     name: New Target network Slack Notification
     runs-on: ubuntu-latest
-    if:
-      ${{ github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'develop' ||
-      github.event.pull_request.base.ref == 'DEV-nojira-test-merge-workflow') }}
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,7 +54,9 @@ jobs:
         with:
           payload: |
             {
-              "body": ":tada: new chain deployment :tada: \nFollowing the PR ${{ github.event.pull_request.title }} we are now working on chain ID ${{ env.targetChainId }}. \nContract addresses: ${{ env.feedManager }}."
+              "pr_title": ${{ github.event.pull_request.title }},
+              "target_chain_id": ${{ env.targetChainId }},
+              "feed_manager_address": ${{ env.feedManager }}
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
