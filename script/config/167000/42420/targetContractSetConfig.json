@@ -6,7 +6,7 @@
   "targetChainId": 167000,
   "publishers": ["0xD2171e5EB129f2D76f60664E021df671D8E42171"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 41, 42, 43],
+  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 41, 42, 43, 59],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -91,6 +91,13 @@
       "decimals": 18,
       "description": "stETH/ETH",
       "feedId": 43
+    },
+    {
+      "base": "0x09db87A538BD693E9d08544577d5cCfAA6373A48",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "ynETH/ETH",
+      "feedId": 59
     }
   ]
 }
