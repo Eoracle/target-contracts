@@ -1,0 +1,54 @@
+{
+  "usePrecompiledModexp": false,
+  "proxyAdminOwner": "0xd9c32116a01F1B924a658545158b9C9c2f073AEf",
+  "targetContractsOwner": "0xd9c32116a01F1B924a658545158b9C9c2f073AEf",
+  "eoracleChainId": 42420,
+  "targetChainId": 81457,
+  "publishers": ["0x8EA04C858c1bD08a424252DDdB85B63aEB266bfA"],
+  "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
+  "supportedFeedIds": [1, 2, 9, 11, 35, 36, 67],
+  "supportedFeedsData": [
+    {
+      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 1,
+      "decimals": 18,
+      "description": "BTC/USD"
+    },
+    {
+      "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 2,
+      "decimals": 18,
+      "description": "ETH/USD"
+    },
+    {
+      "base": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 9,
+      "decimals": 18,
+      "description": "MATIC/USD"
+    },
+    {
+      "base": "0xd6fAA45f5180A36CE1925ba9b4C9683CCaA3D117",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 35,
+      "decimals": 18,
+      "description": "BNB/USD"
+    },
+    {
+      "base": "0xDB9f97165657aeE56ce412966FD68b8715b04815",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 36,
+      "decimals": 18,
+      "description": "AVAX/USD"
+    },
+    {
+      "base": "0x4E15361FD6b4BB609Fa63C81A2be19d873717870",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 67,
+      "decimals": 18,
+      "description": "FTM/ETH"
+    }
+  ]
+}
