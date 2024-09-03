@@ -6,7 +6,7 @@
   "targetChainId": 59144,
   "publishers": ["0xF37e2A6F0D8E94a7F9a897Ec971301d2D19a8820"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 35, 36, 41, 42, 43, 67],
+  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 35, 36, 41, 42, 43, 64, 67],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -105,6 +105,13 @@
       "decimals": 18,
       "description": "stETH/ETH",
       "feedId": 43
+    },
+    {
+      "base": "0x657e8C867D8B37dCC18fA4Caead9C45EB088C642",
+      "quote": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+      "decimals": 8,
+      "description": "eBTC/BTC",
+      "feedId": 64
     },
     {
       "base": "0x4E15361FD6b4BB609Fa63C81A2be19d873717870",
