@@ -18,25 +18,31 @@ contract SetupCoreContracts is Script {
     EOFeedManager public feedManager;
 
     function run() external {
-        run(vm.addr(vm.envUint("OWNER_PRIVATE_KEY")));
+        uint256 pk = vm.envUint("OWNER_PRIVATE_KEY");
+        vm.startBroadcast(pk);
+        execute();
+        vm.stopBroadcast();
     }
 
+    // for testing purposes
     function run(address broadcastFrom) public {
+        vm.startBroadcast(broadcastFrom);
+        execute();
+        vm.stopBroadcast();
+    }
+
+    function execute() public {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
         string memory outputConfig = EOJsonUtils.initOutputConfig();
 
         feedManager = EOFeedManager(outputConfig.readAddress(".feedManager"));
 
-        vm.startBroadcast(broadcastFrom);
-
         // Set supported feedIds in FeedManager which are not set yet
         _updateSupportedFeeds(configStructured);
 
         // Set publishers in FeedManager which are not set yet
         _updateWhiteListedPublishers(configStructured);
-
-        vm.stopBroadcast();
     }
 
     function _updateSupportedFeeds(EOJsonUtils.Config memory _configData) internal {
