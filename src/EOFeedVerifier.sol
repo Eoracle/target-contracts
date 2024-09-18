@@ -5,7 +5,6 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
 import { Merkle } from "./common/Merkle.sol";
 import { IBLS } from "./interfaces/IBLS.sol";
-import { IBN256G2 } from "./interfaces/IBN256G2.sol";
 
 // solhint-disable no-unused-import
 import {
@@ -41,9 +40,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     /// @dev BLS library contract
     IBLS internal _bls;
-
-    /// @dev BN256G2 library contract
-    IBN256G2 internal _bn256G2;
 
     /// @dev length of validators set
     uint256 internal _currentValidatorSetLength;
@@ -92,22 +88,17 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     function initialize(
         address owner,
         IBLS bls_,
-        IBN256G2 bn256G2_,
         uint256 eoracleChainId_,
         address[] calldata allowedSenders
     )
         external
         initializer
     {
-        if (
-            address(bls_) == address(0) || address(bls_).code.length == 0 || address(bn256G2_) == address(0)
-                || address(bn256G2_).code.length == 0
-        ) {
+        if (address(bls_) == address(0) || address(bls_).code.length == 0) {
             revert InvalidAddress();
         }
         _eoracleChainId = eoracleChainId_;
         _bls = bls_;
-        _bn256G2 = bn256G2_;
         _minNumOfValidators = 3;
         _setAllowedSenders(allowedSenders, true);
         __Ownable_init(owner);
@@ -267,14 +258,10 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         return _bls;
     }
 
-    function bn256G2() external view returns (IBN256G2) {
-        return _bn256G2;
-    }
     /**
      * @notice Function to verify the checkpoint signature
      * @param vParams Signed data
      */
-
     function _verifyVerificationParams(IEOFeedVerifier.VerificationParams calldata vParams) internal {
         // if the eventRoot has not changed, we don't need to verify the whole checkpoint again
         if (vParams.eventRoot == _lastProcessedEventRoot) {

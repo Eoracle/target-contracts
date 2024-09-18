@@ -26,15 +26,14 @@ contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
         IBLS blsNull;
         address[] memory allowedSenders;
         vm.expectRevert(InvalidAddress.selector);
-        feedVerifier.initialize(address(this), blsNull, bn256G2, eoracleChainId, allowedSenders);
+        feedVerifier.initialize(address(this), blsNull, eoracleChainId, allowedSenders);
     }
 
     function test_Initialize() public {
         address[] memory allowedSenders = new address[](1);
         allowedSenders[0] = EOCHAIN_SENDER;
-        feedVerifier.initialize(address(this), bls, bn256G2, eoracleChainId, allowedSenders);
+        feedVerifier.initialize(address(this), bls, eoracleChainId, allowedSenders);
         assertEq(address(feedVerifier.bls()), address(bls));
-        assertEq(address(feedVerifier.bn256G2()), address(bn256G2));
         assertEq(feedVerifier.eoracleChainId(), eoracleChainId);
         assertEq(feedVerifier.owner(), address(this));
         assertEq(feedVerifier.isSenderAllowed(EOCHAIN_SENDER), true);

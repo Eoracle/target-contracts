@@ -7,8 +7,6 @@ import { BLS } from "../../src/common/BLS.sol";
 import { IEOFeedVerifier } from "../../src/interfaces/IEOFeedVerifier.sol";
 import { Utils } from "../utils/Utils.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
-import { BN256G2 } from "../../src/common/BN256G2.sol";
-import { IBN256G2 } from "../../src/interfaces/IBN256G2.sol";
 
 // solhint-disable max-states-count
 // solhint-disable var-name-mixedcase
@@ -42,7 +40,6 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
 
     EOFeedVerifier public feedVerifier;
     BLS public bls;
-    IBN256G2 public bn256G2;
     uint256 internal validatorSetSize;
     IEOFeedVerifier.Validator[] internal validatorSet;
     uint256[] internal secrets;
@@ -117,11 +114,6 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
         apkG2_3 = decoded.apkG2_3;
 
         bls = new BLS();
-        _setBN256G2();
-    }
-
-    function _setBN256G2() internal virtual {
-        bn256G2 = new BN256G2();
     }
 
     function _getDefaultInputLeaf() internal view returns (IEOFeedVerifier.LeafInput memory) {
@@ -184,7 +176,7 @@ abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
         address[] memory allowedSenders = new address[](1);
         allowedSenders[0] = EOCHAIN_SENDER;
 
-        feedVerifier.initialize(address(this), bls, bn256G2, eoracleChainId, allowedSenders);
+        feedVerifier.initialize(address(this), bls, eoracleChainId, allowedSenders);
         feedVerifier.setNewValidatorSet(validatorSet);
         feedVerifier.setFeedManager(address(this));
     }
