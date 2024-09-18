@@ -364,7 +364,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param eventRoot event root the leaf should belong to
      * @return The leaf data field
      */
-    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal view returns (bytes memory) {
+    function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal pure returns (bytes memory) {
         bytes32 leaf = keccak256(input.unhashedLeaf);
         if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
             revert InvalidProof();

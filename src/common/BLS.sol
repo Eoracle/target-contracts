@@ -905,7 +905,7 @@ contract BLS is IBLS {
         return (success, out[0] != 0);
     }
 
-    function hashToField(bytes32 domain, bytes memory messages) internal view returns (uint256[2] memory) {
+    function hashToField(bytes32 domain, bytes memory messages) internal pure returns (uint256[2] memory) {
         bytes memory _msg = expandMsgTo96(domain, messages);
         uint256 u0;
         uint256 u1;

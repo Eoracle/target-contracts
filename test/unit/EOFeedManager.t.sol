@@ -269,7 +269,7 @@ contract EOFeedManagerTest is Test, Utils {
         registry.setSupportedFeeds(feedIds, isSupported);
     }
 
-    function _getDefaultVerificationParams() private view returns (IEOFeedVerifier.VerificationParams memory) {
+    function _getDefaultVerificationParams() private pure returns (IEOFeedVerifier.VerificationParams memory) {
         IEOFeedVerifier.VerificationParams memory vParams;
         vParams.blockNumber = 1;
         vParams.eventRoot = bytes32(uint256(1));
