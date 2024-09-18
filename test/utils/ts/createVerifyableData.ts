@@ -57,7 +57,7 @@ async function run() {
     let _apkG2_1 = new mcl.G2();
     const nonSignersBitmap1 = '0x00';
 
-    // second data set for testing partial signing but still within consensus threshold - 3/4 validators
+    // second data set for testing partial signing but still within consensus threshold - 11/12 validators
     const leafInputs2: ILeafInput[] = [
         [1, 64001, 20398409484],
         [2, 3001, 20398409484]
@@ -96,13 +96,13 @@ async function run() {
     })
     const block3 = 3;
     let _apkG2_3 = new mcl.G2();
-    const nonSignersBitmap3 = '0x0e'; // only one voter
+    const nonSignersBitmap3 = '0xfe'; // only one voter
 
     let _sig1: mcl.G1 = new mcl.G1(), _sig2: mcl.G1 = new mcl.G1(), _sig3: mcl.G1 = new mcl.G1();
     let msg1 = ethers.keccak256(ethers.solidityPacked(['bytes32', 'uint256'], [root1, block1]));
     let msg2 = ethers.keccak256(ethers.solidityPacked(['bytes32', 'uint256'], [root2, block2]));
     let msg3 = ethers.keccak256(ethers.solidityPacked(['bytes32', 'uint256'], [root3, block3]));
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 12; i++) {
         const { secret, g1pk, g2pk } = newKey();
         const g1pkArr = g1ToArray(g1pk);
         const g2pkArr = g2ToArray(g2pk);
