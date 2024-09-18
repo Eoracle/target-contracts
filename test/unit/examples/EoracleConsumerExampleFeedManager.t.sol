@@ -57,15 +57,13 @@ contract EoracleConsumerExampleFeedManagerTest is Test {
         input.unhashedLeaf = abi.encode(feedId, rate, timestamp);
         _feedManager.updatePriceFeed(
             input,
-            IEOFeedVerifier.Checkpoint({
+            IEOFeedVerifier.VerificationParams({
                 blockNumber: 0,
-                epoch: 0,
                 eventRoot: bytes32(0),
-                blockHash: bytes32(0),
-                blockRound: 0
-            }),
-            [uint256(0), uint256(0)],
-            bytes("0")
+                signature: [uint256(0), uint256(0)],
+                apkG2: [uint256(0), uint256(0), uint256(0), uint256(0)],
+                nonSignersBitmap: bytes("0")
+            })
         );
     }
 }

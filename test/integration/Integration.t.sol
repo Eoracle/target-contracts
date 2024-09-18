@@ -64,7 +64,7 @@ contract IntegrationMultipleLeavesSingleCheckpointTests is IntegrationBaseTests 
     /**
      * @notice should not allow to update feed with data not related to merkle root
      */
-    function testFuzz_RevertWhen_updatePriceFeed_UnsignedData(bytes memory data) public {
+    function testFuzz_RevertWhen_updatePriceFeed_UnvParams(bytes memory data) public {
         vm.assume(keccak256(input[0].unhashedLeaf) != keccak256(data));
         input[0].unhashedLeaf = data;
         vm.startPrank(_publisher);

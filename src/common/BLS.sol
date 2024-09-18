@@ -1,17 +1,7 @@
-// Sources flattened with hardhat v2.19.1 https://hardhat.org
-
 // SPDX-License-Identifier: MIT
-
-// File lib/core-contracts/contracts/interfaces/common/IBLS.sol
-
-// Original license: SPDX_License_Identifier: MIT
 pragma solidity 0.8.25;
 
 import { IBLS } from "../interfaces/IBLS.sol";
-// File lib/core-contracts/contracts/lib/ModExp.sol
-
-// Original license: SPDX_License_Identifier: MIT
-
 /* MIT License
 
 Copyright (c) 2021 Hubble-Project
@@ -42,6 +32,7 @@ SOFTWARE.
  *     @dev the function body is generated with the modified addchain script
  *     see https://github.com/kobigurk/addchain/commit/2c37a2ace567a9bdc680b4e929c94aaaa3ec700f
  */
+
 library ModexpInverse {
     /**
      * @notice computes inverse
@@ -724,173 +715,49 @@ SOFTWARE.
  *     @dev points on G1 are used for signatures and messages, and on G2 for public keys
  */
 contract BLS is IBLS {
+    uint256 internal constant PAIRING_EQUALITY_CHECK_GAS = 120_000;
+
     // Field order
     // prettier-ignore
-    uint256 private constant N =
+    uint256 internal constant N =
         21_888_242_871_839_275_222_246_405_745_257_275_088_696_311_157_297_823_662_689_037_894_645_226_208_583;
 
-    // Negated generator of G2
-    // prettier-ignore
-    uint256 private constant N_G2_X1 =
-        11_559_732_032_986_387_107_991_004_021_392_285_783_925_812_861_821_192_530_917_403_151_452_391_805_634;
-    // prettier-ignore
-    uint256 private constant N_G2_X0 =
+    // Generator of G1
+    uint256 internal constant G1_X = 1;
+    uint256 internal constant G1_Y = 2;
+
+    // generator of G2
+    uint256 internal constant G2_X0 =
         10_857_046_999_023_057_135_944_570_762_232_829_481_370_756_359_578_518_086_990_519_993_285_655_852_781;
-    // prettier-ignore
-    uint256 private constant N_G2_Y1 =
-        17_805_874_995_975_841_540_914_202_342_111_839_520_379_459_829_704_422_454_583_296_818_431_106_115_052;
-    // prettier-ignore
-    uint256 private constant N_G2_Y0 =
+    uint256 internal constant G2_X1 =
+        11_559_732_032_986_387_107_991_004_021_392_285_783_925_812_861_821_192_530_917_403_151_452_391_805_634;
+    uint256 internal constant G2_Y0 =
+        8_495_653_923_123_431_417_604_973_247_489_272_438_418_190_587_263_600_148_770_280_649_306_958_101_930;
+    uint256 internal constant G2_Y1 =
+        4_082_367_875_863_433_681_332_203_403_145_435_568_316_851_327_593_401_208_105_741_076_214_120_093_531;
+
+    // Negated generator of G2
+    uint256 internal constant N_G2_X0 =
+        10_857_046_999_023_057_135_944_570_762_232_829_481_370_756_359_578_518_086_990_519_993_285_655_852_781;
+    uint256 internal constant N_G2_X1 =
+        11_559_732_032_986_387_107_991_004_021_392_285_783_925_812_861_821_192_530_917_403_151_452_391_805_634;
+    uint256 internal constant N_G2_Y0 =
         13_392_588_948_715_843_804_641_432_497_768_002_650_278_120_570_034_223_513_918_757_245_338_268_106_653;
-    // slither-disable-start too-many-digits
+    uint256 internal constant N_G2_Y1 =
+        17_805_874_995_975_841_540_914_202_342_111_839_520_379_459_829_704_422_454_583_296_818_431_106_115_052;
+
     // sqrt(-3)
-    // prettier-ignore
-    uint256 private constant Z0 = 0x0000000000000000b3c4d79d41a91759a9e4c7e359b6b89eaec68e62effffffd;
-    // (sqrt(-3) - 1)  / 2
-    // prettier-ignore
-    uint256 private constant Z1 = 0x000000000000000059e26bcea0d48bacd4f263f1acdb5c4f5763473177fffffe;
+    uint256 internal constant Z0 = 0x0000000000000000b3c4d79d41a91759a9e4c7e359b6b89eaec68e62effffffd;
+    // (sqrt(-3) - 1) / 2
+    uint256 internal constant Z1 = 0x000000000000000059e26bcea0d48bacd4f263f1acdb5c4f5763473177fffffe;
 
-    // prettier-ignore
-    uint256 private constant T24 = 0x1000000000000000000000000000000000000000000000000;
-    // slither-disable-end too-many-digits
+    uint256 internal constant T24 = 0x1000000000000000000000000000000000000000000000000;
+    uint256 internal constant MASK24 = 0xffffffffffffffffffffffffffffffffffffffffffffffff;
 
-    // prettier-ignore
-    uint256 private constant MASK24 = 0xffffffffffffffffffffffffffffffffffffffffffffffff;
-
-    /**
-     * @inheritdoc IBLS
-     */
-    function verifySingle(
-        uint256[2] calldata signature,
-        uint256[4] calldata pubkey,
-        uint256[2] calldata message
-    )
-        external
-        view
-        returns (bool, bool)
-    {
-        uint256[12] memory input = [
-            signature[0],
-            signature[1],
-            N_G2_X1,
-            N_G2_X0,
-            N_G2_Y1,
-            N_G2_Y0,
-            message[0],
-            message[1],
-            pubkey[1],
-            pubkey[0],
-            pubkey[3],
-            pubkey[2]
-        ];
-        uint256[1] memory out;
-
-        bool callSuccess;
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            callSuccess := staticcall(gas(), 8, input, 384, out, 0x20)
-        }
-        if (!callSuccess) {
-            return (false, false);
-        }
-        return (out[0] != 0, true);
-    }
-
-    /**
-     * @inheritdoc IBLS
-     */
-    function verifyMultiple(
-        uint256[2] calldata signature,
-        uint256[4][] calldata pubkeys,
-        uint256[2][] calldata messages
-    )
-        external
-        view
-        returns (bool checkResult, bool callSuccess)
-    {
-        uint256 size = pubkeys.length;
-        // solhint-disable-next-line reason-string
-        require(size > 0, "BLS: number of public key is zero");
-        // solhint-disable-next-line reason-string
-        require(size == messages.length, "BLS: number of public keys and messages must be equal");
-        uint256 inputSize = (size + 1) * 6;
-        uint256[] memory input = new uint256[](inputSize);
-        input[0] = signature[0];
-        input[1] = signature[1];
-        input[2] = N_G2_X1;
-        input[3] = N_G2_X0;
-        input[4] = N_G2_Y1;
-        input[5] = N_G2_Y0;
-        for (uint256 i = 0; i < size; i++) {
-            input[i * 6 + 6] = messages[i][0];
-            input[i * 6 + 7] = messages[i][1];
-            input[i * 6 + 8] = pubkeys[i][1];
-            input[i * 6 + 9] = pubkeys[i][0];
-            input[i * 6 + 10] = pubkeys[i][3];
-            input[i * 6 + 11] = pubkeys[i][2];
-        }
-        uint256[1] memory out;
-
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            callSuccess := staticcall(gas(), 8, add(input, 0x20), mul(inputSize, 0x20), out, 0x20)
-        }
-        if (!callSuccess) {
-            return (false, false);
-        }
-        return (out[0] != 0, true);
-    }
-
-    /**
-     * @inheritdoc IBLS
-     */
-    function verifyMultipleSameMsg(
-        uint256[2] calldata signature,
-        uint256[4][] calldata pubkeys,
-        uint256[2] calldata message
-    )
-        external
-        view
-        returns (bool checkResult, bool callSuccess)
-    {
-        uint256 size = pubkeys.length;
-        // solhint-disable-next-line reason-string
-        require(size > 0, "BLS: number of public key is zero");
-        uint256 inputSize = (size + 1) * 6;
-        uint256[] memory input = new uint256[](inputSize);
-        input[0] = signature[0];
-        input[1] = signature[1];
-        input[2] = N_G2_X1;
-        input[3] = N_G2_X0;
-        input[4] = N_G2_Y1;
-        input[5] = N_G2_Y0;
-        for (uint256 i = 0; i < size; i++) {
-            input[i * 6 + 6] = message[0];
-            input[i * 6 + 7] = message[1];
-            input[i * 6 + 8] = pubkeys[i][1];
-            input[i * 6 + 9] = pubkeys[i][0];
-            input[i * 6 + 10] = pubkeys[i][3];
-            input[i * 6 + 11] = pubkeys[i][2];
-        }
-        uint256[1] memory out;
-
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            callSuccess := staticcall(gas(), 8, add(input, 0x20), mul(inputSize, 0x20), out, 0x20)
-        }
-        if (!callSuccess) {
-            return (false, false);
-        }
-        return (out[0] != 0, true);
-    }
-
-    /**
-     * @inheritdoc IBLS
-     */
     function hashToPoint(bytes32 domain, bytes memory message) external view returns (uint256[2] memory) {
-        uint256[2] memory u = this.hashToField(domain, message);
-        uint256[2] memory p0 = this.mapToPoint(u[0]);
-        uint256[2] memory p1 = this.mapToPoint(u[1]);
+        uint256[2] memory u = hashToField(domain, message);
+        uint256[2] memory p0 = mapToPoint(u[0]);
+        uint256[2] memory p1 = mapToPoint(u[1]);
         uint256[4] memory bnAddInput;
         bnAddInput[0] = p0[0];
         bnAddInput[1] = p0[1];
@@ -907,164 +774,139 @@ contract BLS is IBLS {
         return p0;
     }
 
-    /**
-     * @inheritdoc IBLS
-     */
-    function mapToPoint(uint256 _x) external pure returns (uint256[2] memory p) {
-        // solhint-disable-next-line reason-string
-        require(_x < N, "mapToPointFT: invalid field element");
-        uint256 x = _x;
+    // asserts e(σ, -G₂) · e(H(m), pk₂) = 1
+    // where σ is the signature
+    function verifySignature(
+        uint256[2] calldata signature,
+        uint256[4] calldata pubkey,
+        uint256[2] calldata message
+    )
+        external
+        view
+        returns (bool, bool)
+    {
+        return ecpairing(signature, [N_G2_X0, N_G2_X1, N_G2_Y0, N_G2_Y1], message, pubkey, PAIRING_EQUALITY_CHECK_GAS);
+    }
 
-        (, bool decision) = sqrt(x);
+    // asserts e(σ + γ·pk₁, -G₂) · e(H(m) + γ·G₁ , pk₂) = 1
+    // where σ is the signature
+    //       γ is the delineation factor
+    // referece: (https://geometry.xyz/notebook/Optimized-BLS-multisignatures-on-EVM)
+    function verifySignatureAndVeracity(
+        uint256[2] calldata pk,
+        uint256[2] calldata signature,
+        uint256[2] calldata msgHash,
+        uint256[4] calldata pkG2
+    )
+        external
+        view
+        returns (bool, bool)
+    {
+        uint256 gamma = uint256(keccak256(abi.encode(msgHash, pk, pkG2, signature))) % N;
+        // verify the signature
+        return ecpairing(
+            ecadd(signature, ecmul(pk, gamma)),
+            [N_G2_X0, N_G2_X1, N_G2_Y0, N_G2_Y1],
+            ecadd(msgHash, ecmul([G1_X, G1_Y], gamma)),
+            pkG2,
+            PAIRING_EQUALITY_CHECK_GAS
+        );
+    }
 
-        uint256 a0 = mulmod(x, x, N);
-        a0 = addmod(a0, 4, N);
-        uint256 a1 = mulmod(x, Z0, N);
-        uint256 a2 = mulmod(a1, a0, N);
-        a2 = inverse(a2);
-        a1 = mulmod(a1, a1, N);
-        a1 = mulmod(a1, a2, N);
+    function ecadd(uint256[2] memory p1, uint256[2] memory p2) public view returns (uint256[2] memory r) {
+        uint256[4] memory input;
+        input[0] = p1[0];
+        input[1] = p1[1];
+        input[2] = p2[0];
+        input[3] = p2[1];
+        bool success;
 
-        // x1
-        a1 = mulmod(x, a1, N);
-        x = addmod(Z1, N - a1, N);
-        // check curve
-        a1 = mulmod(x, x, N);
-        a1 = mulmod(a1, x, N);
-        a1 = addmod(a1, 3, N);
-        bool found;
-        (a1, found) = sqrt(a1);
-        if (found) {
-            if (!decision) {
-                a1 = N - a1;
-            }
-            return [x, a1];
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            success := staticcall(sub(gas(), 2000), 6, input, 0x80, r, 0x40)
+            // Use "invalid" to make gas estimation work
+            switch success
+            case 0 { invalid() }
         }
 
-        // x2
-        x = N - addmod(x, 1, N);
-        // check curve
-        a1 = mulmod(x, x, N);
-        a1 = mulmod(a1, x, N);
-        a1 = addmod(a1, 3, N);
-        (a1, found) = sqrt(a1);
-        if (found) {
-            if (!decision) {
-                a1 = N - a1;
-            }
-            return [x, a1];
-        }
-
-        // x3
-        x = mulmod(a0, a0, N);
-        x = mulmod(x, x, N);
-        x = mulmod(x, a2, N);
-        x = mulmod(x, a2, N);
-        x = addmod(x, 1, N);
-        // must be on curve
-        a1 = mulmod(x, x, N);
-        a1 = mulmod(a1, x, N);
-        a1 = addmod(a1, 3, N);
-        (a1, found) = sqrt(a1);
-        // solhint-disable-next-line reason-string
-        require(found, "BLS: bad ft mapping implementation");
-        if (!decision) {
-            a1 = N - a1;
-        }
-        return [x, a1];
+        require(success, "ec-add-failed");
     }
 
     /**
-     * @inheritdoc IBLS
+     * @return r the product of a point on G1 and a scalar, i.e.
+     *         p == p.scalar_mul(1) and p.plus(p) == p.scalar_mul(2) for all
+     *         points p.
      */
-    // solhint-disable-next-line ordering
-    function isValidSignature(uint256[2] memory signature) external view returns (bool) {
-        if ((signature[0] >= N) || (signature[1] >= N)) {
-            return false;
+    function ecmul(uint256[2] memory p, uint256 s) public view returns (uint256[2] memory r) {
+        uint256[3] memory input;
+        input[0] = p[0];
+        input[1] = p[1];
+        input[2] = s;
+        bool success;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            success := staticcall(sub(gas(), 2000), 7, input, 0x60, r, 0x40)
+            // Use "invalid" to make gas estimation work
+            switch success
+            case 0 { invalid() }
+        }
+        require(success, "ec-mul-failed");
+    }
+
+    /**
+     * @param p Some point in G1.
+     * @return The negation of `p`, i.e. p.plus(p.negate()) should be zero.
+     */
+    function neg(uint256[2] memory p) public pure returns (uint256[2] memory) {
+        // The prime q in the base field F_q for G1
+        if (p[0] == 0 && p[1] == 0) {
+            return [uint256(0), uint256(0)];
         } else {
-            return this.isOnCurveG1(signature);
+            return [p[0], N - (p[1] % N)];
         }
     }
 
-    /**
-     * @inheritdoc IBLS
-     */
-    function isOnCurveG1(uint256[2] memory point) external pure returns (bool _isOnCurve) {
+    function ecpairing(
+        uint256[2] memory a1,
+        uint256[4] memory a2,
+        uint256[2] memory b1,
+        uint256[4] memory b2,
+        uint256 pairingGas
+    )
+        internal
+        view
+        returns (bool, bool)
+    {
+        uint256[12] memory input;
+        input[0] = a1[0];
+        input[1] = a1[1];
+        input[2] = a2[1];
+        input[3] = a2[0];
+        input[4] = a2[3];
+        input[5] = a2[2];
+        input[6] = b1[0];
+        input[7] = b1[1];
+        input[8] = b2[1];
+        input[9] = b2[0];
+        input[10] = b2[3];
+        input[11] = b2[2];
+
+        uint256[1] memory out;
+        bool success;
+
         // solhint-disable-next-line no-inline-assembly
         assembly {
-            let t0 := mload(point)
-            let t1 := mload(add(point, 32))
-            let t2 := mulmod(t0, t0, N)
-            t2 := mulmod(t2, t0, N)
-            t2 := addmod(t2, 3, N)
-            t1 := mulmod(t1, t1, N)
-            _isOnCurve := eq(t1, t2)
+            success := staticcall(pairingGas, 8, input, 0x180, out, 0x20)
         }
+
+        //Out is the output of the pairing precompile, either 0 or 1 based on whether the two pairings are equal.
+        //Success is true if the precompile actually goes through (aka all inputs are valid)
+
+        return (success, out[0] != 0);
     }
 
-    /**
-     * @inheritdoc IBLS
-     */
-    function isOnCurveG2(uint256[4] memory point) external pure returns (bool _isOnCurve) {
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            // x0, x1
-            let t0 := mload(point)
-            let t1 := mload(add(point, 32))
-            // x0 ^ 2
-            let t2 := mulmod(t0, t0, N)
-            // x1 ^ 2
-            let t3 := mulmod(t1, t1, N)
-            // 3 * x0 ^ 2
-            let t4 := add(add(t2, t2), t2)
-            // 3 * x1 ^ 2
-            let t5 := addmod(add(t3, t3), t3, N)
-            // x0 * (x0 ^ 2 - 3 * x1 ^ 2)
-            t2 := mulmod(add(t2, sub(N, t5)), t0, N)
-            // x1 * (3 * x0 ^ 2 - x1 ^ 2)
-            t3 := mulmod(add(t4, sub(N, t3)), t1, N)
-
-            // x ^ 3 + b
-            t0 := addmod(t2, 0x2b149d40ceb8aaae81be18991be06ac3b5b4c5e559dbefa33267e6dc24a138e5, N)
-            t1 := addmod(t3, 0x009713b03af0fed4cd2cafadeed8fdf4a74fa084e52d1852e4a2bd0685c315d2, N)
-
-            // y0, y1
-            t2 := mload(add(point, 64))
-            t3 := mload(add(point, 96))
-            // y ^ 2
-            t4 := mulmod(addmod(t2, t3, N), addmod(t2, sub(N, t3), N), N)
-            t3 := mulmod(shl(1, t2), t3, N)
-
-            // y ^ 2 == x ^ 3 + b
-            _isOnCurve := and(eq(t0, t4), eq(t1, t3))
-        }
-    }
-
-    /**
-     * @notice returns square root of a uint256 value
-     * @param xx the value to take the square root of
-     * @return x the uint256 value of the root
-     * @return hasRoot a bool indicating if there is a square root
-     */
-    function sqrt(uint256 xx) internal pure returns (uint256 x, bool hasRoot) {
-        x = ModexpSqrt.run(xx);
-        hasRoot = mulmod(x, x, N) == xx;
-    }
-
-    /**
-     * @notice inverts a uint256 value
-     * @param a uint256 value to invert
-     * @return uint256 of the value of the inverse
-     */
-    function inverse(uint256 a) internal pure returns (uint256) {
-        return ModexpInverse.run(a);
-    }
-
-    /**
-     * @inheritdoc IBLS
-     */
-    function hashToField(bytes32 domain, bytes memory messages) external view returns (uint256[2] memory) {
-        bytes memory _msg = this.expandMsgTo96(domain, messages);
+    function hashToField(bytes32 domain, bytes memory messages) internal view returns (uint256[2] memory) {
+        bytes memory _msg = expandMsgTo96(domain, messages);
         uint256 u0;
         uint256 u1;
         uint256 a0;
@@ -1085,10 +927,7 @@ contract BLS is IBLS {
         return [a0, a1];
     }
 
-    /**
-     * @inheritdoc IBLS
-     */
-    function expandMsgTo96(bytes32 domain, bytes memory message) external pure returns (bytes memory) {
+    function expandMsgTo96(bytes32 domain, bytes memory message) internal pure returns (bytes memory) {
         // zero<64>|msg<var>|lib_str<2>|I2OSP(0, 1)<1>|dst<var>|dst_len<1>
         uint256 t0 = message.length;
         bytes memory msg0 = new bytes(32 + t0 + 64 + 4);
@@ -1175,5 +1014,89 @@ contract BLS is IBLS {
         }
 
         return out;
+    }
+
+    function mapToPoint(uint256 _x) internal pure returns (uint256[2] memory p) {
+        // solhint-disable-next-line reason-string
+        require(_x < N, "mapToPointFT: invalid field element");
+        uint256 x = _x;
+
+        (, bool decision) = sqrt(x);
+
+        uint256 a0 = mulmod(x, x, N);
+        a0 = addmod(a0, 4, N);
+        uint256 a1 = mulmod(x, Z0, N);
+        uint256 a2 = mulmod(a1, a0, N);
+        a2 = inverse(a2);
+        a1 = mulmod(a1, a1, N);
+        a1 = mulmod(a1, a2, N);
+
+        // x1
+        a1 = mulmod(x, a1, N);
+        x = addmod(Z1, N - a1, N);
+        // check curve
+        a1 = mulmod(x, x, N);
+        a1 = mulmod(a1, x, N);
+        a1 = addmod(a1, 3, N);
+        bool found;
+        (a1, found) = sqrt(a1);
+        if (found) {
+            if (!decision) {
+                a1 = N - a1;
+            }
+            return [x, a1];
+        }
+
+        // x2
+        x = N - addmod(x, 1, N);
+        // check curve
+        a1 = mulmod(x, x, N);
+        a1 = mulmod(a1, x, N);
+        a1 = addmod(a1, 3, N);
+        (a1, found) = sqrt(a1);
+        if (found) {
+            if (!decision) {
+                a1 = N - a1;
+            }
+            return [x, a1];
+        }
+
+        // x3
+        x = mulmod(a0, a0, N);
+        x = mulmod(x, x, N);
+        x = mulmod(x, a2, N);
+        x = mulmod(x, a2, N);
+        x = addmod(x, 1, N);
+        // must be on curve
+        a1 = mulmod(x, x, N);
+        a1 = mulmod(a1, x, N);
+        a1 = addmod(a1, 3, N);
+        (a1, found) = sqrt(a1);
+        // solhint-disable-next-line reason-string
+        require(found, "BLS: bad ft mapping implementation");
+        if (!decision) {
+            a1 = N - a1;
+        }
+        return [x, a1];
+    }
+
+    /**
+     * @notice returns square root of a uint256 value
+     * @param xx the value to take the square root of
+     * @return x the uint256 value of the root
+     * @return hasRoot a bool indicating if there is a square root
+     */
+    function sqrt(uint256 xx) internal pure returns (uint256 x, bool hasRoot) {
+        x = ModexpSqrt.run(xx);
+        hasRoot = mulmod(x, x, N) == xx;
+    }
+
+    /**
+     * @notice inverts a uint256 value
+     * @param a uint256 value to invert
+     * @return uint256 of the value of the inverse
+     */
+    function inverse(uint256 a) internal pure returns (uint256) {
+        return ModexpInverse.run(a);
     }
 }

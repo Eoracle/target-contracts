@@ -10,7 +10,6 @@ import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 import { InvalidAddress } from "../../../src/interfaces/Errors.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { Options } from "openzeppelin-foundry-upgrades/Options.sol";
-
 // solhint-disable ordering
 
 abstract contract EOFeedAdapterTestUninitialized is Test {
@@ -165,15 +164,13 @@ contract EOFeedAdapterTest is EOFeedAdapterTestUninitialized {
         input.unhashedLeaf = abi.encode(feedId, rate, timestamp);
         _feedManager.updatePriceFeed(
             input,
-            IEOFeedVerifier.Checkpoint({
+            IEOFeedVerifier.VerificationParams({
                 blockNumber: _lastBlockNumber,
-                epoch: 0,
                 eventRoot: bytes32(0),
-                blockHash: bytes32(0),
-                blockRound: 0
-            }),
-            [uint256(0), uint256(0)],
-            bytes("0")
+                signature: [uint256(0), uint256(0)],
+                apkG2: [uint256(0), uint256(0), uint256(0), uint256(0)],
+                nonSignersBitmap: bytes("0")
+            })
         );
     }
 }

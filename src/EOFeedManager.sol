@@ -84,7 +84,7 @@ contract EOFeedManager is IEOFeedManager, OwnableUpgradeable {
     /**
      * @inheritdoc IEOFeedManager
      */
-    function whitelistPublishers(address[] memory publishers, bool[] memory isWhitelisted) external onlyOwner {
+    function whitelistPublishers(address[] calldata publishers, bool[] calldata isWhitelisted) external onlyOwner {
         if (publishers.length != isWhitelisted.length) revert InvalidInput();
         for (uint256 i = 0; i < publishers.length; i++) {
             if (publishers[i] == address(0)) revert InvalidAddress();
@@ -98,16 +98,14 @@ contract EOFeedManager is IEOFeedManager, OwnableUpgradeable {
     // Reentrancy is not an issue because _feedVerifier is set by the owner
     // slither-disable-next-line reentrancy-benign,reentrancy-events
     function updatePriceFeed(
-        IEOFeedVerifier.LeafInput memory input,
-        IEOFeedVerifier.Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
+        IEOFeedVerifier.LeafInput calldata input,
+        IEOFeedVerifier.VerificationParams calldata vParams
     )
         external
         onlyWhitelisted
     {
-        bytes memory data = _feedVerifier.verify(input, checkpoint, signature, bitmap);
-        _processVerifiedRate(data, checkpoint.blockNumber);
+        bytes memory data = _feedVerifier.verify(input, vParams);
+        _processVerifiedRate(data, vParams.blockNumber);
     }
 
     /**
@@ -117,18 +115,16 @@ contract EOFeedManager is IEOFeedManager, OwnableUpgradeable {
     // slither-disable-next-line reentrancy-benign,reentrancy-events
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        IEOFeedVerifier.Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
+        IEOFeedVerifier.VerificationParams calldata vParams
     )
         external
         onlyWhitelisted
     {
         if (inputs.length == 0) revert MissingLeafInputs();
 
-        bytes[] memory data = _feedVerifier.batchVerify(inputs, checkpoint, signature, bitmap);
+        bytes[] memory data = _feedVerifier.batchVerify(inputs, vParams);
         for (uint256 i = 0; i < data.length; i++) {
-            _processVerifiedRate(data[i], checkpoint.blockNumber);
+            _processVerifiedRate(data[i], vParams.blockNumber);
         }
     }
 
