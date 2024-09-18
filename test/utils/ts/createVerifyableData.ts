@@ -90,9 +90,9 @@ async function run() {
         }
     });
     const tree3 = new MerkleTree(leafInputs3.map(d => ethers.keccak256(d.unhashedLeaf)), ethers.keccak256, { sort: true });
-    const root3 = tree2.getRoot();
+    const root3 = tree3.getRoot();
     leafInputs3.forEach((d, i) => {
-        d.proof = tree2.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x' + p.data.toString('hex'));
+        d.proof = tree3.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x' + p.data.toString('hex'));
     })
     const block3 = 3;
     let _apkG2_3 = new mcl.G2();
