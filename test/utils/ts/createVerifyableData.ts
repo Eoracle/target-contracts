@@ -7,12 +7,12 @@ const abiCoder = new ethers.AbiCoder();
 
 function isBitOn(number: number, index: number): boolean {
     if (index < 1 || index > 32) {
-      throw new Error('Index must be between 1 and 32.');
+        throw new Error('Index must be between 1 and 32.');
     }
-  
+
     // Convert index from 1-32 range to 0-31 range for bitwise operation
     const bitPosition = index - 1;
-  
+
     // Use bitwise AND to check if the bit at the specified position is set
     return (number & (1 << bitPosition)) !== 0;
 }
@@ -32,7 +32,7 @@ interface ILeafInput {
 
 async function run() {
     await initializeMCL();
-    
+
     // full apk test - no non signers
     const leafInputs1: ILeafInput[] = [
         [1, 64000, 20398409483],
@@ -47,7 +47,7 @@ async function run() {
     const tree1 = new MerkleTree(leafInputs1.map(d => ethers.keccak256(d.unhashedLeaf)), ethers.keccak256, { sort: true });
     const root1 = tree1.getRoot();
     leafInputs1.forEach((d, i) => {
-        d.proof = tree1.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x'+p.data.toString('hex'));
+        d.proof = tree1.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x' + p.data.toString('hex'));
     })
     const block1 = 1;
     let _apkG2_1 = new mcl.G2();
@@ -67,7 +67,7 @@ async function run() {
     const tree2 = new MerkleTree(leafInputs2.map(d => ethers.keccak256(d.unhashedLeaf)), ethers.keccak256, { sort: true });
     const root2 = tree2.getRoot();
     leafInputs2.forEach((d, i) => {
-        d.proof = tree2.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x'+p.data.toString('hex'));
+        d.proof = tree2.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x' + p.data.toString('hex'));
     })
     const block2 = 2;
     let _apkG2_2 = new mcl.G2();
@@ -88,7 +88,7 @@ async function run() {
     const tree3 = new MerkleTree(leafInputs3.map(d => ethers.keccak256(d.unhashedLeaf)), ethers.keccak256, { sort: true });
     const root3 = tree2.getRoot();
     leafInputs3.forEach((d, i) => {
-        d.proof = tree2.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x'+p.data.toString('hex'));
+        d.proof = tree2.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x' + p.data.toString('hex'));
     })
     const block3 = 3;
     let _apkG2_3 = new mcl.G2();
@@ -118,13 +118,13 @@ async function run() {
         if (!isBitOn(ethers.toNumber(nonSignersBitmap2), i + 1)) {
             _apkG2_2 = mcl.add(_apkG2_2, g2pk);
             const sig = signMessageG1(secret, msg2);
-            _sig2 = mcl.add(_sig2, sig);            
+            _sig2 = mcl.add(_sig2, sig);
         }
 
         if (!isBitOn(ethers.toNumber(nonSignersBitmap3), i + 1)) {
             _apkG2_3 = mcl.add(_apkG2_3, g2pk);
             const sig = signMessageG1(secret, msg3);
-            _sig3 = mcl.add(_sig3, sig);            
+            _sig3 = mcl.add(_sig3, sig);
         }
 
     }
@@ -135,32 +135,7 @@ async function run() {
     const apkG2_2 = g2ToArray(_apkG2_2);
     const apkG2_3 = g2ToArray(_apkG2_3);
 
-    // console.log('ROOT:       ' + root1.toString('hex'));
-    // console.log('SIGNATURE:  ' + sig1);
-    // console.log('APK G2:     ' + _apkG2_1.getStr(10));
-    // console.log('MESSAGE G1: ' + hashToPoint(msg1, DOMAIN).getStr(10));
-    // return
-    // const verifyEthPairing = (a: bigint[], b: bigint[]) => {
-    //     const a1: mcl.G1 = g1FromArray([BigInt(a[0]), BigInt(a[1])]);
-    //     console.log('A1: ' + a1.getStr(10));
-    //     const b1: mcl.G1 = g1FromArray([BigInt(b[0]), BigInt(b[1])]);
-    //     console.log('B1: ' + b1.getStr(10));
-    //     const a2: mcl.G2 = g2FromArray([BigInt(a[3]), BigInt(a[2]), BigInt(a[5]), BigInt(a[4])]);
-    //     console.log('A2: ' + a2.getStr(10));
-    //     const b2: mcl.G2 = g2FromArray([BigInt(b[3]), BigInt(b[2]), BigInt(b[5]), BigInt(b[4])]);
-    //     console.log('B2: ' + b2.getStr(10));
-    //     const pairing = mcl.mul(mcl.pairing(a1, a2), mcl.pairing(b1, b2));
-    //     return toBigInt(pairing.serialize().reverse()); //to big endian
-    // }
-    // const ng2 = g2ToArray(mcl.neg(g2()));
-    // const m = g1ToArray(hashToPoint(msg1, DOMAIN));
-    // console.log('verify: ' + verifySignature(g2FromArray(apkG2_1), g1FromArray(sig1), msg1));
-    // console.log('test: ' + mcl.mul(mcl.pairing(g1FromArray(sig1), g2FromArray(ng2)), mcl.pairing(g1FromArray(m), g2FromArray(apkG2_1))).serialize().reverse());
-    // console.log(`[${sig1[0]}, ${sig1[1]}, ${ng2[1]}, ${ng2[0]} ${ng2[3]}, ${ng2[2]}], [${m[0]}, ${m[1]}, ${apkG2_1[1]}, ${apkG2_1[0]}, ${apkG2_1[3]}, ${apkG2_1[2]}]`);
-    // console.log(g2ToArray(mcl.neg(g2())));
-    // return;
-//  [844632404156993305817852911303902622083885840228231898451395099306951798319, 19684076810391313060206141342967322552919068531712231534464901018889429706772, 11559732032986387107991004021392285783925812861821192530917403151452391805634, 10857046999023057135944570762232829481370756359578518086990519993285655852781, 17805874995975841540914202342111839520379459829704422454583296818431106115052, 13392588948715843804641432497768002650278120570034223513918757245338268106653], [6533196836614429860413573310143167080212049683150873056074392462148763921503, 16123913767699218274148335276855873513084001978894621429465889741282790581919, 17577399953798862380987573965590827693574145399306740271042783443046234111885, 15693991417947318966531622826694032461402158848772261947361879024777051464850, 21588438139864545175370857962783713312668744829732611604650631825903377461022, 3017895435737783597539696400846177338343684843429769397170398610139916504081]
-//  [844632404156993305817852911303902622083885840228231898451395099306951798319, 19684076810391313060206141342967322552919068531712231534464901018889429706772, 11559732032986387107991004021392285783925812861821192530917403151452391805634, 10857046999023057135944570762232829481370756359578518086990519993285655852781, 17805874995975841540914202342111839520379459829704422454583296818431106115052, 13392588948715843804641432497768002650278120570034223513918757245338268106653], [16055256255278101123720674686003377966216868653318324755058358743374319087889, 4680274558307191975105661369765819689310076978632307758980931260666264665340, 17577399953798862380987573965590827693574145399306740271042783443046234111885, 15693991417947318966531622826694032461402158848772261947361879024777051464850, 21588438139864545175370857962783713312668744829732611604650631825903377461022, 3017895435737783597539696400846177338343684843429769397170398610139916504081]
+    // generate the full payload in one huge struct to preserve a shallow stack in solidity
     let decodedData = 'tuple(';
     [
         'tuple(address _address, uint256[2] g1pk, uint256[4] g2pk, uint256 votingPower)[] validators',
@@ -170,21 +145,21 @@ async function run() {
         'bytes32 root1',
         'uint256 block1',
         'bytes nonSignersBitmap1',
-        'uint256[2] signature1', 
+        'uint256[2] signature1',
         'uint256[4] apkG2_1',
 
         'tuple(uint256 leafIndex, bytes unhashedLeaf, bytes32[] proof)[] leafInputs2',
         'bytes32 root2',
         'uint256 block2',
         'bytes nonSignersBitmap2',
-        'uint256[2] signature2', 
+        'uint256[2] signature2',
         'uint256[4] apkG2_2',
 
         'tuple(uint256 leafIndex, bytes unhashedLeaf, bytes32[] proof)[] leafInputs3',
         'bytes32 root3',
         'uint256 block3',
         'bytes nonSignersBitmap3',
-        'uint256[2] signature3', 
+        'uint256[2] signature3',
         'uint256[4] apkG2_3'
     ].forEach((t, i) => {
         if (i > 0) {
@@ -199,7 +174,7 @@ async function run() {
     ], [
         {
             validators,
-            secrets,    
+            secrets,
             leafInputs1,
             root1,
             block1,
