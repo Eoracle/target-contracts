@@ -788,10 +788,17 @@ contract BLS is IBLS {
         return ecpairing(signature, [N_G2_X0, N_G2_X1, N_G2_Y0, N_G2_Y1], message, pubkey, PAIRING_EQUALITY_CHECK_GAS);
     }
 
-    // asserts e(σ + γ·pk₁, -G₂) · e(H(m) + γ·G₁ , pk₂) = 1
-    // where σ is the signature
-    //       γ is the delineation factor
+    // @notice
+    //  asserts e(σ + γ·pk₁, -G₂) · e(H(m) + γ·G₁ , pk₂) = 1
+    //  where σ is the signature
+    //        γ is the delineation factor
+    //        H(m) is the hashed message to G1
+    //  this will pass only for correlated pk₁/pk₂ and properly signed hash.
     // referece: (https://geometry.xyz/notebook/Optimized-BLS-multisignatures-on-EVM)
+    // @param pk - the claimed G1 based public key
+    // @param signature - the signature in G1
+    // @param msgHash - message hash in G1
+    // @param pkG2 - supplied G2 public key
     function verifySignatureAndVeracity(
         uint256[2] calldata pk,
         uint256[2] calldata signature,
@@ -813,6 +820,12 @@ contract BLS is IBLS {
         );
     }
 
+    /**
+     * @notice Adds two G1 points on the elliptic curve
+     * @param p1 First point
+     * @param p2 Second point
+     * @return r Result of the addition
+     */
     function ecadd(uint256[2] memory p1, uint256[2] memory p2) public view returns (uint256[2] memory r) {
         uint256[4] memory input;
         input[0] = p1[0];
@@ -833,9 +846,9 @@ contract BLS is IBLS {
     }
 
     /**
-     * @return r the product of a point on G1 and a scalar, i.e.
-     *         p == p.scalar_mul(1) and p.plus(p) == p.scalar_mul(2) for all
-     *         points p.
+     * @param p G1 point
+     * @param s scalar
+     * @return r the product of a point on G1 and a scalar
      */
     function ecmul(uint256[2] memory p, uint256 s) public view returns (uint256[2] memory r) {
         uint256[3] memory input;
@@ -855,7 +868,7 @@ contract BLS is IBLS {
 
     /**
      * @param p Some point in G1.
-     * @return The negation of `p`, i.e. p.plus(p.negate()) should be zero.
+     * @return The negation of `p`
      */
     function neg(uint256[2] memory p) public pure returns (uint256[2] memory) {
         // The prime q in the base field F_q for G1
@@ -866,6 +879,16 @@ contract BLS is IBLS {
         }
     }
 
+    /**
+     * @notice Performs elliptic curve pairing check
+     * @param a1 First point in G1
+     * @param a2 First point in G2
+     * @param b1 Second point in G1
+     * @param b2 Second point in G2
+     * @param pairingGas Gas limit for the pairing operation
+     * @return success Whether the pairing check was successful
+     * @return result Whether the pairing equality holds
+     */
     function ecpairing(
         uint256[2] memory a1,
         uint256[4] memory a2,
@@ -875,7 +898,7 @@ contract BLS is IBLS {
     )
         internal
         view
-        returns (bool, bool)
+        returns (bool success, bool result)
     {
         uint256[12] memory input;
         input[0] = a1[0];
@@ -892,7 +915,6 @@ contract BLS is IBLS {
         input[11] = b2[2];
 
         uint256[1] memory out;
-        bool success;
 
         // solhint-disable-next-line no-inline-assembly
         assembly {
@@ -905,6 +927,12 @@ contract BLS is IBLS {
         return (success, out[0] != 0);
     }
 
+    /**
+     * @notice Hashes a message to a field element
+     * @param domain Domain separator
+     * @param messages Message to hash
+     * @return Array representing the G1 hashed message
+     */
     function hashToField(bytes32 domain, bytes memory messages) internal pure returns (uint256[2] memory) {
         bytes memory _msg = expandMsgTo96(domain, messages);
         uint256 u0;
@@ -927,6 +955,12 @@ contract BLS is IBLS {
         return [a0, a1];
     }
 
+    /**
+     * @notice Expands a message to 96 bytes
+     * @param domain Domain separator
+     * @param message Message to expand
+     * @return Expanded message
+     */
     function expandMsgTo96(bytes32 domain, bytes memory message) internal pure returns (bytes memory) {
         // zero<64>|msg<var>|lib_str<2>|I2OSP(0, 1)<1>|dst<var>|dst_len<1>
         uint256 t0 = message.length;
@@ -1016,6 +1050,11 @@ contract BLS is IBLS {
         return out;
     }
 
+    /**
+     * @notice Maps a field element to a point on the curve
+     * @param _x Field element to map
+     * @return p Resulting point on the curve
+     */
     function mapToPoint(uint256 _x) internal pure returns (uint256[2] memory p) {
         // solhint-disable-next-line reason-string
         require(_x < N, "mapToPointFT: invalid field element");
