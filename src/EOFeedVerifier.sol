@@ -349,7 +349,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @param eventRoot the root this event should belong to
      * @return Array of the leaf data fields of all submitted leaves
      */
-    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal view returns (bytes[] memory) {
+    function _verifyLeaves(LeafInput[] calldata inputs, bytes32 eventRoot) internal pure returns (bytes[] memory) {
         uint256 length = inputs.length;
         bytes[] memory returnData = new bytes[](length);
         for (uint256 i = 0; i < length; i++) {
