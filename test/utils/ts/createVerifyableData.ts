@@ -36,7 +36,9 @@ async function run() {
     // full apk test - no non signers
     const leafInputs1: ILeafInput[] = [
         [1, 64000, 20398409483],
-        [2, 3000, 20398409483]
+        [2, 3000, 20398409483],
+        [3, 1300, 20398409483],
+        [4, 800, 20398409483]
     ].map((d, i) => {
         const unhashedLeaf = abiCoder.encode(['uint16', 'uint256', 'uint64'], d);
         return {
@@ -47,7 +49,9 @@ async function run() {
     const tree1 = new MerkleTree(leafInputs1.map(d => ethers.keccak256(d.unhashedLeaf)), ethers.keccak256, { sort: true });
     const root1 = tree1.getRoot();
     leafInputs1.forEach((d, i) => {
-        d.proof = tree1.getProof(ethers.keccak256(d.unhashedLeaf)).map(p => '0x' + p.data.toString('hex'));
+        const leaf = ethers.keccak256(d.unhashedLeaf);
+        const proof = tree1.getProof(leaf);
+        d.proof = proof.map(p => '0x' + p.data.toString('hex'));
     })
     const block1 = 1;
     let _apkG2_1 = new mcl.G2();

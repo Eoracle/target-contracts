@@ -3,8 +3,8 @@ pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { IEOFeedVerifier } from "./interfaces/IEOFeedVerifier.sol";
-import { Merkle } from "./common/Merkle.sol";
 import { IBLS } from "./interfaces/IBLS.sol";
+import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 // solhint-disable no-unused-import
 import {
@@ -29,8 +29,6 @@ import {
  * sufficient voting power.
  */
 contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
-    using Merkle for bytes32;
-
     bytes32 public constant DOMAIN = keccak256("EORACLE_FEED_VERIFIER");
 
     uint256 internal _minNumOfValidators;
@@ -353,9 +351,13 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      */
     function _verifyLeaf(LeafInput calldata input, bytes32 eventRoot) internal pure returns (bytes memory) {
         bytes32 leaf = keccak256(input.unhashedLeaf);
-        if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
+
+        if (!MerkleProof.verify(input.proof, eventRoot, leaf)) {
             revert InvalidProof();
         }
+
+        // if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
+        // }
 
         return input.unhashedLeaf;
     }

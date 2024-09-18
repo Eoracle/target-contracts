@@ -115,148 +115,109 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         feedVerifier.verify(input[0], vParams);
     }
 
-    // function test_RevertWhen_InvalidSender() public {
-    //     // generate leaves for invalid sender
-    //     address invalidSender = makeAddr("invalidSender");
-    //     string[] memory cmd = new string[](5);
-    //     cmd[0] = "npx";
-    //     cmd[1] = "ts-node";
-    //     cmd[2] = "test/utils/ts/generateMsgProof.ts";
-    //     cmd[3] = vm.toString(abi.encode(DOMAIN));
-    //     cmd[4] = vm.toString(invalidSender);
-    //     bytes memory out = vm.ffi(cmd);
+    function test_RevertIf_DataIsAltered_Verify() public {
+        IEOFeedVerifier.LeafInput memory input = _getDefaultInputLeaf();
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
 
-    //     IEOFeedVerifier.Validator[] memory validatorSetTmp;
+        //alter one byte in the leaf unhashed data
+        input.unhashedLeaf[0] = input.unhashedLeaf[0] == bytes1(0x10) ? bytes1(0x20) : bytes1(0x10);
 
-    //     (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, bitmaps, unhashedLeaves, proves, leavesArray) =
-    //     abi.decode(
-    //         out,
-    //         (uint256, IEOFeedVerifier.Validator[], uint256[2][], bytes32[], bytes[], bytes[], bytes32[][],
-    // bytes32[][])
-    //     );
-    //     feedVerifier.setNewValidatorSet(validatorSetTmp);
+        vm.expectRevert(InvalidProof.selector);
+        feedVerifier.verify(input, vParams);
+    }
 
-    //     IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
-    //     IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
-    //     uint256[2] memory signature = aggMessagePoints[0];
-    //     bytes memory bitmap = bitmaps[0];
+    function test_batchVerify() public {
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
+        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
+        inputs[0] = _getDefaultInputLeaf();
+        feedVerifier.batchVerify(inputs, vParams);
+    }
 
-    //     vm.expectRevert(abi.encodeWithSelector(SenderNotAllowed.selector, invalidSender));
-    //     feedVerifier.verify(input, checkpoint, signature, bitmap);
-    // }
+    function test_RevertWhen_CalledByNotFeedManager_BatchVerify() public {
+        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
+        inputs[0] = _getDefaultInputLeaf();
 
-    // function test_RevertIf_DataIsAltered_Verify() public {
-    //     IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
-    //     IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
+        vm.expectRevert(CallerIsNotFeedManager.selector);
+        vm.prank(alice);
+        feedVerifier.batchVerify(inputs, vParams);
+    }
 
-    //     //alter one byte in the leaf unhashed data
-    //     input.unhashedLeaf[0] = input.unhashedLeaf[0] == bytes1(0x10) ? bytes1(0x20) : bytes1(0x10);
-    //     uint256[2] memory signature = aggMessagePoints[0];
-    //     bytes memory bitmap = bitmaps[0];
+    function test_RevertWhen_InvalidEventRoot_BatchVerify() public {
+        IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
+        inputs[0] = _getDefaultInputLeaf();
 
-    //     vm.expectRevert(InvalidProof.selector);
-    //     feedVerifier.verify(input, checkpoint, signature, bitmap);
-    // }
+        // solhint-disable-next-line func-named-parameters
 
-    // function test_batchVerify() public {
-    //     IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
-    //     IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
+        feedVerifier.batchVerify(inputs, vParams);
 
-    //     inputs[0] = _getDefaultInput();
+        vParams.eventRoot = bytes32(0);
 
-    //     uint256[2] memory signature = aggMessagePoints[0];
+        vm.expectRevert(InvalidEventRoot.selector);
+        feedVerifier.batchVerify(inputs, vParams);
+    }
 
-    //     feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
-    // }
+    function test_SetNewValidatorSet() public {
+        feedVerifier.setNewValidatorSet(validatorSet);
+        uint256 totalPower = 0;
+        bytes32 validatorSetHash = keccak256(abi.encode(validatorSet));
+        assertEq(feedVerifier.currentValidatorSetLength(), validatorSetSize);
+        assertEq(feedVerifier.currentValidatorSetHash(), validatorSetHash);
+        for (uint256 i = 0; i < validatorSetSize; i++) {
+            IEOFeedVerifier.Validator memory validator = feedVerifier.currentValidatorSet(i);
+            assertEq(validator._address, validatorSet[i]._address);
+            assertEq(validator.votingPower, validatorSet[i].votingPower);
+            totalPower += validator.votingPower;
+        }
+        assertEq(feedVerifier.totalVotingPower(), totalPower);
+    }
 
-    // function test_RevertWhen_CalledByNotFeedManager_BatchVerify() public {
-    //     IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
-    //     IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
-    //     inputs[0] = _getDefaultInput();
+    function test_RevertWhen_VotingPowerIsZero_SetNewValidatorSet() public {
+        validatorSet[0].votingPower = 0;
+        vm.expectRevert(VotingPowerIsZero.selector);
+        feedVerifier.setNewValidatorSet(validatorSet);
+    }
 
-    //     uint256[2] memory signature = aggMessagePoints[0];
+    function test_RevertWhen_ZeroAddress_SetNewValidatorSet() public {
+        validatorSet[0]._address = address(0);
+        vm.expectRevert(InvalidAddress.selector);
+        feedVerifier.setNewValidatorSet(validatorSet);
+    }
 
-    //     vm.expectRevert(CallerIsNotFeedManager.selector);
-    //     vm.prank(alice);
-    //     feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
-    // }
+    function test_RevertWhen_NotOwner_SetNewValidatorSet() public {
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
+        vm.prank(alice);
+        feedVerifier.setNewValidatorSet(validatorSet);
+    }
 
-    // function test_RevertWhen_InvalidEventRoot_BatchVerify() public {
-    //     IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](1);
-    //     IEOFeedVerifier.Checkpoint memory checkpoint = _getDefaultCheckpoint();
-    //     inputs[0] = _getDefaultInput();
+    function test_RevertWhen_ValidatorSetTooSmall() public {
+        IEOFeedVerifier.Validator[] memory smallValidatorSet = new IEOFeedVerifier.Validator[](1);
+        smallValidatorSet[0] = validatorSet[0];
+        vm.expectRevert(ValidatorSetTooSmall.selector);
+        feedVerifier.setNewValidatorSet(smallValidatorSet);
+    }
 
-    //     uint256[2] memory signature = aggMessagePoints[0];
-    //     // solhint-disable-next-line func-named-parameters
+    function test_RevertWhen_ValidatorIndexOutOfBounds() public {
+        vm.expectRevert(ValidatorIndexOutOfBounds.selector);
+        feedVerifier.currentValidatorSet(validatorSet.length);
+    }
 
-    //     feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
+    function test_SetAllowedSenders() public {
+        address[] memory allowedSenders = new address[](1);
+        allowedSenders[0] = makeAddr("allowedSender");
+        feedVerifier.setAllowedSenders(allowedSenders, true);
+        assertEq(feedVerifier.isSenderAllowed(allowedSenders[0]), true);
 
-    //     checkpoint.eventRoot = bytes32(0);
+        feedVerifier.setAllowedSenders(allowedSenders, false);
+        assertEq(feedVerifier.isSenderAllowed(allowedSenders[0]), false);
+    }
 
-    //     vm.expectRevert(InvalidEventRoot.selector);
-    //     feedVerifier.batchVerify(inputs, checkpoint, signature, bitmaps[0]);
-    // }
-
-    // function test_SetNewValidatorSet() public {
-    //     feedVerifier.setNewValidatorSet(validatorSet);
-    //     uint256 totalPower = 0;
-    //     bytes32 validatorSetHash = keccak256(abi.encode(validatorSet));
-    //     assertEq(feedVerifier.currentValidatorSetLength(), validatorSetSize);
-    //     assertEq(feedVerifier.currentValidatorSetHash(), validatorSetHash);
-    //     for (uint256 i = 0; i < validatorSetSize; i++) {
-    //         IEOFeedVerifier.Validator memory validator = feedVerifier.currentValidatorSet(i);
-    //         assertEq(validator._address, validatorSet[i]._address);
-    //         assertEq(validator.votingPower, validatorSet[i].votingPower);
-    //         totalPower += validator.votingPower;
-    //     }
-    //     assertEq(feedVerifier.totalVotingPower(), totalPower);
-    // }
-
-    // function test_RevertWhen_VotingPowerIsZero_SetNewValidatorSet() public {
-    //     validatorSet[0].votingPower = 0;
-    //     vm.expectRevert(VotingPowerIsZero.selector);
-    //     feedVerifier.setNewValidatorSet(validatorSet);
-    // }
-
-    // function test_RevertWhen_ZeroAddress_SetNewValidatorSet() public {
-    //     validatorSet[0]._address = address(0);
-    //     vm.expectRevert(InvalidAddress.selector);
-    //     feedVerifier.setNewValidatorSet(validatorSet);
-    // }
-
-    // function test_RevertWhen_NotOwner_SetNewValidatorSet() public {
-    //     vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
-    //     vm.prank(alice);
-    //     feedVerifier.setNewValidatorSet(validatorSet);
-    // }
-
-    // function test_RevertWhen_ValidatorSetTooSmall() public {
-    //     IEOFeedVerifier.Validator[] memory smallValidatorSet = new IEOFeedVerifier.Validator[](1);
-    //     smallValidatorSet[0] = validatorSet[0];
-    //     vm.expectRevert(ValidatorSetTooSmall.selector);
-    //     feedVerifier.setNewValidatorSet(smallValidatorSet);
-    // }
-
-    // function test_RevertWhen_ValidatorIndexOutOfBounds() public {
-    //     vm.expectRevert(ValidatorIndexOutOfBounds.selector);
-    //     feedVerifier.currentValidatorSet(validatorSet.length);
-    // }
-
-    // function test_SetAllowedSenders() public {
-    //     address[] memory allowedSenders = new address[](1);
-    //     allowedSenders[0] = makeAddr("allowedSender");
-    //     feedVerifier.setAllowedSenders(allowedSenders, true);
-    //     assertEq(feedVerifier.isSenderAllowed(allowedSenders[0]), true);
-
-    //     feedVerifier.setAllowedSenders(allowedSenders, false);
-    //     assertEq(feedVerifier.isSenderAllowed(allowedSenders[0]), false);
-    // }
-
-    // function test_RevertWhen_NotOwner_SetAllowedSenders() public {
-    //     address[] memory allowedSenders = new address[](1);
-    //     allowedSenders[0] = makeAddr("allowedSender");
-    //     vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
-    //     vm.prank(alice);
-    //     feedVerifier.setAllowedSenders(allowedSenders, true);
-    // }
+    function test_RevertWhen_NotOwner_SetAllowedSenders() public {
+        address[] memory allowedSenders = new address[](1);
+        allowedSenders[0] = makeAddr("allowedSender");
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
+        vm.prank(alice);
+        feedVerifier.setAllowedSenders(allowedSenders, true);
+    }
 }
