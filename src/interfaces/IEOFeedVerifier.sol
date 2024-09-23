@@ -18,8 +18,11 @@ interface IEOFeedVerifier {
 
     /**
      * @dev Signed Data structure
-     * @param eventRoot Event root of the merkle tree
-     * @param blockNumber Block number
+     * @param eventRoot merkle tree root for events
+     * @param blockNumber the block number this merkle tree originated from (on EO chain)
+     * @param signature G1 hashed payload of abi.encode(eventRoot, blockNumber)
+     * @param apkG2 G2 apk provided from off-chain
+     * @param nonSignersBitmap used to construct G1 apk onchain
      */
     struct VerificationParams {
         bytes32 eventRoot;
@@ -30,9 +33,11 @@ interface IEOFeedVerifier {
     }
 
     /**
+     * @notice consider adding a small gap for future fields to ease upgrades in the future.
      * @dev Validator structure
-     * @param _address Validator address
-     * @param blsKey Validator BLS key
+     * @param _address validator address
+     * @param g1pk validator G1 public key
+     * @param g2pk validator G2 public key (not used for now but good to have it)
      * @param votingPower Validator voting power
      */
     struct Validator {

@@ -789,7 +789,7 @@ contract BLS is IBLS {
     }
 
     // @notice
-    //  asserts e(σ + γ·pk₁, -G₂) · e(H(m) + γ·G₁ , pk₂) = 1
+    //  asserts e(σ + γ·pk₁, G₂) = e(H(m) + γ·G₁ , pk₂)
     //  where σ is the signature
     //        γ is the delineation factor
     //        H(m) is the hashed message to G1

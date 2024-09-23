@@ -113,7 +113,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         onlyFeedManager
         returns (bytes memory)
     {
-        _verifyVerificationParams(vParams);
+        _verifyParams(vParams);
         bytes memory data = _verifyLeaf(input, vParams.eventRoot);
         return data;
     }
@@ -129,7 +129,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         onlyFeedManager
         returns (bytes[] memory)
     {
-        _verifyVerificationParams(vParams);
+        _verifyParams(vParams);
         return _verifyLeaves(inputs, vParams.eventRoot);
     }
 
@@ -157,6 +157,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             _currentValidatorSet[i] = newValidatorSet[i];
             apk = _bls.ecadd(apk, newValidatorSet[i].g1pk);
         }
+
         _fullApk = apk;
         _totalVotingPower = totalPower;
         emit ValidatorSetUpdated(_currentValidatorSetLength, _currentValidatorSetHash, _totalVotingPower);
@@ -260,7 +261,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
      * @notice Function to verify the checkpoint signature
      * @param vParams Signed data
      */
-    function _verifyVerificationParams(IEOFeedVerifier.VerificationParams calldata vParams) internal {
+    function _verifyParams(IEOFeedVerifier.VerificationParams calldata vParams) internal {
         // if the eventRoot has not changed, we don't need to verify the whole checkpoint again
         if (vParams.eventRoot == _lastProcessedEventRoot) {
             return;
