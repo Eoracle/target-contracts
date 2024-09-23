@@ -26,14 +26,7 @@ FEED_MANAGER_INIT=$(cast calldata "initialize(address,address)" $FEED_VERIFIER_P
 deploy_proxy "src/EOFeedManager.sol:EOFeedManager" $FEED_MANAGER_INIT $PROXY_ADMIN_OWNER
 FEED_MANAGER_PROXY=$(get_deployed_address "EOFeedManagerProxy")
 
-# Get current owner of EOFeedVerifierProxy
-CURRENT_OWNER=$(cast call $FEED_VERIFIER_PROXY "owner()(address)" --rpc-url $RPC_URL)
-
-# Transfer ownership of FeedVerifier only if current owner is different
-if [ "$CURRENT_OWNER" != "$OWNER_ADDRESS" ]; then
-    call_contract $FEED_VERIFIER_PROXY "setFeedManager(address)" $PRIVATE_KEY $FEED_MANAGER_PROXY
-    call_contract $FEED_VERIFIER_PROXY "transferOwnership(address)" $PRIVATE_KEY $OWNER_ADDRESS
-fi
+call_contract $FEED_VERIFIER_PROXY "setFeedManager(address)" $OWNER_PRIVATE_KEY $FEED_MANAGER_PROXY
 
 # Setup core contracts
 SUPPORTED_FEED_IDS=$(echo $CONFIG | jq -r '.supportedFeedIds | join(",")')
