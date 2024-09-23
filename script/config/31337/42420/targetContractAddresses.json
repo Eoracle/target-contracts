@@ -1,18 +1,18 @@
 {
-  "bls": "0xa0Cb889707d426A7A386870A03bc70d1b0697598",
+  "bls": "0xc7183455a4C133Ae270771860664b6B7ec320bB1",
   "bn256G2": "0xc7183455a4C133Ae270771860664b6B7ec320bB1",
   "checkpointManager": "0xDB8cFf278adCCF9E9b5da745B44E754fC4EE3C76",
   "checkpointManagerImplementation": "0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3",
   "feedAdapterImplementation": "0x90193C961A926261B756D1E5bb255e67ff9498A1",
   "feedImplementation": "0xDEb1E9a6Be7Baf84208BB6E10aC9F9bbE1D70809",
-  "feedManager": "0xD6BbDE9174b1CdAa358d2Cf4D57D1a9F7178FBfF",
-  "feedManagerImplementation": "0x03A6a84cD762D9707A21605b548aaaB891562aAb",
+  "feedManager": "0x03A6a84cD762D9707A21605b548aaaB891562aAb",
+  "feedManagerImplementation": "0xA4AD4f68d0b91CFD19687c881e50f3A00242828c",
   "feedRegistry": "0x62c20Aa1e0272312BC100b4e23B4DC1Ed96dD7D1",
   "feedRegistryAdapter": "0xBb2180ebd78ce97360503434eD37fcf4a1Df61c3",
   "feedRegistryAdapterImplementation": "0xA8452Ec99ce0C64f20701dB7dD3abDb607c00496",
   "feedRegistryImplementation": "0x50EEf481cae4250d252Ae577A09bF514f224C6C4",
-  "feedVerifier": "0xA4AD4f68d0b91CFD19687c881e50f3A00242828c",
-  "feedVerifierImplementation": "0x1d1499e622D69689cdf9004d05Ec547d650Ff211",
+  "feedVerifier": "0x1d1499e622D69689cdf9004d05Ec547d650Ff211",
+  "feedVerifierImplementation": "0xa0Cb889707d426A7A386870A03bc70d1b0697598",
   "feeds": {
     "BTC/USD": "0xe82aB0ed3Dd37f3609266e49567Db9B99234D45e",
     "ETH/USD": "0xB9bc102f443F848dD14Fe4aDfdF987a73e5F594D"

@@ -9,15 +9,40 @@ import { EOFeedManager } from "../../src/EOFeedManager.sol";
 import { EOFeedRegistryAdapter } from "../../src/adapters/EOFeedRegistryAdapter.sol";
 import { EOFeedVerifier } from "../../src/EOFeedVerifier.sol";
 import { DeployNewTargetContractSet } from "../../script/deployment/DeployNewTargetContractSet.s.sol";
-import { EOJsonUtils } from "../../script/utils/EOJsonUtils.sol";
 import { DeployFeedRegistryAdapter } from "../../script/deployment/DeployFeedRegistryAdapter.s.sol";
 import { DeployFeeds } from "../../script/deployment/DeployFeeds.s.sol";
 import { SetupCoreContracts } from "../../script/deployment/setup/SetupCoreContracts.s.sol";
-// solhint-disable max-states-count
 import { EOJsonUtils } from "../..//script/utils/EOJsonUtils.sol";
+
+// solhint-disable max-states-count
+// solhint-disable var-name-mixedcase
+// solhint-disable ordering
 
 abstract contract IntegrationBaseTests is Test, Utils {
     using stdJson for string;
+
+    struct DecodedData {
+        IEOFeedVerifier.Validator[] validatorSet;
+        uint256[] secrets;
+        IEOFeedVerifier.LeafInput[] leafInputs1;
+        bytes32 merkleRoot1;
+        uint256 blockNumber1;
+        bytes nonSignersBitmap1;
+        uint256[2] sigG1_1;
+        uint256[4] apkG2_1;
+        IEOFeedVerifier.LeafInput[] leafInputs2;
+        bytes32 merkleRoot2;
+        uint256 blockNumber2;
+        bytes nonSignersBitmap2;
+        uint256[2] sigG1_2;
+        uint256[4] apkG2_2;
+        IEOFeedVerifier.LeafInput[] leafInputs3;
+        bytes32 merkleRoot3;
+        uint256 blockNumber3;
+        bytes nonSignersBitmap3;
+        uint256[2] sigG1_3;
+        uint256[4] apkG2_3;
+    }
 
     EOFeedManager public _feedManager;
     EOFeedRegistryAdapter public _feedRegistryAdapter;
@@ -26,12 +51,8 @@ abstract contract IntegrationBaseTests is Test, Utils {
     address public _publisher;
     address public _owner;
 
-    uint16[] public _feedIds;
-    uint256[] public _rates;
-    uint256[] public _timestamps;
     // TODO: pass to ts as argument
     uint256 public validatorSetSize;
-    bytes[] public feedsData;
     IEOFeedVerifier.Validator[] public validatorSet;
 
     uint256 public constant VALIDATOR_SET_SIZE = 10;
@@ -54,7 +75,7 @@ abstract contract IntegrationBaseTests is Test, Utils {
         address feedVerifierAddr;
         address feedManagerAddr;
 
-        (,, feedVerifierAddr, feedManagerAddr) = mainDeployer.run(address(this));
+        (, feedVerifierAddr, feedManagerAddr) = mainDeployer.run(address(this));
         coreContractsSetup.run(_owner);
         address feedRegistryAdapterAddress;
         (, feedRegistryAdapterAddress) = adapterDeployer.run();
@@ -64,10 +85,16 @@ abstract contract IntegrationBaseTests is Test, Utils {
         _feedManager = EOFeedManager(feedManagerAddr);
         _feedRegistryAdapter = EOFeedRegistryAdapter(feedRegistryAdapterAddress);
 
-        _seedFeedsData(configStructured, uint256(100));
-        _generatePayload(feedsData);
-
+        _generatePayload();
         _setValidatorSet(validatorSet);
+    }
+
+    function getData() private returns (bytes memory) {
+        string[] memory cmd = new string[](3);
+        cmd[0] = "npx";
+        cmd[1] = "ts-node";
+        cmd[2] = "test/utils/ts/createVerifyableData.ts";
+        return vm.ffi(cmd);
     }
 
     function _setValidatorSet(IEOFeedVerifier.Validator[] memory _validatorSet) internal {
@@ -93,64 +120,29 @@ abstract contract IntegrationBaseTests is Test, Utils {
         _feedManager.whitelistPublishers(publishers, isWhitelisted);
     }
 
-    function _generatePayload(bytes[] memory _feedsData) internal virtual {
-        require(_feedsData.length > 0, "FEEDSDATA_EMPTY");
+    function _generatePayload() internal virtual {
+        DecodedData memory decoded = abi.decode(getData(), (DecodedData));
+
         delete validatorSet;
         delete input;
         delete vParams;
-
-        uint256 blockNumber = block.number;
-        uint256 len = 6 + _feedsData.length;
-        string[] memory cmd = new string[](len);
-        cmd[0] = "npx";
-        cmd[1] = "ts-node";
-        cmd[2] = "test/utils/ts/generateMsgProofRates.ts";
-        cmd[3] = vm.toString(abi.encode(DOMAIN));
-        cmd[4] = vm.toString(abi.encode(VALIDATOR_SET_SIZE));
-        cmd[5] = vm.toString(abi.encode(blockNumber));
-        for (uint256 i = 0; i < _feedsData.length; i++) {
-            cmd[6 + i] = vm.toString(_feedsData[i]);
-        }
-
-        bytes memory out = vm.ffi(cmd);
-        bytes[] memory unhashedLeaves;
-        bytes32[][] memory proves;
-        bytes32[] memory hashes;
-        bytes[] memory _bitmaps;
-        uint256[2][] memory aggMessagePoints;
-
-        IEOFeedVerifier.Validator[] memory validatorSetTmp;
-
-        (validatorSetSize, validatorSetTmp, aggMessagePoints, hashes, _bitmaps, unhashedLeaves, proves,) = abi.decode(
-            out,
-            (uint256, IEOFeedVerifier.Validator[], uint256[2][], bytes32[], bytes[], bytes[], bytes32[][], bytes32[][])
-        );
-
+        validatorSetSize = decoded.validatorSet.length;
         for (uint256 i = 0; i < validatorSetSize; i++) {
-            validatorSet.push(validatorSetTmp[i]);
+            validatorSet.push(decoded.validatorSet[i]);
+        }
+        for (uint256 i = 0; i < decoded.leafInputs1.length; i++) {
+            input.push(decoded.leafInputs1[i]);
         }
 
-        for (uint256 i = 0; i < _feedsData.length; i++) {
-            input.push(IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaves[i], leafIndex: i, proof: proves[i] }));
-
-            // solhint-disable-next-line func-named-parameters
-        }
-        signatures.push(aggMessagePoints[0]);
-        vParams.push(IEOFeedVerifier.VerificationParams({ blockNumber: blockNumber, eventRoot: hashes[0] }));
-
-        bitmaps.push(_bitmaps[0]);
-    }
-
-    function _seedFeedsData(EOJsonUtils.Config memory configStructured, uint256 initialRate) internal virtual {
-        delete feedsData;
-        delete _rates;
-        delete _feedIds;
-        delete _timestamps;
-        for (uint256 i = 0; i < configStructured.supportedFeedIds.length; i++) {
-            _feedIds.push(uint16(configStructured.supportedFeedIds[i]));
-            _rates.push(initialRate + configStructured.supportedFeedIds[i]);
-            _timestamps.push(block.timestamp);
-            feedsData.push(abi.encode(_feedIds[i], _rates[i], _timestamps[i]));
-        }
+        // full signature - 4/4 voters
+        vParams.push(
+            IEOFeedVerifier.VerificationParams({
+                blockNumber: decoded.blockNumber1,
+                eventRoot: decoded.merkleRoot1,
+                signature: decoded.sigG1_1,
+                apkG2: decoded.apkG2_1,
+                nonSignersBitmap: decoded.nonSignersBitmap1
+            })
+        );
     }
 }

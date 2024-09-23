@@ -73,6 +73,8 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
         alice = makeAddr("Alice");
         bob = makeAddr("Bob");
 
+        feedVerifier = EOFeedVerifier(Upgrades.deployTransparentProxy("EOFeedVerifier.sol", admin, ""));
+
         DecodedData memory decoded = abi.decode(getData(), (DecodedData));
 
         validatorSetSize = decoded.validatorSet.length;
@@ -161,7 +163,6 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
     }
 
     function getData() private returns (bytes memory) {
-        feedVerifier = EOFeedVerifier(Upgrades.deployTransparentProxy("EOFeedVerifier.sol", admin, ""));
         string[] memory cmd = new string[](3);
         cmd[0] = "npx";
         cmd[1] = "ts-node";

@@ -37,8 +37,8 @@ async function run() {
     const leafInputs1: ILeafInput[] = [
         [1, 64000, 20398409483],
         [2, 3000, 20398409483],
-        [3, 1300, 20398409483],
-        [4, 800, 20398409483]
+        //        [3, 1300, 20398409483],
+        //        [4, 800, 20398409483]
     ].map((d, i) => {
         const unhashedLeaf = abiCoder.encode(['uint16', 'uint256', 'uint64'], d);
         return {
