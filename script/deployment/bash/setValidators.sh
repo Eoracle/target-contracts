@@ -5,8 +5,8 @@ source script/deployment/bash/common_functions.sh
 # Load environment variables
 source .env
 
-# Get the EOFeedVerifierProxy address from the OUTPUT_FILE
-TARGET_VERIFIER_ADDRESS=$(grep "EOFeedVerifierProxy" "$OUTPUT_FILE" | cut -d '"' -f4)
+# Get the feedVerifier address from the OUTPUT_FILE
+TARGET_VERIFIER_ADDRESS=$(grep "\"feedVerifier\":" "$OUTPUT_FILE" | cut -d '"' -f4)
 
 if [ -z "$TARGET_VERIFIER_ADDRESS" ]; then
     echo "Error: EOFeedVerifierProxy address not found in $OUTPUT_FILE"
@@ -59,15 +59,5 @@ echo "Setting new validator set..."
 tx_hash=$(cast send --private-key $OWNER_PRIVATE_KEY --rpc-url $RPC_URL $TARGET_VERIFIER_ADDRESS $call_data)
 
 echo "Transaction sent: $tx_hash"
-
-# Wait for transaction receipt
-echo "Waiting for transaction receipt..."
-cast receipt $tx_hash --rpc-url $RPC_URL
-
-# Get new validator set length
-new_len=$(cast call $TARGET_VERIFIER_ADDRESS "currentValidatorSetLength()" --rpc-url $RPC_URL)
-new_len=$((new_len))
-
-echo "New validator set length: $new_len"
 
 echo "Script completed successfully"

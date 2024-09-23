@@ -33,9 +33,9 @@ get_deployed_address() {
 # Function to deploy a contract
 deploy_contract() {
     local contract_path=$1
-    local constructor_args=${2:-""}
+    local contract_name=$2
+    local constructor_args=${3:-""}
     
-    local contract_name=$(basename $contract_path .sol | cut -d':' -f2)
     if is_deployed "$contract_name"; then
         echo "$contract_name already deployed, skipping..."
     else
@@ -57,20 +57,19 @@ deploy_contract() {
 # Function to deploy a proxy contract
 deploy_proxy() {
     local contract_path=$1
-    local init_data=$2
-    local proxy_admin=$3
+    local contract_name=$2
+    local init_data=$3
+    local proxy_admin=$4
     
-    local contract_name=$(basename $contract_path .sol | cut -d':' -f2)
-    local proxy_name="${contract_name}Proxy"
-    if is_deployed "$proxy_name"; then
-        echo "$proxy_name already deployed, skipping..."
+    if is_deployed "$contract_name"; then
+        echo "$contract_name already deployed, skipping..."
     else
         echo "Deploying implementation for $contract_name..."
-        if ! deploy_contract $contract_path; then
+        if ! deploy_contract $contract_path "${contract_name}Implementation"; then
             echo "Failed to deploy implementation for $contract_name"
             return 1
         fi
-        implementation_address=$(get_deployed_address $contract_name)
+        implementation_address=$(get_deployed_address "${contract_name}Implementation")
         
         echo "Deploying proxy for $contract_name..."
         local output
@@ -78,15 +77,15 @@ deploy_proxy() {
             lib/openzeppelin-contracts/contracts/proxy/transparent/TransparentUpgradeableProxy.sol:TransparentUpgradeableProxy \
             --constructor-args $implementation_address $proxy_admin $init_data 2>&1); then
             address=$(echo "$output" | grep "Deployed to" | awk '{print $3}')
-            echo "$proxy_name deployed to: $address"
-            echo "\"$proxy_name\": \"$address\"," >> $OUTPUT_FILE
+            echo "$contract_name deployed to: $address"
+            echo "\"$contract_name\": \"$address\"," >> $OUTPUT_FILE
         else
             echo "Failed to deploy proxy for $contract_name"
             echo "$output"
             return 1
         fi
     fi
-    get_deployed_address "$proxy_name"
+    get_deployed_address "$contract_name"
 }
 
 # Function to call a contract method

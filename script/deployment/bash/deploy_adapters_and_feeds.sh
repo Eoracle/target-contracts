@@ -3,13 +3,13 @@
 source script/deployment/bash/common_functions.sh
 
 # Deploy FeedRegistryAdapter
-deploy_contract "src/adapters/EOFeedAdapter.sol:EOFeedAdapter"
-FEED_ADAPTER_IMPL=$(get_deployed_address "EOFeedAdapter")
+deploy_contract "src/adapters/EOFeedAdapter.sol:EOFeedAdapter" "feedAdapterImplementation"
+FEED_ADAPTER_IMPL=$(get_deployed_address "feedAdapterImplementation")
 
-FEED_MANAGER_PROXY=$(get_deployed_address "EOFeedManagerProxy")
+FEED_MANAGER_PROXY=$(get_deployed_address "feedManager")
 FEED_REGISTRY_ADAPTER_INIT=$(cast calldata "initialize(address,address,address)" $FEED_MANAGER_PROXY $FEED_ADAPTER_IMPL $OWNER_ADDRESS)
-deploy_proxy "src/adapters/EOFeedRegistryAdapter.sol:EOFeedRegistryAdapter" $FEED_REGISTRY_ADAPTER_INIT $PROXY_ADMIN_OWNER
-FEED_REGISTRY_ADAPTER_PROXY=$(get_deployed_address "EOFeedRegistryAdapterProxy")
+deploy_proxy "src/adapters/EOFeedRegistryAdapter.sol:EOFeedRegistryAdapter" "feedRegistryAdapter" $FEED_REGISTRY_ADAPTER_INIT $PROXY_ADMIN_OWNER
+FEED_REGISTRY_ADAPTER_PROXY=$(get_deployed_address "feedRegistryAdapter")
 
 # Deploy Feeds
 echo "\"feeds\": {" >> $OUTPUT_FILE
@@ -31,9 +31,6 @@ for feed in $SUPPORTED_FEEDS_DATA; do
     fi
 done
 echo "}" >> "$OUTPUT_FILE"
-
-# Deploy LibDenominations
-deploy_contract "src/libraries/Denominations.sol:Denominations"
 
 # Close the output file if it's not properly closed
 sed -i -e '$ s/,$//' "$OUTPUT_FILE"
