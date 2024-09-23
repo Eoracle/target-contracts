@@ -12,7 +12,6 @@ import {
     InvalidProof,
     InvalidAddress,
     VotingPowerIsZero,
-    AggVotingPowerIsZero,
     InsufficientVotingPower,
     CallerIsNotFeedManager,
     InvalidEventRoot,
@@ -98,14 +97,6 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
         vm.expectRevert(InvalidEventRoot.selector);
         feedVerifier.verify(input[0], vParams);
     }
-
-    // function test_RevertWhen_AggVotingPowerIsZero_Verify() public {
-    //     IEOFeedVerifier.LeafInput memory input = _getDefaultInput();
-    //     IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
-
-    //     vm.expectRevert(AggVotingPowerIsZero.selector);
-    //     feedVerifier.verify(input, vParams);
-    // }
 
     function test_RevertWhen_InsufficientVotingPower_Verify() public {
         IEOFeedVerifier.LeafInput[] memory input = _getNotEnoughVotingPowerInput();

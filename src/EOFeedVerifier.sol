@@ -13,7 +13,6 @@ import {
     InvalidAddress,
     InvalidEventRoot,
     VotingPowerIsZero,
-    AggVotingPowerIsZero,
     InsufficientVotingPower,
     SignatureVerificationFailed,
     SignaturePairingFailed,
@@ -314,7 +313,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         }
 
         // we check the agg voting power is indeed sufficient
-        if (aggVotingPower == 0) revert AggVotingPowerIsZero();
         if (aggVotingPower <= ((2 * _totalVotingPower) / 3)) revert InsufficientVotingPower();
 
         // then we negate the non signers and add the full apk
