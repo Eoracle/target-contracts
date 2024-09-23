@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 /// @notice This is a mock contract of the ERC20 standard for testing purposes only, it SHOULD NOT be used in
 /// production.

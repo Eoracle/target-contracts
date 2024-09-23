@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import { stdJson } from "forge-std/Script.sol";
 import { Script } from "forge-std/Script.sol";

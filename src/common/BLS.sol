@@ -5,7 +5,7 @@
 // File lib/core-contracts/contracts/interfaces/common/IBLS.sol
 
 // Original license: SPDX_License_Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity 0.8.23;
 
 import { IBLS } from "../interfaces/IBLS.sol";
 // File lib/core-contracts/contracts/lib/ModExp.sol

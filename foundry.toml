@@ -11,7 +11,7 @@
   optimizer_runs = 10_000
   out = "out"
   script = "script"
-  solc = "0.8.25"
+  solc = "0.8.23"
   src = "src"
   build_info = true
   extra_output = ["storageLayout"]
@@ -20,6 +20,12 @@
   fs_permissions = [{ access = "read-write", path = "./" }]
   ffi = true
   ast = true
+
+[profile.default.zksync] 
+  # Compile contracts for zkVM
+  compile = true 
+  # By default the latest version is used
+  zksolc = "1.3.22" 
 
 [profile.full_test]
   test = "test"
