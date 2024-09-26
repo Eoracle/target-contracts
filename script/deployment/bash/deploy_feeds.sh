@@ -1,18 +1,24 @@
-#!/bin/bash
-
 source script/deployment/bash/common_functions.sh
 
-# Deploy FeedRegistryAdapter
-deploy_contract "src/adapters/EOFeedAdapter.sol:EOFeedAdapter" "feedAdapterImplementation"
-FEED_ADAPTER_IMPL=$(get_deployed_address "feedAdapterImplementation")
-
-FEED_MANAGER_PROXY=$(get_deployed_address "feedManager")
-FEED_REGISTRY_ADAPTER_INIT=$(cast calldata "initialize(address,address,address)" $FEED_MANAGER_PROXY $FEED_ADAPTER_IMPL $OWNER_ADDRESS)
-deploy_proxy "src/adapters/EOFeedRegistryAdapter.sol:EOFeedRegistryAdapter" "feedRegistryAdapter" $FEED_REGISTRY_ADAPTER_INIT $PROXY_ADMIN_OWNER
 FEED_REGISTRY_ADAPTER_PROXY=$(get_deployed_address "feedRegistryAdapter")
 
+IS_NEW_FEEDS=0
+# Add feeds section if not already present
+if ! grep -q "\"feeds\":" "$OUTPUT_FILE"; then
+    echo "\"feeds\": {" >> $OUTPUT_FILE
+    IS_NEW_FEEDS=1
+fi 
+
+# if feeds exist remove two closing braces
+if [ $IS_NEW_FEEDS -eq 0 ]; then
+    # delete two last lines
+    sed -i '' -e '$ d' "$OUTPUT_FILE"
+    sed -i '' -e '$ d' "$OUTPUT_FILE"
+    # add comma to the end of the file
+    echo "," >> "$OUTPUT_FILE"
+fi
+
 # Deploy Feeds
-echo "\"feeds\": {" >> $OUTPUT_FILE
 SUPPORTED_FEEDS_DATA=$(echo $CONFIG | jq -c '.supportedFeedsData[]')
 for feed in $SUPPORTED_FEEDS_DATA; do
     FEED_ID=$(echo $feed | jq -r '.feedId')
@@ -30,10 +36,11 @@ for feed in $SUPPORTED_FEEDS_DATA; do
         echo "Feed with ID $FEED_ID already exists. Skipping deployment."
     fi
 done
-echo "}" >> "$OUTPUT_FILE"
-
-# Close the output file if it's not properly closed
+# Remove last comma
 sed -i -e '$ s/,$//' "$OUTPUT_FILE"
+
+echo "}" >> "$OUTPUT_FILE"
 echo "}" >> "$OUTPUT_FILE"
 
-echo "Deployment of adapters and feeds completed. Addresses saved to $OUTPUT_FILE"
+echo "Running prettier..."
+npx prettier --write $OUTPUT_FILE --parser json

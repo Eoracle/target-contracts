@@ -15,5 +15,4 @@ lcov.info
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
-**/targetContractAddresses.json
 README.md
