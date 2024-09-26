@@ -43,4 +43,4 @@ echo "}" >> "$OUTPUT_FILE"
 echo "}" >> "$OUTPUT_FILE"
 
 echo "Running prettier..."
-npx prettier --write $OUTPUT_FILE --parser json
+npx prettier --write $OUTPUT_FILE --ignore-path ''

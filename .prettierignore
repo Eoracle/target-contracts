@@ -5,6 +5,7 @@ coverage
 node_modules
 out
 lib
+zkout
 
 # files
 *.env
@@ -15,4 +16,5 @@ lcov.info
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+**/targetContractAddresses.json
 README.md
