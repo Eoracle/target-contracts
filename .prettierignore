@@ -5,6 +5,7 @@ coverage
 node_modules
 out
 lib
+zkout
 
 # files
 *.env
