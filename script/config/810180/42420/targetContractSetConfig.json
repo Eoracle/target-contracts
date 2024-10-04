@@ -6,7 +6,7 @@
   "targetChainId": 810180,
   "publishers": ["0x4e73CbE367527a21ECA4b6616C25973F0ADE9778"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 17, 54, 58, 66, 70, 71, 72, 73, 75, 76, 77, 79, 80, 81],
+  "supportedFeedIds": [1, 2, 17, 54, 58, 66, 70, 71, 72, 73, 75, 76, 77, 78, 79, 80, 81],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -84,6 +84,13 @@
       "decimals": 18,
       "description": "SolvBTC/USD",
       "feedId": 77
+    },
+    {
+      "base": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 12,
+      "description": "WBTCUSDC",
+      "feedId": 78
     },
     {
       "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
