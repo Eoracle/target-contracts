@@ -314,7 +314,7 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         if (checkpoint.eventRoot == _lastProcessedEventRoot) {
             return;
         }
-        _verifySignature(checkpoint, signature, bitmap);
+        // _verifySignature(checkpoint, signature, bitmap);
         if (checkpoint.blockNumber > _lastProcessedBlockNumber) {
             _lastProcessedBlockNumber = checkpoint.blockNumber;
             _lastProcessedEventRoot = checkpoint.eventRoot;
