@@ -1,12 +1,12 @@
 {
     "bls": "0xa3a1b8b0Af749a369904939C6EA11dC3c799d721",
     "bn256G2": "0x144Fe844ac29490190563d7700DE0707A6B78A1F",
-    "feedVerifierImplementation": "0x1fb85762f3a12A9C08F9B99E39349AE9faf55aD8",
+    "feedVerifierImplementation": "0x9d7ad9c7aff4f886a2711e561ea7b35af910e662",
     "feedVerifier": "0x92F5FCa9fC1aa9686364767733A3F951c5F27Aff",
-    "feedManagerImplementation": "0xCc4EEBa7bEdF13EA7c2367a24A3eb72a22f82BeF",
+    "feedManagerImplementation": "0xe8373615baa7185f76726f90b9d38f31ec24bcba",
     "feedManager": "0xEECECaecf142992c25668c925d6E2eEF3A8C0DCE",
-    "feedAdapterImplementation": "0x88d6c63ADB448BFf7E4827429e017640bbEd5926",
-    "feedRegistryAdapterImplementation": "0x5E1E61CF76AE5857e2678d96222BB89493E150dd",
+    "feedAdapterImplementation": "0xdff3C48A34A5f86E31498700133B91cd9C870888",
+    "feedRegistryAdapterImplementation": "0x78af473ee01bc19f204f1dd43a592cafcc7cd841",
     "feedRegistryAdapter": "0xaee83A647E9f97360bfa8E570f185E20B7BB13a5",
     "feeds": {
         "BTC/USD": "0x8d718854B469F87C708ED00842084e21684E649f",
