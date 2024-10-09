@@ -6,7 +6,7 @@
   "targetChainId": 534352,
   "publishers": ["0x82f1354ae675dBffcd5cB92F0cC9c1Fff1D4B917"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [2, 17, 54, 57, 58, 60, 66, 76, 77, 83, 85, 86],
+  "supportedFeedIds": [2, 17, 54, 75, 76, 77, 83, 85, 86, 89, 90, 91, 92],
   "supportedFeedsData": [
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -30,30 +30,30 @@
       "description": "USDC/USD"
     },
     {
-      "base": "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+      "base": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
       "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 57,
+      "feedId": 89,
       "decimals": 18,
       "description": "weETH/USD"
     },
     {
-      "base": "0xd9a442856c234a39a81a089c06451ebaa4306a72",
+      "base": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
       "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 58,
+      "feedId": 75,
       "decimals": 18,
       "description": "pufETH/USD"
     },
     {
       "base": "0xf1376bcef0f78459c0ed0ba5ddce976f1ddf51f4",
       "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 60,
+      "feedId": 90,
       "decimals": 18,
       "description": "uniETH/USD"
     },
     {
-      "base": "0xa1290d69c65a6fe4df752f95823fae25cb99e5a7",
+      "base": "0xa25b25548B4C98B0c7d3d27dcA5D5ca743d68b7F",
       "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 66,
+      "feedId": 91,
       "decimals": 18,
       "description": "wrsETH/USD"
     },
@@ -79,16 +79,16 @@
       "description": "WBTC/USD"
     },
     {
-      "base": "0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
+      "base": "0x4c9EDD5852cd905f086C759E8383e09bff1E68B3",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 85,
       "decimals": 18,
       "description": "USDe/USD"
     },
     {
-      "base": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+      "base": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
       "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 86,
+      "feedId": 92,
       "decimals": 18,
       "description": "wstETH/USD"
     }
