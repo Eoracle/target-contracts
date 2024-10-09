@@ -6,7 +6,7 @@
   "targetChainId": 59144,
   "publishers": ["0xF37e2A6F0D8E94a7F9a897Ec971301d2D19a8820"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 35, 36, 41, 42, 43, 64, 67],
+  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 35, 36, 41, 42, 43, 54, 56, 57, 64, 66, 67, 79, 84],
   "supportedFeedsData": [
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
@@ -107,6 +107,27 @@
       "feedId": 43
     },
     {
+      "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 54,
+      "decimals": 18,
+      "description": "USDC/USD"
+    },
+    {
+      "base": "0xbf5495efe5db9ce00f80364c8b423567e58d2110",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "ezETH/ETH",
+      "feedId": 56
+    },
+    {
+      "base": "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 57,
+      "decimals": 18,
+      "description": "weETH/USD"
+    },
+    {
       "base": "0x657e8C867D8B37dCC18fA4Caead9C45EB088C642",
       "quote": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
       "decimals": 8,
@@ -114,11 +135,32 @@
       "feedId": 64
     },
     {
+      "base": "0xa1290d69c65a6fe4df752f95823fae25cb99e5a7",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 66,
+      "decimals": 18,
+      "description": "wrsETH/USD"
+    },
+    {
       "base": "0x4E15361FD6b4BB609Fa63C81A2be19d873717870",
       "quote": "0x0000000000000000000000000000000000000348",
       "decimals": 18,
       "description": "FTM/ETH",
       "feedId": 67
+    },
+    {
+      "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "M-BTC/USD",
+      "feedId": 79
+    },
+    {
+      "base": "0xdfc7c877a950e49d2610114102175a06c2e3167a",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "MODE/USD",
+      "feedId": 84
     }
   ]
 }
