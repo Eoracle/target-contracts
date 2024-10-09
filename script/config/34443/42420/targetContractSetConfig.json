@@ -6,7 +6,7 @@
   "targetChainId": 34443,
   "publishers": ["0xfE9e2523eA97dE94743266a822443984ae00781d"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [2, 17, 54, 76],
+  "supportedFeedIds": [2, 17, 54, 56, 57, 66, 76, 79, 84],
   "supportedFeedsData": [
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -30,11 +30,46 @@
       "description": "USDC/USD"
     },
     {
+      "base": "0xbf5495Efe5DB9ce00f80364C8B423567e58d2110",
+      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "decimals": 18,
+      "description": "ezETH/ETH",
+      "feedId": 56
+    },
+    {
+      "base": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 57,
+      "decimals": 18,
+      "description": "weETH/USD"
+    },
+    {
+      "base": "0xe7903B1F75C534Dd8159b313d92cDCfbC62cB3Cd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 66,
+      "decimals": 18,
+      "description": "wrsETH/USD"
+    },
+    {
       "base": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 76,
       "decimals": 18,
       "description": "STONE/USD"
+    },
+    {
+      "base": "0xB880fd278198bd590252621d4CD071b1842E9Bcd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "M-BTC/USD",
+      "feedId": 79
+    },
+    {
+      "base": "0xDfc7C877a950e49D2610114102175A06C2e3167a",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "MODE/USD",
+      "feedId": 84
     }
   ]
 }
