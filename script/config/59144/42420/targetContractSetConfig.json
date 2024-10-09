@@ -6,70 +6,14 @@
   "targetChainId": 59144,
   "publishers": ["0xF37e2A6F0D8E94a7F9a897Ec971301d2D19a8820"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [1, 2, 6, 11, 13, 14, 16, 17, 18, 35, 36, 41, 42, 43, 64, 67],
+  "supportedFeedIds": [2, 35, 36, 54, 67, 76, 77, 79, 80, 81, 83],
   "supportedFeedsData": [
-    {
-      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 1,
-      "decimals": 18,
-      "description": "BTC/USD"
-    },
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 2,
       "decimals": 18,
       "description": "ETH/USD"
-    },
-    {
-      "base": "0xd4094e4ffa89985583E52D491251619a4C5b0BE9",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 6,
-      "decimals": 18,
-      "description": "SOL/USD"
-    },
-    {
-      "base": "0x7D800a2559b7e3A9b50a1865Ac45C22D168Ce900",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 11,
-      "decimals": 18,
-      "description": "XAU/USD"
-    },
-    {
-      "base": "0x00000000000000000000000000000000000003d2",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 13,
-      "decimals": 18,
-      "description": "EUR/USD"
-    },
-    {
-      "base": "0x0000000000000000000000000000000000000024",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 14,
-      "decimals": 18,
-      "description": "AUD/USD"
-    },
-    {
-      "base": "0x000000000000000000000000000000000000033A",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 16,
-      "decimals": 18,
-      "description": "GBP/USD"
-    },
-    {
-      "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 17,
-      "decimals": 18,
-      "description": "USDT/USD"
-    },
-    {
-      "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 18,
-      "decimals": 18,
-      "description": "LINK/USD"
     },
     {
       "base": "0xd6fAA45f5180A36CE1925ba9b4C9683CCaA3D117",
@@ -86,39 +30,60 @@
       "description": "AVAX/USD"
     },
     {
-      "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
-      "quote": "0x853d955acef822db058eb8505911ed77f175b99e",
+      "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "quote": "0x0000000000000000000000000000000000000348",
       "decimals": 18,
-      "description": "sFRAX/FRAX",
-      "feedId": 41
-    },
-    {
-      "base": "0xac3e018457b222d93114458476f3e3416abbe38f",
-      "quote": "0xcf7ecee185f19e2e970a301ee37f93536ed66179",
-      "decimals": 18,
-      "description": "sfrxETH/frxETH",
-      "feedId": 42
-    },
-    {
-      "base": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "stETH/ETH",
-      "feedId": 43
-    },
-    {
-      "base": "0x657e8C867D8B37dCC18fA4Caead9C45EB088C642",
-      "quote": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-      "decimals": 8,
-      "description": "eBTC/BTC",
-      "feedId": 64
+      "description": "USDC/USD",
+      "feedId": 54
     },
     {
       "base": "0x4E15361FD6b4BB609Fa63C81A2be19d873717870",
       "quote": "0x0000000000000000000000000000000000000348",
       "decimals": 18,
-      "description": "FTM/ETH",
+      "description": "FTM/USD",
       "feedId": 67
+    },
+    {
+      "base": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "STONE/USD",
+      "feedId": 76
+    },
+    {
+      "base": "0x7A56E1C57C7475CCf742a1832B028F0456652F97",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "SolvBTC/USD",
+      "feedId": 77
+    },
+    {
+      "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "M-BTC/USD",
+      "feedId": 79
+    },
+    {
+      "base": "0xF5e11df1ebCf78b6b6D26E04FF19cD786a1e81dC",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "BBTC/USD",
+      "feedId": 80
+    },
+    {
+      "base": "0x77776b40C3d75cb07ce54dEA4b2Fd1D07F865222",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "BBUSD/USD",
+      "feedId": 81
+    },
+    {
+      "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "WBTC/USD",
+      "feedId": 83
     }
   ]
 }
