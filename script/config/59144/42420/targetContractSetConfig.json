@@ -4,7 +4,7 @@
   "targetContractsOwner": "0x5B7c58A8403fAB4061EDd07c03B29464a10DFc42",
   "eoracleChainId": 42420,
   "targetChainId": 59144,
-  "publishers": ["0xF37e2A6F0D8E94a7F9a897Ec971301d2D19a8820"],
+  "publishers": ["0x61860cb3f16c4C9A018e04211dDf32E5BD5C328d"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
   "supportedFeedIds": [2, 35, 36, 54, 67, 76, 77, 79, 80, 81, 83],
   "supportedFeedsData": [
@@ -79,7 +79,7 @@
       "feedId": 81
     },
     {
-      "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
+      "base": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
       "quote": "0x0000000000000000000000000000000000000348",
       "decimals": 18,
       "description": "WBTC/USD",
