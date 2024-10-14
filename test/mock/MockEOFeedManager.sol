@@ -13,22 +13,18 @@ contract MockEOFeedManager is IEOFeedManager {
 
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput calldata input,
-        IEOFeedVerifier.Checkpoint calldata checkpoint,
-        uint256[2] calldata,
-        bytes calldata
+        IEOFeedVerifier.VerificationParams calldata vParams
     )
         external
     {
         (uint16 feedId, uint256 rate, uint256 timestamp) = abi.decode(input.unhashedLeaf, (uint16, uint256, uint256));
 
-        priceFeeds[feedId] = PriceFeed(rate, timestamp, checkpoint.blockNumber);
+        priceFeeds[feedId] = PriceFeed(rate, timestamp, vParams.blockNumber);
     }
 
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        IEOFeedVerifier.Checkpoint calldata checkpoint,
-        uint256[2] calldata,
-        bytes calldata
+        IEOFeedVerifier.VerificationParams calldata vParams
     )
         external
     {
@@ -36,7 +32,7 @@ contract MockEOFeedManager is IEOFeedManager {
             (uint16 feedId, uint256 rate, uint256 timestamp) =
                 abi.decode(inputs[i].unhashedLeaf, (uint16, uint256, uint256));
 
-            priceFeeds[feedId] = PriceFeed(rate, timestamp, checkpoint.blockNumber);
+            priceFeeds[feedId] = PriceFeed(rate, timestamp, vParams.blockNumber);
         }
     }
 
@@ -44,7 +40,7 @@ contract MockEOFeedManager is IEOFeedManager {
         return priceFeeds[feedId];
     }
 
-    function getLatestPriceFeeds(uint16[] memory feedIds) external view returns (PriceFeed[] memory) {
+    function getLatestPriceFeeds(uint16[] calldata feedIds) external view returns (PriceFeed[] memory) {
         PriceFeed[] memory feeds = new PriceFeed[](feedIds.length);
         for (uint256 i = 0; i < feedIds.length; i++) {
             feeds[i] = priceFeeds[feedIds[i]];
@@ -52,7 +48,7 @@ contract MockEOFeedManager is IEOFeedManager {
         return feeds;
     }
 
-    function whitelistPublishers(address[] memory, bool[] memory) external { }
+    function whitelistPublishers(address[] calldata, bool[] calldata) external { }
 
     function isWhitelistedPublisher(address) external pure returns (bool) {
         return true;

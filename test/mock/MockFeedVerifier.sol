@@ -15,9 +15,7 @@ contract MockFeedVerifier is IEOFeedVerifier {
 
     function verify(
         LeafInput memory input,
-        Checkpoint calldata,
-        uint256[2] calldata,
-        bytes calldata
+        VerificationParams calldata
     )
         external
         pure
@@ -29,9 +27,7 @@ contract MockFeedVerifier is IEOFeedVerifier {
 
     function batchVerify(
         LeafInput[] memory inputs,
-        Checkpoint calldata,
-        uint256[2] calldata,
-        bytes calldata
+        VerificationParams calldata
     )
         external
         pure
@@ -47,10 +43,6 @@ contract MockFeedVerifier is IEOFeedVerifier {
     }
 
     function setFeedManager(address) external pure {
-        return;
-    }
-
-    function setAllowedSenders(address[] calldata, bool) external pure {
         return;
     }
 }

@@ -27,30 +27,22 @@ interface IEOFeedManager {
     /**
      * @notice Update the price for a feed
      * @param input A merkle leaf containing price data and its merkle proof
-     * @param checkpoint Checkpoint data containing eoracle chain metadata and the data merkle root
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
+     * @param vParams Verification parameters
      */
     function updatePriceFeed(
         IEOFeedVerifier.LeafInput calldata input,
-        IEOFeedVerifier.Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
+        IEOFeedVerifier.VerificationParams calldata vParams
     )
         external;
 
     /**
      * @notice Update the price for multiple feeds
      * @param inputs Array of leafs to prove the price feeds
-     * @param checkpoint Checkpoint data
-     * @param signature Aggregated signature of the checkpoint
-     * @param bitmap Bitmap of the validators who signed the checkpoint
+     * @param vParams Verification parameters
      */
     function updatePriceFeeds(
         IEOFeedVerifier.LeafInput[] calldata inputs,
-        IEOFeedVerifier.Checkpoint calldata checkpoint,
-        uint256[2] calldata signature,
-        bytes calldata bitmap
+        IEOFeedVerifier.VerificationParams calldata vParams
     )
         external;
 

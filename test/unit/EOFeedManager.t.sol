@@ -18,7 +18,7 @@ import {
     SymbolReplay
 } from "../../src/interfaces/Errors.sol";
 
-// solhint-disable max-states-count
+//solhint-disable max-states-count
 contract EOFeedManagerTest is Test, Utils {
     EOFeedManager private registry;
     IEOFeedVerifier private verifier;
@@ -136,56 +136,32 @@ contract EOFeedManagerTest is Test, Utils {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            blockNumber: blockNumber,
-            epoch: epochNumber,
-            eventRoot: eventRoot,
-            blockHash: blockHash,
-            blockRound: blockRound
-        });
-        uint256[2] memory signature = [uint256(1), uint256(2)];
-        bytes memory bitmap = bytes("1");
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
         vm.expectRevert(abi.encodeWithSelector(CallerIsNotWhitelisted.selector, address(this)));
-        registry.updatePriceFeed(input, checkpoint, signature, bitmap);
+        registry.updatePriceFeed(input, vParams);
     }
 
     function test_RevertWhen_FeedNotSupported_UpdatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            blockNumber: blockNumber,
-            epoch: epochNumber,
-            eventRoot: eventRoot,
-            blockHash: blockHash,
-            blockRound: blockRound
-        });
-        uint256[2] memory signature = [uint256(1), uint256(2)];
-        bytes memory bitmap = bytes("1");
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
 
         _whitelistPublisher(owner, publisher);
         vm.expectRevert(abi.encodeWithSelector(FeedNotSupported.selector, feedId));
         vm.prank(publisher);
-        registry.updatePriceFeed(input, checkpoint, signature, bitmap);
+        registry.updatePriceFeed(input, vParams);
     }
 
     function test_UpdatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            blockNumber: blockNumber,
-            epoch: epochNumber,
-            eventRoot: eventRoot,
-            blockHash: blockHash,
-            blockRound: blockRound
-        });
-        uint256[2] memory signature = [uint256(1), uint256(2)];
-        bytes memory bitmap = bytes("1");
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
         _whitelistPublisher(owner, publisher);
@@ -193,33 +169,25 @@ contract EOFeedManagerTest is Test, Utils {
         vm.expectEmit(true, false, false, true);
         emit RateUpdated(feedId, rate, timestamp);
         vm.prank(publisher);
-        registry.updatePriceFeed(input, checkpoint, signature, bitmap);
+        registry.updatePriceFeed(input, vParams);
         IEOFeedManager.PriceFeed memory feedAdapter = registry.getLatestPriceFeed(1);
         assertEq(feedAdapter.value, rate);
-        assertEq(feedAdapter.eoracleBlockNumber, checkpoint.blockNumber);
+        assertEq(feedAdapter.eoracleBlockNumber, vParams.blockNumber);
     }
 
     function test_RevertWhen_SymbolReplay_UpdatePriceFeed() public {
         bytes memory ratesData = abi.encode(feedId, rate, timestamp);
         bytes memory unhashedLeaf = abi.encode(1, address(0), address(0), ratesData);
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            blockNumber: blockNumber,
-            epoch: epochNumber,
-            eventRoot: eventRoot,
-            blockHash: blockHash,
-            blockRound: blockRound
-        });
-        uint256[2] memory signature = [uint256(1), uint256(2)];
-        bytes memory bitmap = bytes("1");
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
         IEOFeedVerifier.LeafInput memory input =
             IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf, leafIndex: 1, proof: new bytes32[](0) });
         _whitelistPublisher(owner, publisher);
         _setSupportedFeed(owner, feedId);
         vm.startPrank(publisher);
-        registry.updatePriceFeed(input, checkpoint, signature, bitmap);
+        registry.updatePriceFeed(input, vParams);
         vm.expectRevert(abi.encodeWithSelector(SymbolReplay.selector, feedId));
-        registry.updatePriceFeed(input, checkpoint, signature, bitmap);
+        registry.updatePriceFeed(input, vParams);
     }
 
     function test_UpdatePriceFeeds() public {
@@ -228,15 +196,7 @@ contract EOFeedManagerTest is Test, Utils {
         bytes memory ratesData1 = abi.encode(feedId + 1, rate + 1, timestamp + 1);
         bytes memory unhashedLeaf1 = abi.encode(2, address(0), address(0), ratesData1);
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            blockNumber: blockNumber,
-            epoch: epochNumber,
-            eventRoot: eventRoot,
-            blockHash: blockHash,
-            blockRound: blockRound
-        });
-        uint256[2] memory signature = [uint256(1), uint256(2)];
-        bytes memory bitmap = bytes("1");
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
 
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](2);
         inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf0, leafIndex: 0, proof: new bytes32[](0) });
@@ -246,15 +206,15 @@ contract EOFeedManagerTest is Test, Utils {
         _setSupportedFeed(owner, feedId);
         _setSupportedFeed(owner, feedId + 1);
         vm.prank(publisher);
-        registry.updatePriceFeeds(inputs, checkpoint, signature, bitmap);
+        registry.updatePriceFeeds(inputs, vParams);
         uint16[] memory feedIds = new uint16[](2);
         feedIds[0] = feedId;
         feedIds[1] = feedId + 1;
         IEOFeedManager.PriceFeed[] memory feeds = registry.getLatestPriceFeeds(feedIds);
         assertEq(feeds[0].value, rate);
         assertEq(feeds[1].value, rate + 1);
-        assertEq(feeds[0].eoracleBlockNumber, checkpoint.blockNumber);
-        assertEq(feeds[1].eoracleBlockNumber, checkpoint.blockNumber);
+        assertEq(feeds[0].eoracleBlockNumber, vParams.blockNumber);
+        assertEq(feeds[1].eoracleBlockNumber, vParams.blockNumber);
     }
 
     function test_RevertWhen_NotWhitelisted_UpdatePriceFeeds() public {
@@ -263,16 +223,7 @@ contract EOFeedManagerTest is Test, Utils {
         bytes memory ratesData1 = abi.encode(feedId + 1, rate + 1, timestamp + 1);
         bytes memory unhashedLeaf1 = abi.encode(2, address(0), address(0), ratesData1);
 
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            blockNumber: blockNumber,
-            epoch: epochNumber,
-            eventRoot: eventRoot,
-            blockHash: blockHash,
-            blockRound: blockRound
-        });
-        uint256[2] memory signature = [uint256(1), uint256(2)];
-        bytes memory bitmap = bytes("1");
-
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
         IEOFeedVerifier.LeafInput[] memory inputs = new IEOFeedVerifier.LeafInput[](2);
         inputs[0] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf0, leafIndex: 0, proof: new bytes32[](0) });
         inputs[1] = IEOFeedVerifier.LeafInput({ unhashedLeaf: unhashedLeaf1, leafIndex: 1, proof: new bytes32[](0) });
@@ -281,26 +232,18 @@ contract EOFeedManagerTest is Test, Utils {
         _setSupportedFeed(owner, feedId);
         _setSupportedFeed(owner, feedId + 1);
         vm.expectRevert(abi.encodeWithSelector(CallerIsNotWhitelisted.selector, address(this)));
-        registry.updatePriceFeeds(inputs, checkpoint, signature, bitmap);
+        registry.updatePriceFeeds(inputs, vParams);
     }
 
     function test_RevertWhen_IncorrectInput_UpdatePriceFeeds() public {
-        IEOFeedVerifier.Checkpoint memory checkpoint = IEOFeedVerifier.Checkpoint({
-            blockNumber: 0,
-            epoch: 0,
-            eventRoot: bytes32(0),
-            blockHash: bytes32(0x00),
-            blockRound: 0
-        });
-        uint256[2] memory signature = [uint256(0), uint256(0)];
-        bytes memory bitmap = bytes("1");
+        IEOFeedVerifier.VerificationParams memory vParams = _getDefaultVerificationParams();
 
         _whitelistPublisher(owner, publisher);
         vm.startPrank(publisher);
 
         IEOFeedVerifier.LeafInput[] memory inputs;
         vm.expectRevert(MissingLeafInputs.selector);
-        registry.updatePriceFeeds(inputs, checkpoint, signature, bitmap);
+        registry.updatePriceFeeds(inputs, vParams);
     }
 
     function test_RevertWhen_FeedNotSupported_GetLatestPriceFeed() public {
@@ -324,5 +267,15 @@ contract EOFeedManagerTest is Test, Utils {
         isSupported[0] = true;
         vm.prank(_executer);
         registry.setSupportedFeeds(feedIds, isSupported);
+    }
+
+    function _getDefaultVerificationParams() private pure returns (IEOFeedVerifier.VerificationParams memory) {
+        IEOFeedVerifier.VerificationParams memory vParams;
+        vParams.blockNumber = 1;
+        vParams.eventRoot = bytes32(uint256(1));
+        vParams.apkG2 = [uint256(1), uint256(2), uint256(3), uint256(4)];
+        vParams.signature = [uint256(1), uint256(2)];
+        vParams.nonSignersBitmap = new bytes(1);
+        return vParams;
     }
 }

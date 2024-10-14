@@ -5,7 +5,6 @@
   "eoracleChainId": 42420,
   "targetChainId": 80084,
   "publishers": ["0xCC243bcFf9718d559A434f4124EC257cEd1A0776"],
-  "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
   "supportedFeedIds": [1, 2, 17, 41, 42, 54, 55],
   "supportedFeedsData": [
     {

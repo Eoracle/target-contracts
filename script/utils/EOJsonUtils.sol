@@ -9,7 +9,6 @@ library EOJsonUtils {
     using stdJson for string;
 
     struct Config {
-        address[] allowedSenders;
         uint256 eoracleChainId;
         address proxyAdminOwner;
         address[] publishers;

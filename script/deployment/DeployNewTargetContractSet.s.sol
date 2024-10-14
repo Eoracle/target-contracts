@@ -7,10 +7,7 @@ import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/O
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { FeedVerifierDeployer } from "./base/DeployFeedVerifier.s.sol";
 import { FeedManagerDeployer } from "./base/DeployFeedManager.s.sol";
-import { BN256G2 } from "../../src/common/BN256G2.sol";
-import { BN256G2v1 } from "../../src/common/BN256G2v1.sol";
 import { BLS } from "src/common/BLS.sol";
-import { IBN256G2 } from "src/interfaces/IBN256G2.sol";
 import { IBLS } from "src/interfaces/IBLS.sol";
 import { IEOFeedVerifier } from "src/interfaces/IEOFeedVerifier.sol";
 import { EOJsonUtils } from "script/utils/EOJsonUtils.sol";
@@ -26,7 +23,7 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
 
     function run(address broadcastFrom)
         public
-        returns (address bls, address bn256G2, address feedVerifierProxy, address feedManagerProxy)
+        returns (address bls, address feedVerifierProxy, address feedManagerProxy)
     {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
@@ -40,13 +37,6 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
 
         EOJsonUtils.initOutputConfig();
 
-        if (configStructured.usePrecompiledModexp) {
-            bn256G2 = address(new BN256G2v1());
-        } else {
-            bn256G2 = address(new BN256G2());
-        }
-        EOJsonUtils.OUTPUT_CONFIG.serialize("bn256G2", bn256G2);
-
         bls = address(new BLS());
         EOJsonUtils.OUTPUT_CONFIG.serialize("bls", bls);
 
@@ -54,12 +44,7 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
                                         EOFeedVerifier
         //////////////////////////////////////////////////////////////////////////*/
         feedVerifierProxy = deployFeedVerifier(
-            configStructured.proxyAdminOwner,
-            broadcastFrom,
-            IBLS(bls),
-            IBN256G2(bn256G2),
-            configStructured.eoracleChainId,
-            configStructured.allowedSenders
+            configStructured.proxyAdminOwner, broadcastFrom, IBLS(bls), configStructured.eoracleChainId
         );
         EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifier", feedVerifierProxy);
 

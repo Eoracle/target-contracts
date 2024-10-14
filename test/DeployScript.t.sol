@@ -21,7 +21,6 @@ contract DeployScriptTest is Test {
     SetupCoreContracts public coreContractsSetup;
     DeployFeeds public feedsDeployer;
     address public bls;
-    address public bn256G2;
     address public feedVerifierProxy;
     address public feedManagerProxy;
     address public feedAdapterImplementation;
@@ -41,7 +40,7 @@ contract DeployScriptTest is Test {
         config = EOJsonUtils.getConfig();
         targetContractsOwner = config.readAddress(".targetContractsOwner");
 
-        (bls, bn256G2, feedVerifierProxy, feedManagerProxy) = mainDeployer.run(address(this));
+        (bls, feedVerifierProxy, feedManagerProxy) = mainDeployer.run(address(this));
         (feedAdapterImplementation, adapterProxy) = adapterDeployer.run();
         coreContractsSetup.run(targetContractsOwner);
         feedsDeployer.run(targetContractsOwner);
@@ -53,7 +52,6 @@ contract DeployScriptTest is Test {
         assertEq(EOFeedVerifier(feedVerifierProxy).owner(), targetContractsOwner);
         assertEq(EOFeedVerifier(feedVerifierProxy).eoracleChainId(), eoracleChainId);
         assertEq(address(EOFeedVerifier(feedVerifierProxy).bls()), bls);
-        assertEq(address(EOFeedVerifier(feedVerifierProxy).bn256G2()), bn256G2);
         assertEq(feedVerifierProxy, outputConfig.readAddress(".feedVerifier"));
     }
 
