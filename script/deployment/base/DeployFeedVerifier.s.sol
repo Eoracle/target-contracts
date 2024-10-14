@@ -12,13 +12,12 @@ abstract contract FeedVerifierDeployer is Script {
         address proxyAdmin,
         address owner,
         IBLS bls,
-        uint256 eoracleChainId,
-        address[] memory allowedSenders
+        uint256 eoracleChainId
     )
         internal
         returns (address proxyAddr)
     {
-        bytes memory initData = abi.encodeCall(EOFeedVerifier.initialize, (owner, bls, eoracleChainId, allowedSenders));
+        bytes memory initData = abi.encodeCall(EOFeedVerifier.initialize, (owner, bls, eoracleChainId));
 
         proxyAddr = Upgrades.deployTransparentProxy("EOFeedVerifier.sol", proxyAdmin, initData);
     }
@@ -29,12 +28,11 @@ contract DeployFeedVerifier is FeedVerifierDeployer {
         address proxyAdmin,
         address owner,
         IBLS bls,
-        uint256 eoracleChainId,
-        address[] calldata allowedSenders
+        uint256 eoracleChainId
     )
         external
         returns (address proxyAddr)
     {
-        return deployFeedVerifier(proxyAdmin, owner, bls, eoracleChainId, allowedSenders);
+        return deployFeedVerifier(proxyAdmin, owner, bls, eoracleChainId);
     }
 }

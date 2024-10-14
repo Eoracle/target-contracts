@@ -61,9 +61,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
 
     uint256[2] internal _fullApk;
 
-    /// @dev mapping of allowed senders
-    mapping(address => bool) internal _allowedSenders;
-
     /**
      * @dev Allows only the feed manager to call the function
      */
@@ -80,24 +77,14 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
     /**
      * @param owner Owner of the contract
      * @param eoracleChainId_ Chain ID of the eoracle chain
-     * @param allowedSenders List of allowed senders
      */
-    function initialize(
-        address owner,
-        IBLS bls_,
-        uint256 eoracleChainId_,
-        address[] calldata allowedSenders
-    )
-        external
-        initializer
-    {
+    function initialize(address owner, IBLS bls_, uint256 eoracleChainId_) external initializer {
         if (address(bls_) == address(0) || address(bls_).code.length == 0) {
             revert InvalidAddress();
         }
         _eoracleChainId = eoracleChainId_;
         _bls = bls_;
         _minNumOfValidators = 3;
-        _setAllowedSenders(allowedSenders, true);
         __Ownable_init(owner);
     }
 
@@ -160,13 +147,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         _fullApk = apk;
         _totalVotingPower = totalPower;
         emit ValidatorSetUpdated(_currentValidatorSetLength, _currentValidatorSetHash, _totalVotingPower);
-    }
-
-    /**
-     * @inheritdoc IEOFeedVerifier
-     */
-    function setAllowedSenders(address[] calldata senders, bool allowed) external onlyOwner {
-        _setAllowedSenders(senders, allowed);
     }
 
     /**
@@ -244,14 +224,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         return _feedManager;
     }
 
-    /**
-     * @notice Returns whether the sender is allowed to submit leaves.
-     * @param sender The address of the sender.
-     */
-    function isSenderAllowed(address sender) external view returns (bool) {
-        return _allowedSenders[sender];
-    }
-
     function bls() external view returns (IBLS) {
         return _bls;
     }
@@ -272,12 +244,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         if (vParams.blockNumber > _lastProcessedBlockNumber) {
             _lastProcessedBlockNumber = vParams.blockNumber;
             _lastProcessedEventRoot = vParams.eventRoot;
-        }
-    }
-
-    function _setAllowedSenders(address[] calldata senders, bool allowed) internal {
-        for (uint256 i; i < senders.length; i++) {
-            _allowedSenders[senders[i]] = allowed;
         }
     }
 
@@ -321,7 +287,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
             _bls.hashToPoint(DOMAIN, abi.encode(keccak256(abi.encodePacked(eventRoot, blockNumber))));
         (bool pairingSuccessful, bool signatureIsValid) =
             _bls.verifySignatureAndVeracity(apk, signature, msgHash, apkG2);
-        // (bool pairingSuccessful, bool signatureIsValid) = _bls.verifySignature(signature, apkG2, msgG1);
 
         if (!pairingSuccessful) revert SignaturePairingFailed();
         if (!signatureIsValid) revert SignatureVerificationFailed();
@@ -354,9 +319,6 @@ contract EOFeedVerifier is IEOFeedVerifier, OwnableUpgradeable {
         if (!MerkleProof.verify(input.proof, eventRoot, leaf)) {
             revert InvalidProof();
         }
-
-        // if (!leaf.checkMembership(input.leafIndex, eventRoot, input.proof)) {
-        // }
 
         return input.unhashedLeaf;
     }

@@ -44,11 +44,7 @@ contract DeployNewTargetContractSet is FeedVerifierDeployer, FeedManagerDeployer
                                         EOFeedVerifier
         //////////////////////////////////////////////////////////////////////////*/
         feedVerifierProxy = deployFeedVerifier(
-            configStructured.proxyAdminOwner,
-            broadcastFrom,
-            IBLS(bls),
-            configStructured.eoracleChainId,
-            configStructured.allowedSenders
+            configStructured.proxyAdminOwner, broadcastFrom, IBLS(bls), configStructured.eoracleChainId
         );
         EOJsonUtils.OUTPUT_CONFIG.serialize("feedVerifier", feedVerifierProxy);
 

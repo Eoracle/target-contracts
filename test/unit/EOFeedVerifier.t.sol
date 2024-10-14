@@ -23,19 +23,15 @@ import {
 contract EOFeedVerifierInitialize is UninitializedFeedVerifier {
     function test_RevertWhen_Initialize_InvalidAddress() public {
         IBLS blsNull;
-        address[] memory allowedSenders;
         vm.expectRevert(InvalidAddress.selector);
-        feedVerifier.initialize(address(this), blsNull, eoracleChainId, allowedSenders);
+        feedVerifier.initialize(address(this), blsNull, eoracleChainId);
     }
 
     function test_Initialize() public {
-        address[] memory allowedSenders = new address[](1);
-        allowedSenders[0] = EOCHAIN_SENDER;
-        feedVerifier.initialize(address(this), bls, eoracleChainId, allowedSenders);
+        feedVerifier.initialize(address(this), bls, eoracleChainId);
         assertEq(address(feedVerifier.bls()), address(bls));
         assertEq(feedVerifier.eoracleChainId(), eoracleChainId);
         assertEq(feedVerifier.owner(), address(this));
-        assertEq(feedVerifier.isSenderAllowed(EOCHAIN_SENDER), true);
     }
 
     function test_RevertWhen_Verify_NotInitialized() public {
@@ -192,23 +188,5 @@ contract EOFeedVerifierTest is InitializedFeedVerifier {
     function test_RevertWhen_ValidatorIndexOutOfBounds() public {
         vm.expectRevert(ValidatorIndexOutOfBounds.selector);
         feedVerifier.currentValidatorSet(validatorSet.length);
-    }
-
-    function test_SetAllowedSenders() public {
-        address[] memory allowedSenders = new address[](1);
-        allowedSenders[0] = makeAddr("allowedSender");
-        feedVerifier.setAllowedSenders(allowedSenders, true);
-        assertEq(feedVerifier.isSenderAllowed(allowedSenders[0]), true);
-
-        feedVerifier.setAllowedSenders(allowedSenders, false);
-        assertEq(feedVerifier.isSenderAllowed(allowedSenders[0]), false);
-    }
-
-    function test_RevertWhen_NotOwner_SetAllowedSenders() public {
-        address[] memory allowedSenders = new address[](1);
-        allowedSenders[0] = makeAddr("allowedSender");
-        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, alice));
-        vm.prank(alice);
-        feedVerifier.setAllowedSenders(allowedSenders, true);
     }
 }

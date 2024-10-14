@@ -174,10 +174,8 @@ abstract contract UninitializedFeedVerifier is Test, Utils {
 abstract contract InitializedFeedVerifier is UninitializedFeedVerifier {
     function setUp() public virtual override {
         super.setUp();
-        address[] memory allowedSenders = new address[](1);
-        allowedSenders[0] = EOCHAIN_SENDER;
 
-        feedVerifier.initialize(address(this), bls, eoracleChainId, allowedSenders);
+        feedVerifier.initialize(address(this), bls, eoracleChainId);
         feedVerifier.setNewValidatorSet(validatorSet);
         feedVerifier.setFeedManager(address(this));
     }
