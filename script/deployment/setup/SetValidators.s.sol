@@ -7,7 +7,6 @@ import { stdJson } from "forge-std/Script.sol";
 import { EOJsonUtils } from "../../utils/EOJsonUtils.sol";
 import { EOFeedVerifier } from "../../../src/EOFeedVerifier.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
-import { console } from "forge-std/console.sol";
 
 contract SetValidators is Script {
     using stdJson for string;
@@ -39,9 +38,8 @@ contract SetValidators is Script {
         string memory outputConfig = EOJsonUtils.getOutputConfig();
         feedVerifier = EOFeedVerifier(outputConfig.readAddress(".feedVerifier"));
 
-        address broadcastFrom = vm.addr(vm.envUint("OWNER_PRIVATE_KEY"));
+        uint256 broadcastFrom = vm.envUint("OWNER_PRIVATE_KEY");
         vm.startBroadcast(broadcastFrom);
-        console.log(feedVerifier.owner());
         feedVerifier.setNewValidatorSet(newValidatorSet);
         vm.stopBroadcast();
     }
