@@ -17,18 +17,26 @@ contract DeployFeeds is Script {
     error FeedIsNotSupported(uint16 feedId);
 
     function run() external {
-        run(vm.addr(vm.envUint("OWNER_PRIVATE_KEY")));
+        uint256 pk = vm.envUint("OWNER_PRIVATE_KEY");
+        vm.startBroadcast(pk);
+        execute();
+        vm.stopBroadcast();
     }
 
+    // for testing purposes
     function run(address broadcastFrom) public {
+        vm.startBroadcast(broadcastFrom);
+        execute();
+        vm.stopBroadcast();
+    }
+
+    function execute() public {
         EOJsonUtils.Config memory configStructured = EOJsonUtils.getParsedConfig();
 
         string memory outputConfig = EOJsonUtils.initOutputConfig();
 
         feedManager = EOFeedManager(outputConfig.readAddress(".feedManager"));
         feedRegistryAdapter = EOFeedRegistryAdapter(outputConfig.readAddress(".feedRegistryAdapter"));
-
-        vm.startBroadcast(broadcastFrom);
 
         // Deploy feeds which are not deployed yet
         address feedAdapter;
@@ -65,7 +73,5 @@ contract DeployFeeds is Script {
         }
         string memory outputConfigJson = EOJsonUtils.OUTPUT_CONFIG.serialize("feeds", feedAddressesJson);
         EOJsonUtils.writeConfig(outputConfigJson);
-
-        vm.stopBroadcast();
     }
 }

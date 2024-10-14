@@ -7,12 +7,12 @@ import { stdJson } from "forge-std/Script.sol";
 import { EOJsonUtils } from "../../utils/EOJsonUtils.sol";
 import { EOFeedVerifier } from "../../../src/EOFeedVerifier.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
-import { console } from "forge-std/console.sol";
 
 contract SetValidators is Script {
     using stdJson for string;
 
     EOFeedVerifier public feedVerifier;
+    EOFeedVerifier public rootChainfeedVerifier;
     uint256 public currentForkId;
 
     function run() public {
@@ -23,13 +23,12 @@ contract SetValidators is Script {
     function _readValidatorsFromRootChain() internal returns (IEOFeedVerifier.Validator[] memory validators) {
         // switch to the root chain to read the current validator set
         currentForkId = vm.createSelectFork(vm.envString("ROOT_RPC_URL"));
-        string memory outputConfig = EOJsonUtils.getOutputConfig();
-        feedVerifier = EOFeedVerifier(outputConfig.readAddress(".feedVerifier"));
+        rootChainfeedVerifier = EOFeedVerifier(vm.envAddress("ROOT_VERIFIER_ADDRESS"));
 
-        uint256 validatorsLength = feedVerifier.currentValidatorSetLength();
+        uint256 validatorsLength = rootChainfeedVerifier.currentValidatorSetLength();
         validators = new IEOFeedVerifier.Validator[](validatorsLength);
         for (uint256 i = 0; i < validatorsLength; i++) {
-            validators[i] = feedVerifier.currentValidatorSet(i);
+            validators[i] = rootChainfeedVerifier.currentValidatorSet(i);
         }
     }
 
@@ -39,9 +38,8 @@ contract SetValidators is Script {
         string memory outputConfig = EOJsonUtils.getOutputConfig();
         feedVerifier = EOFeedVerifier(outputConfig.readAddress(".feedVerifier"));
 
-        address broadcastFrom = vm.addr(vm.envUint("OWNER_PRIVATE_KEY"));
+        uint256 broadcastFrom = vm.envUint("OWNER_PRIVATE_KEY");
         vm.startBroadcast(broadcastFrom);
-        console.log(feedVerifier.owner());
         feedVerifier.setNewValidatorSet(newValidatorSet);
         vm.stopBroadcast();
     }
