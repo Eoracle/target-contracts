@@ -34,6 +34,8 @@
     "clean": "rm -rf cache out",
     "build": "forge build",
     "deploy": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployNewTargetContractSet.s.sol:DeployNewTargetContractSet --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY  --legacy --slow --gas-estimate-multiplier 200",
+    "deploy:zk": "./script/deployment/bash/deploy_all.sh",
+    "deploy:zk:updateFeeds": "./script/deployment/bash/update_feeds.sh",
     "deploy:all": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployAll.s.sol:DeployAll --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY  --legacy --slow --gas-estimate-multiplier 200",
     "deploy:verified": "source .env && forge clean && FOUNDRY_PROFILE=\"full_test\" forge script script/deployment/DeployNewTargetContractSet.s.sol:DeployNewTargetContractSet --rpc-url $RPC_URL --broadcast --private-key $PRIVATE_KEY  --legacy --slow --gas-estimate-multiplier 200 --verify --verifier $VERIFIER_TYPE --etherscan-api-key $VERIFY_API_KEY --verifier-url $VERIFIER_URL",
     "deploy:setup": "source .env && forge clean && forge script script/deployment/setup/SetupCoreContracts.s.sol:SetupCoreContracts --rpc-url $RPC_URL --broadcast --private-key $OWNER_PRIVATE_KEY  --legacy --slow --gas-estimate-multiplier 200",

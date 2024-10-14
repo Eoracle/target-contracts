@@ -2,14 +2,14 @@
   "usePrecompiledModexp": true,
   "proxyAdminOwner": "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34",
   "targetContractsOwner": "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34",
-  "eoracleChainId": 42420,
+  "eoracleChainId": 42421,
   "targetChainId": 17000,
-  "publishers": ["0x077758247f36a5ec1d11b0A583f717eeD66578bf", "0x59cAE195Ad704Ae629a9F263EB5C978A2543dC34"],
-  "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
+  "publishers": ["0x4C6447EE26e87739D8CC5f906c23db8150E46b68"],
+  "allowedSenders": ["0x6B0BE2aaD42612803c9Fc389A3806EF21E8cbDb6"],
   "supportedFeedIds": [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
     32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-    61, 62, 63, 64, 65, 66, 67
+    61, 62, 63, 64, 65, 66, 67, 70, 71, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83
   ],
   "supportedFeedsData": [
     {
@@ -479,7 +479,77 @@
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 67,
       "decimals": 18,
-      "description": "FTM/ETH"
+      "description": "FTM/USD"
+    },
+    {
+      "base": "0x8581cc815e40615998f4561f3e24e68066293595",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "MANTA/USD",
+      "feedId": 70
+    },
+    {
+      "base": "0xB50721BCf8d664c30412Cfbc6cf7a15145234ad1",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "ARB/USD",
+      "feedId": 71
+    },
+    {
+      "base": "0x84716914C0FDF7110A44030D04D0C4923504D9CC",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "BTCT/USD",
+      "feedId": 73
+    },
+    {
+      "base": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "pufETH/USD",
+      "feedId": 75
+    },
+    {
+      "base": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "STONE/USD",
+      "feedId": 76
+    },
+    {
+      "base": "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "SolvBTC/USD",
+      "feedId": 77
+    },
+    {
+      "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "M-BTC/USD",
+      "feedId": 79
+    },
+    {
+      "base": "0xf5e11df1ebcf78b6b6d26e04ff19cd786a1e81dc",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "BBTC/USD",
+      "feedId": 80
+    },
+    {
+      "base": "0x77776b40c3d75cb07ce54dea4b2fd1d07f865222",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "BBUSD/USD",
+      "feedId": 81
+    },
+    {
+      "base": "0xDa4AaEd3A53962c83B35697Cd138cc6df43aF71f",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "decimals": 18,
+      "description": "WBTC/USD",
+      "feedId": 83
     }
   ]
 }

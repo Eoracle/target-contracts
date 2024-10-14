@@ -12,6 +12,7 @@ contract SetValidators is Script {
     using stdJson for string;
 
     EOFeedVerifier public feedVerifier;
+    EOFeedVerifier public rootChainfeedVerifier;
     uint256 public currentForkId;
 
     function run() public {
@@ -22,13 +23,12 @@ contract SetValidators is Script {
     function _readValidatorsFromRootChain() internal returns (IEOFeedVerifier.Validator[] memory validators) {
         // switch to the root chain to read the current validator set
         currentForkId = vm.createSelectFork(vm.envString("ROOT_RPC_URL"));
-        string memory outputConfig = EOJsonUtils.getOutputConfig();
-        feedVerifier = EOFeedVerifier(outputConfig.readAddress(".feedVerifier"));
+        rootChainfeedVerifier = EOFeedVerifier(vm.envAddress("ROOT_VERIFIER_ADDRESS"));
 
-        uint256 validatorsLength = feedVerifier.currentValidatorSetLength();
+        uint256 validatorsLength = rootChainfeedVerifier.currentValidatorSetLength();
         validators = new IEOFeedVerifier.Validator[](validatorsLength);
         for (uint256 i = 0; i < validatorsLength; i++) {
-            validators[i] = feedVerifier.currentValidatorSet(i);
+            validators[i] = rootChainfeedVerifier.currentValidatorSet(i);
         }
     }
 
