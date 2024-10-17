@@ -10,7 +10,9 @@ on:
 jobs:
   notify_merged_pull_request:
     name: New Target network Slack Notification
-    runs-on: ubuntu-latest
+    runs-on: "k8s-native"
+    container:
+      image: "ubuntu:24.04"
     if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop' }}
     steps:
       - name: Checkout
@@ -20,6 +22,7 @@ jobs:
 
       - name: Check that new expected files where added in this PR
         id: check_files
+        shell: bash
         run: |
           echo "Checking for new files in this PR"
 
