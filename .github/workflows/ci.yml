@@ -49,6 +49,8 @@ jobs:
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v2
@@ -62,6 +64,9 @@ jobs:
 
       - name: "Install the Node.js dependencies"
         run: "npm install"
+
+      - name: "Update Foundry dependencies"
+        run: "forge update"
 
       - name: "Build the contracts and print their size"
         run: "forge build --sizes"
@@ -119,6 +124,8 @@ jobs:
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v2
