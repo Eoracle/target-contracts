@@ -6,9 +6,12 @@ on:
 
 jobs:
   enforce_pr_name:
-    runs-on: ubuntu-latest
+    runs-on: "k8s-native"
+    container:
+      image: "ubuntu:24.04"
     steps:
       - name: Enforce PR name
+        shell: bash
         run: |
           pr_title="${{ github.event.pull_request.title }}"
           echo "Pull Request Title: $pr_title"

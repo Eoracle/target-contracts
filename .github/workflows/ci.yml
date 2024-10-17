@@ -14,7 +14,9 @@ on:
 
 jobs:
   lint:
-    runs-on: "ubuntu-latest"
+    runs-on: "k8s-native"
+    container:
+      image: "node:22-bullseye"
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
@@ -41,10 +43,14 @@ jobs:
           echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: "k8s-native"
+    container:
+      image: "node:22-bullseye"
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v2
@@ -58,6 +64,13 @@ jobs:
 
       - name: "Install the Node.js dependencies"
         run: "npm install"
+
+      - name: "Configure Git"
+        run: |
+          git config --global --add safe.directory /__w/target-contracts/target-contracts
+
+      - name: "Update Foundry dependencies"
+        run: "forge update"
 
       - name: "Build the contracts and print their size"
         run: "forge build --sizes"
@@ -69,10 +82,14 @@ jobs:
 
   test:
     needs: ["lint", "build"]
-    runs-on: "ubuntu-latest"
+    runs-on: "k8s-native"
+    container:
+      image: "node:22-bullseye"
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v2
@@ -86,6 +103,13 @@ jobs:
 
       - name: "Install the Node.js dependencies"
         run: "npm install"
+
+      - name: "Configure Git"
+        run: |
+          git config --global --add safe.directory /__w/target-contracts/target-contracts
+
+      - name: "Update Foundry dependencies"
+        run: "forge update"
 
       - name: "Show the Foundry config"
         run: "forge config"
@@ -105,7 +129,7 @@ jobs:
           echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
   slither-analyze:
-    runs-on: "ubuntu-latest"
+    runs-on: "k8s-dind"
     permissions:
       actions: "read"
       contents: "read"
@@ -113,6 +137,8 @@ jobs:
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v2
