@@ -111,7 +111,7 @@ jobs:
           echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
   slither-analyze:
-    runs-on: "k8s-native"
+    runs-on: "k8s-dind"
     permissions:
       actions: "read"
       contents: "read"
