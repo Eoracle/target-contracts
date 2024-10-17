@@ -88,6 +88,8 @@ jobs:
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v4"
+        with:
+          submodules: "recursive"
 
       - name: "Setup Node.js"
         uses: actions/setup-node@v2
@@ -101,6 +103,13 @@ jobs:
 
       - name: "Install the Node.js dependencies"
         run: "npm install"
+
+      - name: "Configure Git"
+        run: |
+          git config --global --add safe.directory /__w/target-contracts/target-contracts
+
+      - name: "Update Foundry dependencies"
+        run: "forge update"
 
       - name: "Show the Foundry config"
         run: "forge config"
