@@ -112,8 +112,6 @@ jobs:
 
   slither-analyze:
     runs-on: "k8s-native"
-    container:
-      image: "node:22-bullseye"
     permissions:
       actions: "read"
       contents: "read"
