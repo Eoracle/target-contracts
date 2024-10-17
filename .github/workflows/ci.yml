@@ -65,6 +65,10 @@ jobs:
       - name: "Install the Node.js dependencies"
         run: "npm install"
 
+      - name: "Configure Git"
+        run: |
+          git config --global --add safe.directory /__w/target-contracts/target-contracts
+
       - name: "Update Foundry dependencies"
         run: "forge update"
 
