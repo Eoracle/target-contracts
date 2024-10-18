@@ -7,10 +7,13 @@ on:
 
 jobs:
   enforce_branch_name:
-    runs-on: ubuntu-latest
+    runs-on: "k8s-native"
+    container:
+      image: "ubuntu:24.04"
 
     steps:
       - name: Check Branch Name
+        shell: bash
         run: |
           regular_branch_pattern='^DEV-([0-9]{3,}|nojira).*$'
           hotfix_branch_pattern='^HF-.*$'
