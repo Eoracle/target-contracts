@@ -6,7 +6,7 @@
   "targetChainId": 59144,
   "publishers": ["0x61860cb3f16c4C9A018e04211dDf32E5BD5C328d"],
   "allowedSenders": ["0x4E70004b01987B4fd7DAcab348F0B39E9AE26110"],
-  "supportedFeedIds": [2, 35, 36, 54, 67, 76, 77, 79, 80, 81, 83, 88, 89, 90, 91, 92],
+  "supportedFeedIds": [2, 35, 36, 54, 67, 76, 77, 79, 80, 81, 83, 88, 89, 90, 91, 92, 93, 94],
   "supportedFeedsData": [
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
@@ -119,6 +119,20 @@
       "feedId": 92,
       "decimals": 18,
       "description": "wstETH/USD"
+    },
+    {
+      "base": "0x96155858A02c410c3C814BB32Fdc413b3241b62E",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 93,
+      "decimals": 18,
+      "description": "SolvBTCb/USD"
+    },
+    {
+      "base": "0x5FFcE65A40f6d3de5332766ffF6A28BF491C868c",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 94,
+      "decimals": 18,
+      "description": "SolvBTCm/USD"
     }
   ]
 }
