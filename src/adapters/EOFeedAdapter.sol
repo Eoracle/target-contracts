@@ -38,7 +38,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      * @notice Initialize the contract
      * @param feedManager The feed manager address
      * @param feedId Feed id
-     * @param inputDecimals The decimals of the rate
+     * @param inputDecimals The input decimal precision of the rate
      * @param outputDecimals The decimals of the rate
      * @param feedDescription The description of feed
      * @param feedVersion The version of feed
