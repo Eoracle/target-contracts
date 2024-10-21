@@ -64,6 +64,7 @@ contract DeployFeeds is Script {
                         feedId,
                         configStructured.supportedFeedsData[i].description,
                         uint8(configStructured.supportedFeedsData[i].decimals),
+                        uint8(configStructured.supportedFeedsData[i].decimals),
                         1
                     )
                 );

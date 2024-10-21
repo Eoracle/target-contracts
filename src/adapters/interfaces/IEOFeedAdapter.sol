@@ -11,7 +11,8 @@ interface IEOFeedAdapter {
     function initialize(
         address feedManager,
         uint16 feedId,
-        uint8 feedDecimals,
+        uint8 inputDecimals,
+        uint8 outputDecimals,
         string memory feedDescription,
         uint256 feedVersion
     )

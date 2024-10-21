@@ -5,7 +5,7 @@ import { IEOFeedManager } from "../interfaces/IEOFeedManager.sol";
 import { IEOFeedAdapter } from "./interfaces/IEOFeedAdapter.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import { InvalidAddress } from "../interfaces/Errors.sol";
+import { InvalidAddress, InvalidDecimals } from "../interfaces/Errors.sol";
 
 /**
  * @title EOFeedAdapter
@@ -26,7 +26,8 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     uint16 private _feedId;
 
     /// @dev Decimals of the rate
-    uint8 private _decimals;
+    uint8 private _inputDecimals;
+    uint8 private _outputDecimals;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -37,14 +38,16 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      * @notice Initialize the contract
      * @param feedManager The feed manager address
      * @param feedId Feed id
-     * @param feedDecimals The decimals of the rate
+     * @param inputDecimals The decimals of the rate
+     * @param outputDecimals The decimals of the rate
      * @param feedDescription The description of feed
      * @param feedVersion The version of feed
      */
     function initialize(
         address feedManager,
         uint16 feedId,
-        uint8 feedDecimals,
+        uint8 inputDecimals,
+        uint8 outputDecimals,
         string memory feedDescription,
         uint256 feedVersion
     )
@@ -52,9 +55,12 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         initializer
     {
         if (feedManager == address(0)) revert InvalidAddress();
+        if (inputDecimals == 0 || inputDecimals > 18) revert InvalidDecimals();
+        if (outputDecimals == 0 || outputDecimals > 18) revert InvalidDecimals();
         _feedManager = IEOFeedManager(feedManager);
         _feedId = feedId;
-        _decimals = feedDecimals;
+        _inputDecimals = inputDecimals;
+        _outputDecimals = outputDecimals;
         _description = feedDescription;
         _version = feedVersion;
     }
@@ -91,7 +97,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return (
             uint80(priceData.eoracleBlockNumber),
-            int256(priceData.value),
+            _normalizePrice(priceData.value),
             priceData.timestamp,
             priceData.timestamp,
             uint80(priceData.eoracleBlockNumber)
@@ -104,7 +110,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      */
     function latestAnswer() external view returns (int256) {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
-        return int256(priceData.value);
+        return _normalizePrice(priceData.value);
     }
 
     /**
@@ -123,7 +129,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      */
     function getAnswer(uint256) external view returns (int256) {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
-        return int256(priceData.value);
+        return _normalizePrice(priceData.value);
     }
 
     /**
@@ -149,7 +155,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      * @return uint8 The decimals
      */
     function decimals() external view returns (uint8) {
-        return _decimals;
+        return _outputDecimals;
     }
 
     /**
@@ -175,6 +181,14 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     function latestRound() external view returns (uint256) {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return priceData.eoracleBlockNumber;
+    }
+
+    function _normalizePrice(uint256 price) internal view returns (int256) {
+        if (_inputDecimals >= _outputDecimals) {
+            return int256(price / (10 ** (_inputDecimals - _outputDecimals)));
+        } else {
+            return int256(price * (10 ** (_outputDecimals - _inputDecimals)));
+        }
     }
 
     // slither-disable-next-line unused-state,naming-convention
