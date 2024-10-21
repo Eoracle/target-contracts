@@ -94,7 +94,7 @@ contract DeployScriptTest is Test {
             assertEq(address(feedAdapter), address(feedByAddresses));
             assertEq(feedAdapter.getFeedId(), feedId);
             assertEq(feedAdapter.description(), configStructured.supportedFeedsData[i].description);
-            assertEq(feedAdapter.decimals(), uint8(configStructured.supportedFeedsData[i].decimals));
+            assertEq(feedAdapter.decimals(), uint8(configStructured.supportedFeedsData[i].outputDecimals));
             assertEq(feedAdapter.version(), 1);
         }
     }

@@ -22,9 +22,10 @@ library EOJsonUtils {
 
     struct FeedData {
         address base;
-        uint256 decimals;
         string description;
         uint256 feedId;
+        uint256 inputDecimals;
+        uint256 outputDecimals;
         address quote;
     }
 
