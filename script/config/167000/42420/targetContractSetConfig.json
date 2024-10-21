@@ -12,95 +12,83 @@
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 1,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "BTC/USD"
     },
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 2,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "ETH/USD"
     },
     {
       "base": "0xd4094e4ffa89985583E52D491251619a4C5b0BE9",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 6,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "SOL/USD"
     },
     {
       "base": "0x7D800a2559b7e3A9b50a1865Ac45C22D168Ce900",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 11,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "XAU/USD"
     },
     {
       "base": "0x00000000000000000000000000000000000003d2",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 13,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "EUR/USD"
     },
     {
       "base": "0x0000000000000000000000000000000000000024",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 14,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "AUD/USD"
     },
     {
       "base": "0x000000000000000000000000000000000000033A",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 16,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "GBP/USD"
     },
     {
       "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 17,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "USDT/USD"
     },
     {
       "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 18,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "LINK/USD"
     },
     {
       "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
       "quote": "0x853d955acef822db058eb8505911ed77f175b99e",
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "sFRAX/FRAX",
       "feedId": 41
     },
     {
       "base": "0xac3e018457b222d93114458476f3e3416abbe38f",
       "quote": "0xcf7ecee185f19e2e970a301ee37f93536ed66179",
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "sfrxETH/frxETH",
       "feedId": 42
     },
     {
       "base": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
       "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "stETH/ETH",
       "feedId": 43
     },
@@ -108,31 +96,27 @@
       "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 54,
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "USDC/USD"
     },
     {
       "base": "0x09db87A538BD693E9d08544577d5cCfAA6373A48",
       "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "ynETH/ETH",
       "feedId": 59
     },
     {
       "base": "0xBBbbCA6A901c926F240b89EacB641d8Aec7AEafD",
       "quote": "0x0000000000000000000000000000000000000348",
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "LRC/USD",
       "feedId": 68
     },
     {
       "base": "0x10dea67478c5F8C5E2D90e5E9B26dBe60c54d800",
       "quote": "0x0000000000000000000000000000000000000348",
-      "inputDecimals": 18,
-      "outputDecimals": 18,
+      "decimals": 18,
       "description": "TAIKO/USD",
       "feedId": 69
     }

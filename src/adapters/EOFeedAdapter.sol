@@ -26,7 +26,8 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     uint16 private _feedId;
 
     /// @dev Decimals of the rate
-    uint8 private _decimals;
+    uint8 private _inputDecimals;
+    uint8 private _outputDecimals;
     int256 private _decimalsDivisor;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -59,12 +60,10 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         if (outputDecimals == 0 || outputDecimals > 18) revert InvalidDecimals();
         _feedManager = IEOFeedManager(feedManager);
         _feedId = feedId;
-        _decimals = outputDecimals;
-        if (inputDecimals >= outputDecimals) {
-            _decimalsDivisor = int256(10 ** (inputDecimals - outputDecimals));
-        } else {
-            _decimalsDivisor = -int256(10 ** (outputDecimals - inputDecimals));
-        }
+        _outputDecimals = outputDecimals;
+        _inputDecimals = inputDecimals;
+        uint256 diff = inputDecimals > outputDecimals ? inputDecimals - outputDecimals : outputDecimals - inputDecimals;
+        _decimalsDivisor = int256(10 ** diff);
         _description = feedDescription;
         _version = feedVersion;
     }
@@ -159,7 +158,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      * @return uint8 The decimals
      */
     function decimals() external view returns (uint8) {
-        return _decimals;
+        return _outputDecimals;
     }
 
     /**
@@ -188,10 +187,10 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     }
 
     function _normalizePrice(uint256 price) internal view returns (int256) {
-        if (_decimalsDivisor > 0) {
+        if (_inputDecimals > _outputDecimals) {
             return int256(price) / _decimalsDivisor;
         } else {
-            return -int256(price) * _decimalsDivisor;
+            return int256(price) * _decimalsDivisor;
         }
     }
 
