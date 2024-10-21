@@ -13,541 +13,98 @@
   ],
   "supportedFeedsData": [
     {
-      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
-      "description": "BTC/USD",
-      "feedId": 1
-    },
-    {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "ETH/USD",
       "feedId": 2
-    },
-    {
-      "base": "0xa3FCD2041abc7fd3ac76aF9DEfCe42ea241b2a5f",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 3,
-      "decimals": 18,
-      "description": "XRP/USD"
-    },
-    {
-      "base": "0xadADADadAdADAdadADADADadadADAdAdadaDAdAD",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 4,
-      "decimals": 18,
-      "description": "ADA/USD"
-    },
-    {
-      "base": "0xDDdDddDdDdddDDddDDddDDDDdDdDDdDDdDDDDDDd",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
-      "description": "DOGE/USD",
-      "feedId": 5
-    },
-    {
-      "base": "0xd4094e4ffa89985583E52D491251619a4C5b0BE9",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 6,
-      "decimals": 18,
-      "description": "SOL/USD"
-    },
-    {
-      "base": "0x50327c6c5a14DCaDE707ABad2E27eB517df87AB5",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 7,
-      "decimals": 18,
-      "description": "TRX/USD"
-    },
-    {
-      "base": "0xE4A74E85E85957B0A7A52D9c566C0a3C8d6133d0",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 8,
-      "decimals": 18,
-      "description": "DOT/USD"
-    },
-    {
-      "base": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 9,
-      "decimals": 18,
-      "description": "MATIC/USD"
-    },
-    {
-      "base": "0x2793E9D561c2235A0bcfAaA496b3e98f57eCA249",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 10,
-      "decimals": 18,
-      "description": "LTC/USD"
-    },
-    {
-      "base": "0x7D800a2559b7e3A9b50a1865Ac45C22D168Ce900",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 11,
-      "decimals": 18,
-      "description": "XAU/USD"
-    },
-    {
-      "base": "0x8cF4C1D3d5EBaFBEC6ed782A10b4D71762c2Acb3",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 12,
-      "decimals": 18,
-      "description": "XAG/USD"
-    },
-    {
-      "base": "0x00000000000000000000000000000000000003d2",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
-      "description": "EUR/USD",
-      "feedId": 13
-    },
-    {
-      "base": "0x0000000000000000000000000000000000000024",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 14,
-      "decimals": 18,
-      "description": "AUD/USD"
-    },
-    {
-      "base": "0x0000000000000000000000000000000000000188",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 15,
-      "decimals": 18,
-      "description": "JPY/USD"
-    },
-    {
-      "base": "0x000000000000000000000000000000000000033A",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 16,
-      "decimals": 18,
-      "description": "GBP/USD"
     },
     {
       "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 17,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "USDT/USD"
-    },
-    {
-      "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 18,
-      "decimals": 18,
-      "description": "LINK/USD"
-    },
-    {
-      "base": "0x582d872A1B094FC48F5DE31D3B73F2D9bE47def1",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 19,
-      "decimals": 18,
-      "description": "TON/USD"
-    },
-    {
-      "base": "0xF8ca0D1a85B62ad87D7dbD440494CAC05B7309F1",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 20,
-      "decimals": 18,
-      "description": "ICP/USD"
-    },
-    {
-      "base": "0x95aD61b0a150d79219dCF64E1E6Cc01f0B64C4cE",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 21,
-      "decimals": 18,
-      "description": "SHIB/USD"
-    },
-    {
-      "base": "0x7540EF9ea0Ff4f8adb9d7dbD7f6C26EFb3F696aB",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 22,
-      "decimals": 18,
-      "description": "BCH/USD"
-    },
-    {
-      "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 23,
-      "decimals": 18,
-      "description": "UNI/USD"
-    },
-    {
-      "base": "0xad2c4d032800AfeEbC71119928BDf1505EcA31B0",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 24,
-      "decimals": 18,
-      "description": "EOS/USD"
-    },
-    {
-      "base": "0x3c935fc39419a40E0244c47D5F613a5b703BF6c2",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 25,
-      "decimals": 18,
-      "description": "ATOM/USD"
-    },
-    {
-      "base": "0x2AF5D2aD76741191D15Dfe7bF6aC92d4Bd912Ca3",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 26,
-      "decimals": 18,
-      "description": "LEO/USD"
-    },
-    {
-      "base": "0x876F5868355879efD89A87f2a6D06BB0b228b3a3",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 27,
-      "decimals": 18,
-      "description": "OP/USD"
-    },
-    {
-      "base": "0xEaF1557dc24F862709890F3Be1683794DDD487E9",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 28,
-      "decimals": 18,
-      "description": "NEAR/USD"
-    },
-    {
-      "base": "0x126f3AE16F30C8A98e5319C31dac3D5355dA1772",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 29,
-      "decimals": 18,
-      "description": "APT/USD"
-    },
-    {
-      "base": "0x89bEB026A4A9A5a80906Ad56A318911E045FC4Af",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 30,
-      "decimals": 18,
-      "description": "NEO/USD"
-    },
-    {
-      "base": "0x6d681E3E45aAeBfC6131e887B55f28b179BB2f37",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 31,
-      "decimals": 18,
-      "description": "STX/USD"
-    },
-    {
-      "base": "0xaB2DB0E7b4EEC02d491777c3381b61A8Fc0308aA",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 32,
-      "decimals": 18,
-      "description": "KAS/USD"
-    },
-    {
-      "base": "0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 33,
-      "decimals": 18,
-      "description": "LDO/USD"
-    },
-    {
-      "base": "0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 34,
-      "decimals": 18,
-      "description": "FIL/USD"
-    },
-    {
-      "base": "0xd6fAA45f5180A36CE1925ba9b4C9683CCaA3D117",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 35,
-      "decimals": 18,
-      "description": "BNB/USD"
-    },
-    {
-      "base": "0xDB9f97165657aeE56ce412966FD68b8715b04815",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 36,
-      "decimals": 18,
-      "description": "AVAX/USD"
-    },
-    {
-      "base": "0x000000000000000000000000000000000000007C",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 37,
-      "decimals": 18,
-      "description": "CAD/USD"
-    },
-    {
-      "base": "0x0000000000000000000000000000000000000164",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 38,
-      "decimals": 18,
-      "description": "INR/USD"
-    },
-    {
-      "base": "0x000000000000000000000000000000000000019A",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 39,
-      "decimals": 18,
-      "description": "KRW/USD"
-    },
-    {
-      "base": "0x00000000000000000000000000000000000003DA",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 40,
-      "decimals": 18,
-      "description": "BRL/USD"
-    },
-    {
-      "base": "0xa663b02cf0a4b149d2ad41910cb81e23e1c41c32",
-      "quote": "0x853d955acef822db058eb8505911ed77f175b99e",
-      "decimals": 18,
-      "description": "sFRAX/FRAX",
-      "feedId": 41
-    },
-    {
-      "base": "0xac3e018457b222d93114458476f3e3416abbe38f",
-      "quote": "0xcf7ecee185f19e2e970a301ee37f93536ed66179",
-      "decimals": 18,
-      "description": "sfrxETH/frxETH",
-      "feedId": 42
-    },
-    {
-      "base": "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "stETH/ETH",
-      "feedId": 43
-    },
-    {
-      "base": "0xae78736Cd615f374D3085123A210448E74Fc6393",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "rETH/ETH",
-      "feedId": 44
-    },
-    {
-      "base": "0xBe9895146f7AF43049ca1c1AE358B0541Ea49704",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "cbETH/ETH",
-      "feedId": 45
-    },
-    {
-      "base": "0xA35b1B31Ce002FBF2058D22F30f95D405200A15b",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "ETHx/ETH",
-      "feedId": 46
-    },
-    {
-      "base": "0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "ankerETH/ETH",
-      "feedId": 47
-    },
-    {
-      "base": "0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "oETH/ETH",
-      "feedId": 48
-    },
-    {
-      "base": "0xf1C9acDc66974dFB6dEcB12aA385b9cD01190E38",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "osETH/ETH",
-      "feedId": 49
-    },
-    {
-      "base": "0xf951E335afb289353dc249e82926178EaC7DEd78",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "swETH/ETH",
-      "feedId": 50
-    },
-    {
-      "base": "0xa2E3356610840701BDf5611a53974510Ae27E2e1",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "wBETH/ETH",
-      "feedId": 51
-    },
-    {
-      "base": "0x8c1BEd5b9a0928467c9B1341Da1D7BD5e10b6549",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "lsETH/ETH",
-      "feedId": 52
-    },
-    {
-      "base": "0xd5F7838F5C461fefF7FE49ea5ebaF7728bB0ADfa",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "mETH/ETH",
-      "feedId": 53
     },
     {
       "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 54,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "USDC/USD"
-    },
-    {
-      "base": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 55,
-      "decimals": 18,
-      "description": "DAI/USD"
-    },
-    {
-      "base": "0xbf5495Efe5DB9ce00f80364C8B423567e58d2110",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 56,
-      "decimals": 18,
-      "description": "ezETH/ETH"
-    },
-    {
-      "base": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 57,
-      "decimals": 18,
-      "description": "weETH/ETH"
-    },
-    {
-      "base": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 58,
-      "decimals": 18,
-      "description": "pufETH/ETH"
-    },
-    {
-      "base": "0x09db87A538BD693E9d08544577d5cCfAA6373A48",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 59,
-      "decimals": 18,
-      "description": "ynETH/ETH"
-    },
-    {
-      "base": "0xF1376bceF0f78459C0Ed0ba5ddce976F1ddF51F4",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 60,
-      "decimals": 18,
-      "description": "uniETH/ETH"
-    },
-    {
-      "base": "0xFAe103DC9cf190eD75350761e95403b7b8aFa6c0",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 61,
-      "decimals": 18,
-      "description": "rswETH/ETH"
-    },
-    {
-      "base": "0x917ceE801a67f933F2e6b33fC0cD1ED2d5909D88",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 62,
-      "decimals": 18,
-      "description": "weETHs/ETH"
-    },
-    {
-      "base": "0x8DB2350D78aBc13f5673A411D4700BCF87864dDE",
-      "quote": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-      "decimals": 8,
-      "description": "swBTC/BTC",
-      "feedId": 63
-    },
-    {
-      "base": "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "rsETH/ETH",
-      "feedId": 64
-    },
-    {
-      "base": "0x657e8C867D8B37dCC18fA4Caead9C45EB088C642",
-      "quote": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-      "decimals": 8,
-      "description": "eBTC/BTC",
-      "feedId": 65
-    },
-    {
-      "base": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "STONE/ETH",
-      "feedId": 66
-    },
-    {
-      "base": "0x4E15361FD6b4BB609Fa63C81A2be19d873717870",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "feedId": 67,
-      "decimals": 18,
-      "description": "FTM/USD"
     },
     {
       "base": "0x8581cc815e40615998f4561f3e24e68066293595",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "MANTA/USD",
       "feedId": 70
     },
     {
       "base": "0xB50721BCf8d664c30412Cfbc6cf7a15145234ad1",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "ARB/USD",
       "feedId": 71
     },
     {
-      "base": "0x84716914C0FDF7110A44030D04D0C4923504D9CC",
-      "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
-      "description": "BTCT/USD",
-      "feedId": 73
-    },
-    {
       "base": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "pufETH/USD",
       "feedId": 75
     },
     {
       "base": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "STONE/USD",
       "feedId": 76
     },
     {
       "base": "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
-      "description": "SolvBTC/USD",
-      "feedId": 77
+      "feedId": 77,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
+      "description": "SolvBTC/USD"
     },
     {
       "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "M-BTC/USD",
       "feedId": 79
     },
     {
       "base": "0xf5e11df1ebcf78b6b6d26e04ff19cd786a1e81dc",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "BBTC/USD",
       "feedId": 80
     },
     {
       "base": "0x77776b40c3d75cb07ce54dea4b2fd1d07f865222",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "BBUSD/USD",
       "feedId": 81
     },
     {
       "base": "0xDa4AaEd3A53962c83B35697Cd138cc6df43aF71f",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "WBTC/USD",
       "feedId": 83
     },
@@ -555,14 +112,16 @@
       "base": "0x96155858A02c410c3C814BB32Fdc413b3241b62E",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 94,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "SolvBTCb/USD"
     },
     {
       "base": "0x5FFcE65A40f6d3de5332766ffF6A28BF491C868c",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 95,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "SolvBTCm/USD"
     }
   ]
