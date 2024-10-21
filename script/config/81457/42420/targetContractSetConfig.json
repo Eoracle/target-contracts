@@ -12,42 +12,48 @@
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 1,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "BTC/USD"
     },
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 2,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "ETH/USD"
     },
     {
       "base": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 9,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "MATIC/USD"
     },
     {
       "base": "0xd6fAA45f5180A36CE1925ba9b4C9683CCaA3D117",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 35,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "BNB/USD"
     },
     {
       "base": "0xDB9f97165657aeE56ce412966FD68b8715b04815",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 36,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "AVAX/USD"
     },
     {
       "base": "0x4E15361FD6b4BB609Fa63C81A2be19d873717870",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 67,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "FTM/ETH"
     }
   ]
