@@ -39,7 +39,7 @@ contract EoracleConsumerExampleFeedAdapterTest is Test {
 
         vm.prank(_owner);
         IEOFeedAdapter feedAdapter = _feedRegistryAdapter.deployEOFeedAdapter(
-            Denominations.ETH, Denominations.USD, FEED_ID, DESCRIPTION, DECIMALS, VERSION
+            Denominations.ETH, Denominations.USD, FEED_ID, DESCRIPTION, DECIMALS, DECIMALS, VERSION
         );
 
         _consumerExampleFeed = new EoracleConsumerExampleFeedAdapter(address(feedAdapter));

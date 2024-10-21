@@ -30,7 +30,7 @@ contract EOFeedAdapterBeaconTest is EOFeedAdapterTest {
         _feedAdapter = EOFeedAdapter(
             address(
                 feedRegistryAdapter.deployEOFeedAdapter(
-                    _baseAddress, _quoteAddress, FEED_ID, DESCRIPTION, DECIMALS, VERSION
+                    _baseAddress, _quoteAddress, FEED_ID, DESCRIPTION, DECIMALS, DECIMALS, VERSION
                 )
             )
         );

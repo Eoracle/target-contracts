@@ -19,8 +19,8 @@ abstract contract EOFeedAdapterTestUninitialized is Test {
     string public constant DESCRIPTION = "ETH/USD";
     uint256 public constant VERSION = 1;
     uint16 public constant FEED_ID = 1;
-    uint256 public constant RATE1 = 100_000_000;
-    uint256 public constant RATE2 = 200_000_000;
+    uint256 public constant RATE1 = 100_000_000_000_000_000;
+    uint256 public constant RATE2 = 200_000_000_000_000_000;
     address public proxyAdmin = makeAddr("proxyAdmin");
 
     EOFeedAdapter internal _feedAdapter;
@@ -42,7 +42,7 @@ abstract contract EOFeedAdapterTestUninitialized is Test {
 
 contract EOFeedAdapterInitializationTest is EOFeedAdapterTestUninitialized {
     function test_Initialize() public {
-        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DECIMALS, DESCRIPTION, VERSION);
         assertEq(_feedAdapter.getFeedId(), FEED_ID);
         assertEq(_feedAdapter.decimals(), DECIMALS);
         assertEq(_feedAdapter.description(), DESCRIPTION);
@@ -51,14 +51,14 @@ contract EOFeedAdapterInitializationTest is EOFeedAdapterTestUninitialized {
 
     function test_RevertWhen_ZeroAddress_Initialize() public {
         vm.expectRevert(InvalidAddress.selector);
-        _feedAdapter.initialize(address(0), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
+        _feedAdapter.initialize(address(0), FEED_ID, DECIMALS, DECIMALS, DESCRIPTION, VERSION);
     }
 }
 
 contract EOFeedAdapterTest is EOFeedAdapterTestUninitialized {
     function setUp() public virtual override {
         super.setUp();
-        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DESCRIPTION, VERSION);
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, DECIMALS, DESCRIPTION, VERSION);
         _updatePriceFeed(FEED_ID, RATE1, block.timestamp);
     }
 
@@ -84,6 +84,12 @@ contract EOFeedAdapterTest is EOFeedAdapterTestUninitialized {
 
     function test_LatestAnswer() public view {
         assertEq(_feedAdapter.latestAnswer(), int256(RATE1));
+    }
+
+    function test_LatestAnswerWithDecimals() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, uint8(4), DESCRIPTION, VERSION);
+        assertEq(feedAdapter.latestAnswer(), int256(RATE1 / 10 ** (DECIMALS - 4)));
     }
 
     function test_LatestTimestamp() public view {

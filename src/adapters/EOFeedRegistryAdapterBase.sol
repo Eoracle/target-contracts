@@ -68,7 +68,8 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
      * @param quote The quote asset address
      * @param feedId The feed id
      * @param feedDescription The description of feed
-     * @param feedDecimals The decimals
+     * @param inputDecimals The input decimals
+     * @param outputDecimals The output decimals
      * @param feedVersion The version of the feed
      * @return IEOFeedAdapter The feed adapter
      */
@@ -80,7 +81,8 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
         address quote,
         uint16 feedId,
         string calldata feedDescription,
-        uint8 feedDecimals,
+        uint8 inputDecimals,
+        uint8 outputDecimals,
         uint256 feedVersion
     )
         external
@@ -100,7 +102,7 @@ abstract contract EOFeedRegistryAdapterBase is OwnableUpgradeable, EOFeedFactory
         }
         address feedAdapter = _deployEOFeedAdapter();
         IEOFeedAdapter(feedAdapter).initialize(
-            address(_feedManager), feedId, feedDecimals, feedDescription, feedVersion
+            address(_feedManager), feedId, inputDecimals, outputDecimals, feedDescription, feedVersion
         );
 
         _feedEnabled[feedAdapter] = true;
