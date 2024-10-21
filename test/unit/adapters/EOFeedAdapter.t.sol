@@ -7,7 +7,7 @@ import { MockEOFeedManager } from "../../mock/MockEOFeedManager.sol";
 import { IEOFeedManager } from "../../../src/interfaces/IEOFeedManager.sol";
 import { IEOFeedVerifier } from "../../../src/interfaces/IEOFeedVerifier.sol";
 
-import { InvalidAddress } from "../../../src/interfaces/Errors.sol";
+import { InvalidDecimals, InvalidAddress } from "../../../src/interfaces/Errors.sol";
 import { Upgrades } from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import { Options } from "openzeppelin-foundry-upgrades/Options.sol";
 
@@ -52,6 +52,31 @@ contract EOFeedAdapterInitializationTest is EOFeedAdapterTestUninitialized {
     function test_RevertWhen_ZeroAddress_Initialize() public {
         vm.expectRevert(InvalidAddress.selector);
         _feedAdapter.initialize(address(0), FEED_ID, DECIMALS, DECIMALS, DESCRIPTION, VERSION);
+    }
+
+    function test_RevertWhen_InputDecimalsTooLarge_Initialize() public {
+        vm.expectRevert(InvalidDecimals.selector);
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, 19, DECIMALS, DESCRIPTION, VERSION);
+    }
+
+    function test_RevertWhen_InputDecimalsZero_Initialize() public {
+        vm.expectRevert(InvalidDecimals.selector);
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, 0, DECIMALS, DESCRIPTION, VERSION);
+    }
+
+    function test_RevertWhen_OutputDecimalsTooLarge_Initialize() public {
+        vm.expectRevert(InvalidDecimals.selector);
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, 19, DESCRIPTION, VERSION);
+    }
+
+    function test_RevertWhen_OutputDecimalsZero_Initialize() public {
+        vm.expectRevert(InvalidDecimals.selector);
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, DECIMALS, 0, DESCRIPTION, VERSION);
+    }
+
+    function test_ValidDecimals_Initialize() public {
+        _feedAdapter.initialize(address(_feedManager), FEED_ID, 18, 18, DESCRIPTION, VERSION);
+        assertEq(_feedAdapter.decimals(), 18);
     }
 }
 
@@ -181,5 +206,93 @@ contract EOFeedAdapterTest is EOFeedAdapterTestUninitialized {
             [uint256(0), uint256(0)],
             bytes("0")
         );
+    }
+
+    function test_InputDecimalsBiggerThanOutput_LatestRoundData() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 10, 8, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 1_234_567_890, block.timestamp);
+
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feedAdapter.latestRoundData();
+        assertEq(roundId, _lastBlockNumber);
+        assertEq(answer, 12_345_678);
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, _lastBlockNumber);
+    }
+
+    function test_OutputDecimalsBiggerThanInput_LatestRoundData() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 8, 10, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 12_345_678, block.timestamp);
+
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feedAdapter.latestRoundData();
+        assertEq(roundId, _lastBlockNumber);
+        assertEq(answer, 1_234_567_800);
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, _lastBlockNumber);
+    }
+
+    function test_InputDecimalsBiggerThanOutput_GetRoundData() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 10, 8, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 1_234_567_890, block.timestamp);
+
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feedAdapter.getRoundData(1);
+        assertEq(roundId, _lastBlockNumber);
+        assertEq(answer, 12_345_678);
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, _lastBlockNumber);
+    }
+
+    function test_OutputDecimalsBiggerThanInput_GetRoundData() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 8, 10, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 12_345_678, block.timestamp);
+
+        (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
+            feedAdapter.getRoundData(1);
+        assertEq(roundId, _lastBlockNumber);
+        assertEq(answer, 1_234_567_800);
+        assertEq(startedAt, block.timestamp);
+        assertEq(updatedAt, block.timestamp);
+        assertEq(answeredInRound, _lastBlockNumber);
+    }
+
+    function test_InputDecimalsBiggerThanOutput_LatestAnswer() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 10, 8, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 1_234_567_890, block.timestamp);
+
+        assertEq(feedAdapter.latestAnswer(), 12_345_678);
+    }
+
+    function test_OutputDecimalsBiggerThanInput_LatestAnswer() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 8, 10, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 12_345_678, block.timestamp);
+
+        assertEq(feedAdapter.latestAnswer(), 1_234_567_800);
+    }
+
+    function test_InputDecimalsBiggerThanOutput_GetAnswer() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 10, 8, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 1_234_567_890, block.timestamp);
+
+        assertEq(feedAdapter.getAnswer(1), 12_345_678);
+    }
+
+    function test_OutputDecimalsBiggerThanInput_GetAnswer() public {
+        EOFeedAdapter feedAdapter = EOFeedAdapter(Upgrades.deployTransparentProxy("EOFeedAdapter.sol", proxyAdmin, ""));
+        feedAdapter.initialize(address(_feedManager), FEED_ID, 8, 10, DESCRIPTION, VERSION);
+        _updatePriceFeed(FEED_ID, 12_345_678, block.timestamp);
+
+        assertEq(feedAdapter.getAnswer(1), 1_234_567_800);
     }
 }

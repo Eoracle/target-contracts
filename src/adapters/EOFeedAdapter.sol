@@ -26,8 +26,8 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     uint16 private _feedId;
 
     /// @dev Decimals of the rate
-    uint8 private _inputDecimals;
-    uint8 private _outputDecimals;
+    uint8 private _decimals;
+    int256 private _decimalsDivisor;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -59,8 +59,12 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         if (outputDecimals == 0 || outputDecimals > 18) revert InvalidDecimals();
         _feedManager = IEOFeedManager(feedManager);
         _feedId = feedId;
-        _inputDecimals = inputDecimals;
-        _outputDecimals = outputDecimals;
+        _decimals = outputDecimals;
+        if (inputDecimals >= outputDecimals) {
+            _decimalsDivisor = int256(10 ** (inputDecimals - outputDecimals));
+        } else {
+            _decimalsDivisor = -int256(10 ** (outputDecimals - inputDecimals));
+        }
         _description = feedDescription;
         _version = feedVersion;
     }
@@ -78,7 +82,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
         IEOFeedManager.PriceFeed memory priceData = _feedManager.getLatestPriceFeed(_feedId);
         return (
             uint80(priceData.eoracleBlockNumber),
-            int256(priceData.value),
+            _normalizePrice(priceData.value),
             priceData.timestamp,
             priceData.timestamp,
             uint80(priceData.eoracleBlockNumber)
@@ -155,7 +159,7 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
      * @return uint8 The decimals
      */
     function decimals() external view returns (uint8) {
-        return _outputDecimals;
+        return _decimals;
     }
 
     /**
@@ -184,10 +188,10 @@ contract EOFeedAdapter is IEOFeedAdapter, Initializable {
     }
 
     function _normalizePrice(uint256 price) internal view returns (int256) {
-        if (_inputDecimals >= _outputDecimals) {
-            return int256(price / (10 ** (_inputDecimals - _outputDecimals)));
+        if (_decimalsDivisor > 0) {
+            return int256(price) / _decimalsDivisor;
         } else {
-            return int256(price * (10 ** (_outputDecimals - _inputDecimals)));
+            return -int256(price) * _decimalsDivisor;
         }
     }
 
