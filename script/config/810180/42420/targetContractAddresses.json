@@ -5,7 +5,7 @@
   "feedVerifier": "0x92F5FCa9fC1aa9686364767733A3F951c5F27Aff",
   "feedManagerImplementation": "0xe8373615baa7185f76726f90b9d38f31ec24bcba",
   "feedManager": "0xEECECaecf142992c25668c925d6E2eEF3A8C0DCE",
-  "feedAdapterImplementation": "0xE6C8B563415d9f3b9a5Fb7e276f586935826b643",
+  "feedAdapterImplementation": "0x468d60bD510daAD4C9C3c9887e5e84b17b6038e5",
   "feedRegistryAdapterImplementation": "0xBb96dC6c1585C26D168042ca109c17Ab6772D87a",
   "feedRegistryAdapter": "0x4075Cabb1019064847AdB1e92291B1c2BaAa2Cd0",
   "feeds": {
