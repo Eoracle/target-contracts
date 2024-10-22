@@ -27,9 +27,10 @@ for feed in $SUPPORTED_FEEDS_DATA; do
         BASE=$(echo $feed | jq -r '.base')
         QUOTE=$(echo $feed | jq -r '.quote')
         DESCRIPTION=$(echo $feed | jq -r '.description')
-        DECIMALS=$(echo $feed | jq -r '.decimals')
-        call_contract $FEED_REGISTRY_ADAPTER_PROXY "deployEOFeedAdapter(address,address,uint16,string,uint8,uint256)" $OWNER_PRIVATE_KEY \
-            $BASE $QUOTE $FEED_ID $DESCRIPTION $DECIMALS 1
+        INPUT_DECIMALS=$(echo $feed | jq -r '.inputDecimals')
+        OUTPUT_DECIMALS=$(echo $feed | jq -r '.outputDecimals')
+        call_contract $FEED_REGISTRY_ADAPTER_PROXY "deployEOFeedAdapter(address,address,uint16,string,uint8,uint8,uint256)" $OWNER_PRIVATE_KEY \
+            $BASE $QUOTE $FEED_ID $DESCRIPTION $INPUT_DECIMALS $OUTPUT_DECIMALS 1
         NEW_FEED=$(cast call $FEED_REGISTRY_ADAPTER_PROXY "getFeedById(uint16)(address)" $FEED_ID --rpc-url $RPC_URL)
         echo "\"$DESCRIPTION\": \"$NEW_FEED\"," >> $OUTPUT_FILE
     else

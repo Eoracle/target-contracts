@@ -12,111 +12,111 @@
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 1,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "BTC/USD"
     },
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 2,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "ETH/USD"
     },
     {
       "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 17,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "USDT/USD"
     },
     {
       "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 54,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "USDC/USD"
-    },
-    {
-      "base": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "feedId": 58,
-      "decimals": 18,
-      "description": "pufETH/ETH"
-    },
-    {
-      "base": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
-      "quote": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "decimals": 18,
-      "description": "STONE/ETH",
-      "feedId": 66
     },
     {
       "base": "0x8581cc815e40615998f4561f3e24e68066293595",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "MANTA/USD",
       "feedId": 70
     },
     {
       "base": "0xB50721BCf8d664c30412Cfbc6cf7a15145234ad1",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "ARB/USD",
       "feedId": 71
     },
     {
       "base": "0x84716914C0FDF7110A44030D04D0C4923504D9CC",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "BTCT/USD",
       "feedId": 73
     },
     {
       "base": "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "SolvBTC/USD",
       "feedId": 77
     },
     {
       "base": "0xb880fd278198bd590252621d4cd071b1842e9bcd",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "M-BTC/USD",
       "feedId": 79
     },
     {
       "base": "0xf5e11df1ebcf78b6b6d26e04ff19cd786a1e81dc",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "BBTC/USD",
       "feedId": 80
     },
     {
       "base": "0x77776b40c3d75cb07ce54dea4b2fd1d07f865222",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "BBUSD/USD",
       "feedId": 81
     },
     {
       "base": "0xD9A442856C234a39a81a089C06451EBAa4306a72",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "pufETH/USD",
       "feedId": 75
     },
     {
       "base": "0x7122985656e38BDC0302Db86685bb972b145bD3C",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "STONE/USD",
       "feedId": 76
     },
     {
       "base": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "WBTC/USD",
       "feedId": 83
     },
@@ -124,7 +124,8 @@
       "base": "0xbEAf16cFD8eFe0FC97C2a07E349B9411F5dC272C",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 94,
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
       "description": "SolvBTCm/USD"
     }
   ]

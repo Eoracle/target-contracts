@@ -11,14 +11,16 @@
     {
       "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "BTC/USD",
       "feedId": 1
     },
     {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
-      "decimals": 18,
+      "inputDecimals": 18,
+      "outputDecimals": 18,
       "description": "ETH/USD",
       "feedId": 2
     }

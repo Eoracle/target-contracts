@@ -15,6 +15,7 @@ error SymbolReplay(uint16 feedId);
 error CallerIsNotFeedManager();
 error InvalidInput();
 error InvalidProof();
+error InvalidDecimals();
 error InvalidAddress();
 error InvalidEventRoot();
 error VotingPowerIsZero();
