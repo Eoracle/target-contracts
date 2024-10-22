@@ -94,37 +94,37 @@
 | X Layer Testnet                | sFRAX/FRAX                | 0x4CD5EBde6F1509492F919c38E33740D0862afab0 |
 | X Layer Testnet                | sfrxETH/frxETH            | 0xBe639791b56078FECa44AF6bBc9AF1A2C0E02155 |
 | zkLink Nova Mainnet            | BTC/USD                   | 0x8d718854B469F87C708ED00842084e21684E649f |
-| zkLink Nova Mainnet            | BTC/USD (8 decimals)      | 0x                                         |
+| zkLink Nova Mainnet            | BTC/USD (8 decimals)      | 0xEC4e9989e6b8433fbc0b2A1D96CcC37A4c67FAB5 |
 | zkLink Nova Mainnet            | ETH/USD                   | 0xF2c007b7392d05A58A68D9eC22599d6C444Af8a4 |
-| zkLink Nova Mainnet            | ETH/USD (8 decimals)      | 0x84BE4C9EE5441D86cd18334632329B6941d27B21 |
+| zkLink Nova Mainnet            | ETH/USD (8 decimals)      | 0xe28AEbAa3Ec11B0a4a5FaF69ef3e84D985DdE27c |
 | zkLink Nova Mainnet            | USDT/USD                  | 0xEd4cFfD935f97872E790Cadf47aE749df2A014F9 |
-| zkLink Nova Mainnet            | USDT/USD (8 decimals)     | 0xA12777eBC6Aadf54fca4aEBaDa0a215d85A104AE |
+| zkLink Nova Mainnet            | USDT/USD (8 decimals)     | 0x0c4516a820D22e790D495bEB7555c5edb65F1136 |
 | zkLink Nova Mainnet            | USDC/USD                  | 0x7146E6B0538308Daad8E54604F9C60aF80cc102e |
-| zkLink Nova Mainnet            | USDC/USD (8 decimals)     | 0xCb39B5BcDA54D1A3782754b0994CBA2c63a80af9 |
+| zkLink Nova Mainnet            | USDC/USD (8 decimals)     | 0x258b3411bd7EE5cCFc431B6fb2a606febd9df1d0 |
 | zkLink Nova Mainnet            | pufETH/ETH                | 0xC4eCB78d1E29a9E4cCa639D64C5C3Fc75E36D1Eb |
 | zkLink Nova Mainnet            | STONE/ETH                 | 0x0D7DBA084e45fE6777812EA7ffB17f3C0863526C |
 | zkLink Nova Mainnet            | MANTA/USD                 | 0x79624c2B57c312aCBd79b26B531dD9b29A7afBb7 |
-| zkLink Nova Mainnet            | MANTA/USD (8 decimals)    | 0x96d7258FFBE77f556bd7B4C5FDD8fc1132bA25a5 |
+| zkLink Nova Mainnet            | MANTA/USD (8 decimals)    | 0x1603bA93278584778ACb61FD6E1e83A8745eA68d |
 | zkLink Nova Mainnet            | ARB/USD                   | 0x684007a99E9A6FCACc65B42b03746faC36Fe6eB6 |
-| zkLink Nova Mainnet            | ARB/USD (8 decimals)      | 0xFea836e22849cDD93B0b10405e597C45E2dDf660 |
+| zkLink Nova Mainnet            | ARB/USD (8 decimals)      | 0x19d9f02E3E8A74476A27661dedf5f78E499B8dF9 |
 | zkLink Nova Mainnet            | BTCT/USD                  | 0x86EaE512798bA5C6f8B74978Cda821c700993dfC |
-| zkLink Nova Mainnet            | BTCT/USD (8 decimals)     | 0x                                         |
+| zkLink Nova Mainnet            | BTCT/USD (8 decimals)     | 0x7746b87d278Eb295c34C56e6DBFeDDa136F00B41 |
 | zkLink Nova Mainnet            | SolvBTC/USD               | 0xE9eD6ceF4a64823D605bca1B49D727E2c7e058d5 |
-| zkLink Nova Mainnet            | SolvBTC/USD (8 decimals)  | 0x25a963d0b613094A0964e19C48109CDf9F9a4B72 |
+| zkLink Nova Mainnet            | SolvBTC/USD (8 decimals)  | 0x37119C5Afa7A1f3E51919776B3DB3c9831F511Fb |
 | zkLink Nova Mainnet            | M-BTC/USD                 | 0x8efCA6D1020038B8Cbc98ae44Ca79c44A2D17237 |
-| zkLink Nova Mainnet            | M-BTC/USD (8 decimals)    | 0xb4AAc6a878a867908EDBaFA06476a11CBEAe948b |
+| zkLink Nova Mainnet            | M-BTC/USD (8 decimals)    | 0x03Ff1A38ddD6Bad6338723b98b0f38daAdae4298 |
 | zkLink Nova Mainnet            | BBTC/USD                  | 0x830E441E99Bf49F654de2dDB6B7e9df867b83d48 |
-| zkLink Nova Mainnet            | BBTC/USD (8 decimals)     | 0x881c581ECBdedf02443CFD50140348CbF49e9893 |
+| zkLink Nova Mainnet            | BBTC/USD (8 decimals)     | 0x5fAfd80ceF6BFb8eBf9876077f2E6b9532170E4e |
 | zkLink Nova Mainnet            | BBUSD/USD                 | 0xE08c27ca8507f56f324Ed029898Bdb99Dec89b8D |
-| zkLink Nova Mainnet            | BBUSD/USD (8 decimals)    | 0x2430687915616Cd00735a94d6a8F13DEd589796E |
+| zkLink Nova Mainnet            | BBUSD/USD (8 decimals)    | 0x6B60fce1DF3cD674F0ECC07D332cBd784e382ED8 |
 | zkLink Nova Mainnet            | pufETH/USD                | 0x8b54a4642B61c6cD652efEE6e55D0a15C6d0A478 |
-| zkLink Nova Mainnet            | pufETH/USD (8 decimals)   | 0x08b9B44A22D8F986cbf2A435b500Fc3957F2557d |
+| zkLink Nova Mainnet            | pufETH/USD (8 decimals)   | 0x689D165052288297b8240f55059DAec51C3CA0F4 |
 | zkLink Nova Mainnet            | STONE/USD                 | 0x872eEdf3485122B973a8Bd14b007aceF14f2F67c |
-| zkLink Nova Mainnet            | STONE/USD (8 decimals)    | 0x0655542962b8124226c3bc5414407e7cB02E60D6 |
+| zkLink Nova Mainnet            | STONE/USD (8 decimals)    | 0xed4370303dED4b82e9B0F06Fd0BD0344E58c633e |
 | zkLink Nova Mainnet            | WBTC/USD                  | 0xfC9cf84887ef1C737Bf648923e89819077BCFf69 |
-| zkLink Nova Mainnet            | WBTC/USD (8 decimals)     | 0xf6Dff5Ae429FFD83BfC259a7FFEC9a5f9f240697 |
+| zkLink Nova Mainnet            | WBTC/USD (8 decimals)     | 0xC9B6c0d45173C2FF5b87222281D2D9fd9a78CD7f |
 | zkLink Nova Mainnet            | SolvBTCm/USD              | 0x95A9eBa556DdC9501e2e4240Dd99b60d96efeAf9 |
-| zkLink Nova Mainnet            | SolvBTCm/USD (8 decimals) | 0xa13d7Fb2Fd66858e60A4d52f3259622f3cf0A05E |
+| zkLink Nova Mainnet            | SolvBTCm/USD (8 decimals) | 0xd18a24341a82d4Aa5f2e6f554093E2292Cd956C7 |
 | Filecoin - Calibration testnet | AUD/USD                   | 0x6243357B9241Fe9C3BAfbA79DeD3300a855113FA |
 | Filecoin - Calibration testnet | BTC/USD                   | 0x705256d9B37950628F97A1a8De7Ab557345a0A80 |
 | Filecoin - Calibration testnet | ETH/USD                   | 0x2bada837140A310f4A1d9D0e7fab114da6b87031 |
