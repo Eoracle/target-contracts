@@ -9,6 +9,14 @@
   "supportedFeedIds": [1, 2, 17, 54, 58, 66, 70, 71, 73, 75, 76, 77, 79, 80, 81, 83, 94],
   "supportedFeedsData": [
     {
+      "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "feedId": 1,
+      "inputDecimals": 18,
+      "outputDecimals": 8,
+      "description": "BTC/USD"
+    },
+    {
       "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "quote": "0x0000000000000000000000000000000000000348",
       "feedId": 2,
@@ -47,6 +55,14 @@
       "outputDecimals": 8,
       "description": "ARB/USD",
       "feedId": 71
+    },
+    {
+      "base": "0x84716914C0FDF7110A44030D04D0C4923504D9CC",
+      "quote": "0x0000000000000000000000000000000000000348",
+      "inputDecimals": 18,
+      "outputDecimals": 8,
+      "description": "BTCT/USD",
+      "feedId": 73
     },
     {
       "base": "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
